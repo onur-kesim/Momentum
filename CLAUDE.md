@@ -13,7 +13,7 @@ ve kod kalitesi. Kapsam otoritesi **`docs/ODEV.md`**. Canlı demo README'de.
 **İŞ BÖLÜMÜ [Onur, 16 Ağu]:** ürün kodunu **Claude Code** yazar; Cowork tasarım · iş emri · denetim ·
 orkestrasyon · hafıza yapar, **kod yazmaz**.
 
-## 2. BİTTİ LİSTESİ (kutu **2 Eyl 2026** · sayaç DURUM.md ilk satırı · tarihler DURUM'da)
+## 2. BİTTİ LİSTESİ (kutu **9 Eyl 2026** · sayaç DURUM.md ilk satırı · tarihler DURUM'da)
 
 - [x] Görev ekle · başlığını düzenle · tamamla
 - [x] Görevi sil (onay sorarak)
@@ -27,25 +27,19 @@ orkestrasyon · hafıza yapar, **kod yazmaz**.
 - [x] Depo klonlanır, README'deki komutla testler **yeşil** koşar
 - [x] **Hesap aç, giriş yap;** kendi görevlerini gör, başkasınınkini görme — *19 Ağu*
 - [x] Görevleri **listelere** ayır, görevi listeye taşı — *20 Ağu*
-- [ ] **İki kullanıcı bir listeyi paylaşır;** birinin yazdığı ötekinin ekranında belirir — *24-27 Ağu*
-- [ ] Göreve **tekrar** ver; tamamlayınca sonraki örnek doğar — *28-29 Ağu*
-- [ ] Göreve **hatırlatıcı** kur; zamanı gelince bildirim düşer — *30 Ağu-1 Eyl · İLK KESİLECEK*
+- [ ] **İki kullanıcı bir listeyi paylaşır;** birinin yazdığı ötekinin ekranında belirir — *4-6 Eyl*
+- [ ] Göreve **tekrar** ver; tamamlayınca sonraki örnek doğar — *7-9 Eyl · SIRADAKİ KESİLECEK*
 
 *Bu listede yasak: spec/ADR/kapı/mutant/borç. Madde eklemek §5'e kesme yazmadan olmaz.*
 
 ## 3. SIRADAKİ İŞ (tek dikey dilim)
 
-**DİLİM 3 — İŞBİRLİĞİ** (24-27 Ağu, taç mücevher). İki kullanıcı bir listeyi paylaşır; birinin
-yazdığı ötekinin ekranında belirir. Ön koşul ÖLÇÜLDÜ (DURUM sınır 35): scope **yazımı** hazır ama
-`SyncPuller` **owner-only** ⇒ pull'a scope kolu + `Project.members` materyalizasyonu gerekir.
-Ara adım **`IS-EMRI-o85-B`**: `projects` materyalizasyonu + `GET /v1/projects` (vitrin).
-Tasarım şıklarla sunulur → kilit → iş emri.
+**DİLİM 3 — İŞBİRLİĞİ** (4-6 Eyl, taç mücevher). Sunucu ayağı `o86-A` yazıldı, **bağımsız
+denetimde DÜŞTÜ**: iki bulgu + eldeki enjeksiyon deliği **tek sınıf** — yetki/görünürlük kararı
+op'un KENDİ beyanına bakıyor, varlığın mevcut bağlamına değil. Düzeltme **`IS-EMRI-o86-A2`**
+(MOD: KRİTİK; üçünü birden kapatır, `project_access` görünümü). Sonra `o86-B` (istemci + realtime).
 🔴 **ADR/spec YAZILMAZ** (İŞLEYİŞ md.4): kimliği bir kez **altı kâğıt kapı turu öldürdü, 30 gün**
-(ÖDEV §6.1). Sonra tekrar → hatırlatıcı; kutu dolarsa kesme sırası **hatırlatıcı → tekrar**
-[Onur kilidi, 18 Ağu].
-
-**DİLİM 2 — LİSTE BİTTİ** (20 Ağu): `ci #75`·`paket #12`·`pages #13` **üçü de `e9bcb91`** ve
-yeşil. Kanıt `KANIT/o85A`+`o85A2`.
+(ÖDEV §6.1). Hatırlatıcı 4 Eyl'de kesildi; sıradaki kesme **tekrar** [Onur kilidi].
 
 ## 4. ORTAM MAYINLARI (yalnız ÖLÇÜLMÜŞ)
 
@@ -77,6 +71,8 @@ yeşil. Kanıt `KANIT/o85A`+`o85A2`.
 
 - **[18 Ağu GERİ ALINDI]** liste · tekrar · hatırlatıcı · işbirliği · kimlik **§2'ye taşındı**,
   kutu 2 Eyl'e uzadı [Onur kilidi]. `v1.0.1` bunlar kesikken çıktı; yeni teslim `v1.1.0`.
+- **[4 Eyl KESİLDİ] Hatırlatıcı** (bildirim): kutu 2 Eyl'de doldu, İŞLEYİŞ md.1 gereği madde
+  kesildi [Onur kilidi, 4 Eyl]. Kesme sırası kilitliydi: hatırlatıcı → tekrar.
 - **[o85 KESİLDİ] Proje/liste klasörü** (üst kap): yeni entityType + materyalizasyon + registry
   dokunuşu demekti [Onur kilidi, 19 Ağu]. Üründe "Liste" denen kap kodda/telde **`Project`**'tir.
 - **Windows masaüstü hedefi yok** [Onur, 16 Ağu]: `src/client/` yalnız `android`/`ios`/`web` taşır;

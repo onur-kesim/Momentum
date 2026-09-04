@@ -472,6 +472,12 @@ Bu liste **kısaltılmadı, yumuşatılmadı ve teslimden önce temizlenmedi.** 
 
 ## Beyan edilmiş sınırlar
 
+- 🔴 **[o86-A3 ÖLÇÜLDÜ] Görev sahipliği İLK YAZANDA sabittir** (`tasks.owner_id` güncellenmez).
+  Bir üyenin paylaşılan projede yarattığı görevi proje sahibi projeden koparırsa görev **üyenin**
+  Gelen Kutusu'na düşer ve sahip artık ona yazamaz. **Sahiplik devri op'u yoktur** — kapsam dışı.
+- 🔴 **[4 Eyl 2026 KESİLDİ] Hatırlatıcı / bildirim.** Takvim kutusu 2 Eyl'de doldu; `CLAUDE.md`
+  İŞLEYİŞ md.1 gereği süre uzatılmadı, **madde kesildi** (kesme sırası 18 Ağu'da kilitliydi:
+  hatırlatıcı → tekrar). `CLAUDE.md` §5'e de yazıldı.
 - **iOS yalnız CI'da derlenir** — geliştirme makinesinde macOS yok.
 - **Windows masaüstü hedefi yok.**
 - **Gerçek zamanlı sinyal web'de kapalı.** Dev-kimlik kalkanı bir HTTP başlığı istiyor, tarayıcı ise

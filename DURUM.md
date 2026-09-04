@@ -1,10 +1,10 @@
 # DURUM.md — Momentum
 
-**BİTTİ: 12/15 · kutu 2 Eyl 2026 · dilim 2/5 LİSTE BİTTİ · HEAD `e9bcb91`. AŞAMA: boşluk kapatma sürüyor.** Teslim biçimi paketlenmiş build (docker imajı + APK); yeni teslim `v1.1.0`.
+**BİTTİ: 12/14 · kutu 9 Eyl · dilim 3/5 sunucu ayağı KABUL · HEAD `adfcaae`. AŞAMA: push + üç kapı, sonra `o86-B`.** Teslim biçimi paketlenmiş build (docker imajı + APK); yeni teslim `v1.1.0`.
 
 > Açılış ≤3 komut: ① `git --no-optional-locks log --oneline -1` + `status --porcelain -- src`
 > ② bu dosya ③ CI durumu — **cihaz Chrome'undan** (bulut tarayıcısı kanıt değil). `arsiv/` AÇILMAZ.
-> **Flutter `src/client`'tan** (sınır 1). Oturum 74-84 + kapanmışlar: `arsiv/DURUM-arsiv-o85.md`.
+> **Flutter `src/client`'tan** (sınır 1). Oturum 74-86 + kapanmışlar: `arsiv/DURUM-arsiv-o85.md`.
 
 ## Kalıcı dersler (dilimden bağımsız)
 
@@ -18,28 +18,19 @@ doğrulanır, liste satırı yanıltır (o81: `pages #8` = o78 kodu ⇒ canlı d
 🔴 **Pozitif kontrol:** boş liste her iddiayı geçirir — her "görünüyor" iddiasının yanına bir
 "görünmemeli" iddiası konur.
 
-## DİLİM 2 — LİSTE BİTTİ (19-20 Ağu)
+## DİLİM 3 — İŞBİRLİĞİ (sunucu ayağı KABUL EDİLDİ, push bekliyor)
 
-**Kapı beyanı (cihaz Chrome, 20 Ağu 00:00):** `ci #75` · `paket #12` · `pages #13` — **üçü de
-`e9bcb91`** ve yeşil, `?query=is:success` pozitif süzgeciyle ölçüldü. `pages` elle tetiklendi;
-`head_sha=e9bcb91…` + `conclusion=success` **run kaydından** okundu, Pages deploy **Active**.
+**Kilitler [Onur, 20 Ağu]:** üyelik = `Project.members` OrSet → `project_members` · davet e-posta
+ile · rol kademesi YOK · sahip OrSet'e YAZILMAZ; erişim = **`project_access`** (sahip ∪ üye).
 
-**Kilitler [Onur, 19 Ağu]:** Liste = sunucudaki **`Project`** (üründe "Liste", kodda/telde
-`Project`; README'de beyan edildi) · **klasör KESİLDİ** (CLAUDE.md §5) · `listPos`/`order` kanalı
-**AÇILMADI** · `projectId == null` = **Gelen Kutusu** (sanal satır yok) · liste silinince görevler
-Gelen Kutusu'na **düşer**, silinmez.
+**Üç commit** (`86d04f9`·`8855ca8`·`adfcaae`), **push YOK**. İki denetim turu **beş** bulgu çıkardı
+(hepsi sınır 38'in sınıfı), beşi de kapandı; kapı proza değil **doğruluk tablosu**
+(`Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8`, 15 satır, 3 mutant). Canlı tur **14/14** · regresyon
+**6/6** ve **8/8** · `verify` EXIT 0 / **175** test · kanıt `KANIT/o86A*`.
 
-**Sunucu kodu DEĞİŞMEDİ:** `Project` op'ları registry'den geçiyor, hydration entityType-agnostik,
-`SyncPuller` owner filtresiyle indiriyor ⇒ iki cihaz aynı listeyi sunucuya dokunmadan görüyor.
-Kanıt `KANIT/o85A` (canlı iki istemci + çevrimdışı) ve `KANIT/o85A2` (mutant-ispatlı K5 kapısı).
-
-**SIRADAKİ: `IS-EMRI-o85-B`** — sunucu vitrini: `projects` materyalizasyonu + `ProjectProjection` +
-`EntityMaterializer` dalı + `GET /v1/projects`. Ürünü **bloke etmez**.
-Sonra **DİLİM 3 — İŞBİRLİĞİ** (24-27 Ağu, taç mücevher).
-Açık (ayrı karar): `KANIT/o83D/` takipsiz · G20 testi emekli değişmezi sabitliyor ·
-`docker-compose.yml:31` `DEV_USER_ID` ölü.
-
-🔴 **ADR/spec YAZILMAZ** (İŞLEYİŞ md.4): bu dilimi bir kez **altı kâğıt kapı turu öldürdü, 30 gün**.
+**DİLİM 2 — LİSTE BİTTİ** (20 Ağu; kapı beyanları `arsiv/DURUM-arsiv-o85.md`). **Kilitler [Onur,
+19 Ağu]:** Liste = sunucudaki **`Project`** · klasör KESİLDİ · `listPos`/`order` kanalı AÇILMADI ·
+`projectId == null` = **Gelen Kutusu** · liste silinince görevler Gelen Kutusu'na **düşer**.
 
 ## Bilinen sınırlar
 
@@ -89,13 +80,18 @@ Açık (ayrı karar): `KANIT/o83D/` takipsiz · G20 testi emekli değişmezi sab
     `boardPos`) snapshot'ta **`scalars[]`** (`fields:$ad`), artımlıda **`order` haritası**
     (`order:$ad`) gelir — AYNI alan, İKİ `alan` dizgesi ⇒ `UzakAlanDurumu` PK'sinde iki satır.
     Bugün etkisiz; kanal açılınca o84'le AYNI SINIF sessiz-kayıp riski — **İLK ÖLÇÜLECEK yer**.
-34. **[o85-A BEYAN] Liste diliminin canlı ölçümü PROTOKOL SEVİYESİNDEDİR** (`/v1/sync` HTTP,
-    `KANIT/o85A/_canli_tur_o85a*.py`) — **Flutter UI'ı canlı koşturulmadı**; ekran davranışı widget
-    testleriyle ölçüldü. o83-G'nin kimlik ölçümüyle aynı yöntem ve aynı sınır.
-35. 🔴 **[o85 — DİLİM 3'ÜN ÖN KOŞULU] `SyncPuller` OWNER-ONLY:** `PullIncrementalAsync` yalnız
-    `owner_id = @actorId` süzer, `scope_id`'ye **bakmaz**; `ScopeMembershipSource` yazılmış ama
-    **çekmede kullanılmıyor**. Scope yazımı (`scope_id = projectId`, `old_scope_id`) hazır.
-    İşbirliği dilimi = pull'a scope kolu + `Project.members` materyalizasyonu.
-36. **[İŞLEYİŞ md.4 — o85 doğrulama sonucu]** o85-A2'de builder beyanı bağımsız doğrulandı ve
-    **TUTTU**: `gorev_listesi_ekrani.dart` `f54ad06`↔`4800de7` **bayt-özdeş** (test-only iddiası),
-    iki mutant ham çıktıyla düşürüldü. Dilim %100 doğrulamaya DÖNMEDİ.
+34. **[o85-A · o86-A] Dilim 2-3'ün canlı ölçümü PROTOKOL SEVİYESİNDEDİR** (`/v1/sync` HTTP betiği);
+    **Flutter UI canlı koşturulmadı**, ekran widget testleriyle ölçüldü (o83-G ile aynı sınır).
+36. **[İŞLEYİŞ md.4] Builder beyanı örneklemesi TUTTU (iki dilim üst üste):** o85-A2'de test-only
+    iddiası bayt-özdeşlikle; o86-A'da `verify` EXIT 0 / 151 test, `EXPLAIN` indeksi ve istemcinin
+    `zehirli` yolu bağımsız doğrulandı. Hiçbir dilim %100 doğrulamaya DÖNMEDİ.
+37. 🔴 **[o86] `outbox.owner_id` = YAZAN; `projects.owner_id` = PROJE SAHİBİ.** Erişim kümesi
+    `project_access` görünümüdür, ham `project_members` sormak yasak (mimari testi). Snapshot varlık
+    listesi outbox GEÇMİŞİNDEN değil GÜNCEL `tasks`/`projects`ten okunur (geçmiş sızdırır).
+38. 🔴 **[o86 · BEŞ ISIRIK] Yetki/görünürlük op'un KENDİ beyanına bakarsa kaçış doğar:** POST-op
+    scope · `isNewEntity` koşulsuz KABUL · tahmin edilen `projectId` · `owner_id`in sonsuz
+    görünürlüğü · scope'suz görevde sahipliğin sorulmaması. KAYNAK ve HEDEF scope'un ikisi,
+    kapsamsızda `tasks.owner_id` sorulur. "A pull" TAZE snapshot'la ölçülürse YALAN söyler.
+39. **[o86-A3 BEYAN] `tasks.owner_id` ON CONFLICT'ta güncellenmez** (ilk yazan sabit) ⇒ üyenin
+    projede yarattığı görevi sahip koparırsa görev **üyenin** kutusuna düşer ve sahip artık ona
+    yazamaz. Sahiplik devri op'u YOK (kapsam dışı, README'de).
