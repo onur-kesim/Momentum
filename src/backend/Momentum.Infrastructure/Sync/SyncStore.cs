@@ -215,4 +215,15 @@ public sealed class SyncStore(SyncDbContext db) : ISyncStore
         command.Parameters.AddWithValue("a", actorId);
         return (bool)(await command.ExecuteScalarAsync(cancellationToken))!;
     }
+
+    // IS-EMRI-o86-A3 §A: FAIL-CLOSED -- `tasks` satiri yoksa (materyalizasyon boslugu, ornegin
+    // henuz hic Applied olmus bir op'u olmayan bir entityId) EXISTS false doner, yetki ACMAZ.
+    public async Task<bool> IsTaskOwnerAsync(Guid taskId, Guid actorId, CancellationToken cancellationToken)
+    {
+        await using var command = await db.CreateRawCommandAsync(
+            "SELECT EXISTS (SELECT 1 FROM tasks WHERE entity_id = @t AND owner_id = @a)", cancellationToken);
+        command.Parameters.AddWithValue("t", taskId);
+        command.Parameters.AddWithValue("a", actorId);
+        return (bool)(await command.ExecuteScalarAsync(cancellationToken))!;
+    }
 }

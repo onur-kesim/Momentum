@@ -626,4 +626,115 @@ public sealed class D9OwnerIdVisibilityTests(PostgresFixture fixture)
         (await Db.ScalarAsync<string>(connectionString, "SELECT title FROM tasks WHERE entity_id = @e", ("e", task)))
             .ShouldBe("Gelen Kutusu gorevi");
     }
+
+    /// <summary>
+    /// IS-EMRI-o86-A3 §B: sinifi (yetki kararinin (isNew, preScope, postScope) -> karar SAF
+    /// FONKSIYONUNU) MEKANIKLESTIREN doğruluk tablosu -- IŞLEYIŞ md.8. Eksenler:
+    ///   preCase ("isNew" eksenini de tasir, cunku yeni varlikta preScope ANLAMSIZDIR):
+    ///     Yeni                -> varlik hic hidratlanmamis (IZIN_PRE=true, preScope SORULMAZ)
+    ///     PreNullBenim        -> mevcut gorev, Gelen Kutusu'nda, actor GERCEK (materyalize) sahip
+    ///     PreNullBaskasinin   -> mevcut gorev, Gelen Kutusu'nda, BASKASI sahip (bulgu 5'in ta kendisi)
+    ///     PreScopeUyeyim      -> mevcut gorev, P'ye scope'lu, actor P'nin HALA UYESI (H3 pozitif kontrol)
+    ///     PreScopeUyeDegilim  -> mevcut gorev, P'ye scope'lu, actor P'nin UYESI DEGIL (H3/H4'un sinifi)
+    ///   postCase:
+    ///     PostNull            -> hedef Gelen Kutusu (IZIN_POST=true KOSULSUZ -- asimetri, DOKUNMA LISTESI)
+    ///     PostSahibim         -> hedef Q, actor Q'nun GERCEK sahibi
+    ///     PostUyeDegilim      -> hedef Q, actor Q'nun UYESI DEGIL
+    /// "Yeni + preScope != null" ANLAMSIZ bilesimi (yeni varlikta gecmis baglam yoktur) hic
+    /// InlineData'ya ALINMADI -- yalniz "Yeni" + 3 postCase (preScope SORULMADIGI icin tek eksenli).
+    /// Diger 4 preCase x 3 postCase TAM CARPIM (12 satir) + 3 "Yeni" satiri = 15 satir.
+    /// </summary>
+    [Theory]
+    [InlineData("Yeni", "PostNull", "Applied")] // yeni gorev, Gelen Kutusu'nda dogar -- IZIN_PRE=true (yeni), IZIN_POST(null)=true
+    [InlineData("Yeni", "PostSahibim", "Applied")] // yeni gorev + actor'un KENDI projesi Q -- H5 pozitif kontrolun ayni sinifi
+    [InlineData("Yeni", "PostUyeDegilim", "RejectedForbidden")] // H5 ana iddia: yabanci, tahmin ettigi Q ile yeni gorev enjekte edemez
+    [InlineData("PreNullBenim", "PostNull", "Applied")] // actor KENDI mevcut Gelen Kutusu gorevini duzenler (regresyon, gercek sahiplik)
+    [InlineData("PreNullBenim", "PostSahibim", "Applied")] // actor kendi Gelen Kutusu gorevini KENDI projesine tasir
+    [InlineData("PreNullBenim", "PostUyeDegilim", "RejectedForbidden")] // actor kendi gorevini UYESI OLMADIGI bir projeye tasiyamaz (IZIN_POST kapisi)
+    [InlineData("PreNullBaskasinin", "PostNull", "RejectedForbidden")] // BULGU 5 (canli tur adim 13): yabanci baskasinin Gelen Kutusu gorevine YAZAMAZ
+    [InlineData("PreNullBaskasinin", "PostSahibim", "RejectedForbidden")] // BULGU 5 (canli tur adim 14): yabanci baskasinin gorevini KENDI projesine CALAMAZ
+    [InlineData("PreNullBaskasinin", "PostUyeDegilim", "RejectedForbidden")] // cifte yetkisiz -- IZIN_PRE zaten tek basina yeter
+    [InlineData("PreScopeUyeyim", "PostNull", "Applied")] // H3 POZITIF KONTROL: hala uye, gorevi Gelen Kutusu'na KOPARABILIR
+    [InlineData("PreScopeUyeyim", "PostSahibim", "Applied")] // hala uye, gorevi KENDI baska projesine MESRU tasir
+    [InlineData("PreScopeUyeyim", "PostUyeDegilim", "RejectedForbidden")] // hala uye ama HEDEFTE uye degil -- IZIN_POST kapisi
+    [InlineData("PreScopeUyeDegilim", "PostNull", "RejectedForbidden")] // H3 ANA IDDIA: eski uye gorevi Gelen Kutusu'na KOPARAMAZ
+    [InlineData("PreScopeUyeDegilim", "PostSahibim", "RejectedForbidden")] // H4 ANA IDDIA: eski uye gorevi KENDI projesine CALAMAZ
+    [InlineData("PreScopeUyeDegilim", "PostUyeDegilim", "RejectedForbidden")] // cifte yetkisiz -- IZIN_PRE zaten tek basina yeter
+    public async Task Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(string preCase, string postCase, string expectedCode)
+    {
+        var connectionString = await TestDatabase.CreateAsync(fixture);
+        await using var app = new SyncTestApp(connectionString);
+        var actor = Guid.NewGuid();
+        var task = Guid.NewGuid();
+
+        // --- preScope kurulumu ("Yeni" ise T hic yaratilmaz -- ACT adimi onu ilk kez dogurur) ---
+        if (preCase != "Yeni")
+        {
+            switch (preCase)
+            {
+                case "PreNullBenim":
+                    // actor KENDI Gelen Kutusu gorevini yaratir -- ilk yazan = materyalize tasks.owner_id.
+                    await app.SyncAsync(actor, Wire.PushNoPull(actor,
+                        Wire.TaskField(Guid.CreateVersion7(), actor, task, actor, "title", "mevcut", counter: 1)));
+                    break;
+                case "PreNullBaskasinin":
+                    // BASKASI (digerActor) gorevi yaratir -- actor SAHIP DEGIL (bulgu 5'in kosulu).
+                    var digerActor = Guid.NewGuid();
+                    await app.SyncAsync(digerActor, Wire.PushNoPull(digerActor,
+                        Wire.TaskField(Guid.CreateVersion7(), digerActor, task, digerActor, "title", "baskasinin", counter: 1)));
+                    break;
+                case "PreScopeUyeyim":
+                case "PreScopeUyeDegilim":
+                    var projectP = Guid.NewGuid();
+                    var pSahibi = Guid.NewGuid();
+                    await app.SyncAsync(pSahibi, Wire.PushNoPull(pSahibi, Wire.Op(Guid.CreateVersion7(), pSahibi, projectP, pSahibi, 1,
+                        fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P", Wire.Hlc(pSahibi, 1)) },
+                        entityType: "Project")));
+                    if (preCase == "PreScopeUyeyim")
+                    {
+                        await app.SyncAsync(pSahibi, Wire.PushNoPull(pSahibi, Wire.Op(Guid.CreateVersion7(), pSahibi, projectP, pSahibi, 2,
+                            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+                            {
+                                ["members"] = new([new WireSetAdd(actor.ToString(), Guid.CreateVersion7(), Wire.Hlc(pSahibi, 2))], null),
+                            },
+                            entityType: "Project")));
+                    }
+
+                    // T'yi P'ye scope'lu YARATIR -- pSahibi yazar, boylece actor'in KENDI tasks.owner_id'si
+                    // MATERYALIZE OLMAZ (IZIN_PRE'in scope kolunu, null kolunu DEGIL, sinamak icin onemli).
+                    await app.SyncAsync(pSahibi, Wire.PushNoPull(pSahibi,
+                        Wire.TaskField(Guid.CreateVersion7(), pSahibi, task, pSahibi, "projectId", projectP.ToString(), counter: 3)));
+                    break;
+            }
+        }
+
+        // --- postScope hedefi kurulumu ---
+        string? postValue = postCase switch
+        {
+            "PostNull" => null,
+            "PostSahibim" => await CreateOwnedProjectAsync(app, actor),
+            "PostUyeDegilim" => await CreateOwnedProjectAsync(app, Guid.NewGuid()), // yabanci sahiplenir, actor UYE DEGIL
+            _ => throw new ArgumentOutOfRangeException(nameof(postCase), postCase, null),
+        };
+
+        // --- ACT: actor, T'yi postValue scope'una YARATIR (Yeni) ya da TASIR (mevcut) ---
+        // wallOffset: preScope kurulumunun "projectId" yazimiyla (varsa) AYNI wallMs'te LWW sayac-
+        // esitligi kirilma tuzagina DUSMEMEK icin (bu oturumda H3/H4'un DAHA ONCE bulunan AYNI HLC
+        // hatasi) -- ACT KESINLIKLE daha SONRAKI bir HLC tasir.
+        var op = preCase == "Yeni"
+            ? Wire.TaskFields(Guid.CreateVersion7(), actor, task, actor, 1, ("title", "yeni gorev"), ("projectId", postValue))
+            : Wire.TaskField(Guid.CreateVersion7(), actor, task, actor, "projectId", postValue, counter: 10, wallOffset: 1000);
+
+        var result = await app.SyncAsync(actor, Wire.PushNoPull(actor, op));
+        result.Applied.ShouldHaveSingleItem().Code.ShouldBe(expectedCode, $"preCase={preCase} postCase={postCase}");
+    }
+
+    private static async Task<string> CreateOwnedProjectAsync(SyncTestApp app, Guid owner)
+    {
+        var project = Guid.NewGuid();
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 1,
+            fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("Q", Wire.Hlc(owner, 1)) },
+            entityType: "Project")));
+        return project.ToString();
+    }
 }

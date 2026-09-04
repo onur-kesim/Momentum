@@ -27,4 +27,10 @@ public interface ISyncStore
 
     /// <summary>True iff <paramref name="actorId"/> is the project's owner OR a project_members row.</summary>
     Task<bool> IsProjectOwnerOrMemberAsync(Guid projectId, Guid actorId, CancellationToken cancellationToken);
+
+    // IS-EMRI-o86-A3 §A (bulgu 5): scope'suz (Gelen Kutusu) bir GOREVIN sahipligi -- IZIN_PRE'in
+    // null kolu bunu sorar. FAIL-CLOSED: `tasks` satiri yoksa (materyalizasyon bosluğu) false doner,
+    // yetki ACMAZ.
+    /// <summary>True iff <paramref name="actorId"/> is the task's materialized owner (tasks.owner_id). Fail-closed: false if the row does not exist.</summary>
+    Task<bool> IsTaskOwnerAsync(Guid taskId, Guid actorId, CancellationToken cancellationToken);
 }

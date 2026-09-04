@@ -1,0 +1,27 @@
+REGRESYON 1/2: _canli_tur_o85a.py (DEGISTIRILMEDI) -- beklenen 6/6
+==================================================================
+=== OZET ===
+1) A liste yaratti -> Applied
+2) B (TAZE kurulum) A'nin listesini GORDU (snapshot, C2 kaniti)
+3) A o listede gorev yaratti (title+projectId TEK op, B3) -> Applied
+4) B (ARTIMLI) yeni gorevi GORDU, projectId DOGRU (changes, senkron kaniti)
+5) A gorevi Gelen Kutusu'na tasidi (projectId:null, B2) -> Applied
+6) B (ARTIMLI) tasimayi GORDU, projectId NULL (changes, senkron kaniti)
+SONUC: TUM adimlar GECTI -- iki istemci gercekten mirror'landi.
+
+[YAZILDI] C:/Users/gulci/AppData/Local/Temp/o85a_regresyon_a3.txt
+
+REGRESYON 2/2: _canli_tur_o86a.py (DEGISTIRILMEDI) -- beklenen 8/8
+==================================================================
+=== OZET (8/8) ===
+1) A, B, C kayit oldu
+2) A proje P + P'de gorev T yaratti -> Applied
+3) B (uye DEGILKEN) ILK pull'da HICBIR SEY gormedi -- NEGATIF KONTROL GECTI
+4) A, B'nin e-postasini lookup'ladi -> dogru userId, yanit YALNIZ userId
+5) A, B'yi members'a ekledi -> Applied
+6) B, snapshot'ta VE artimlida P'yi VE T'yi GORDU (uyelik sonrasi)
+7) B, T'yi duzenledi (uye olarak KABUL edildi) -> A, pull'da B'nin degisikligini GORDU (cift yonlu yakinsama)
+8) C (uye DEGIL) pull'da HICBIR SEY gormedi VE P'ye yazimi REDDEDILDI (RejectedForbidden)
+SONUC: TUM SEKIZ ADIM GECTI -- isbirligi kapisi calisir, yetkisiz erisim/yazim REDDEDILIR.
+
+[YAZILDI] C:/Users/gulci/AppData/Local/Temp/o86a_regresyon_a3.txt

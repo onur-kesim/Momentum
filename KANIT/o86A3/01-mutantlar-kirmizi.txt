@@ -1,0 +1,275 @@
+==========================================================
+MUTANT 1/3: IZIN_PRE'in NULL kolu (sahiplik dogrulamasi) kaldirildi -- kosulsuz true
+==========================================================
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.Persistence.Tests -> C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll
+C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:08.33]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "PreNullBaskasinin", postCase: "PostNull", expectedCode: "RejectedForbidden") [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "PreNullBaskasinin", postCase: "PostNull", expectedCode: "RejectedForbidden") [426 ms]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : result.Applied.ShouldHaveSingleItem().Code
+    should be
+"RejectedForbidden"
+    but was
+"Applied"
+    difference
+Difference     |  |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |   
+               | \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  
+Index          | 0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   
+Expected Value | R    e    j    e    c    t    e    d    F    o    r    b    i    d    d    e    n    
+Actual Value   | A    p    p    l    i    e    d                                                      
+Expected Code  | 82   101  106  101  99   116  101  100  70   111  114  98   105  100  100  101  110  
+Actual Code    | 65   112  112  108  105  101  100                                                    
+
+Additional Info:
+    preCase=PreNullBaskasinin postCase=PostNull
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+[xUnit.net 00:00:10.14]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "PreNullBaskasinin", postCase: "PostSahibim", expectedCode: "RejectedForbidden") [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "PreNullBaskasinin", postCase: "PostSahibim", expectedCode: "RejectedForbidden") [329 ms]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : result.Applied.ShouldHaveSingleItem().Code
+    should be
+"RejectedForbidden"
+    but was
+"Applied"
+    difference
+Difference     |  |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |   
+               | \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  
+Index          | 0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   
+Expected Value | R    e    j    e    c    t    e    d    F    o    r    b    i    d    d    e    n    
+Actual Value   | A    p    p    l    i    e    d                                                      
+Expected Code  | 82   101  106  101  99   116  101  100  70   111  114  98   105  100  100  101  110  
+Actual Code    | 65   112  112  108  105  101  100                                                    
+
+Additional Info:
+    preCase=PreNullBaskasinin postCase=PostSahibim
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+
+Başarısız! - Başarısız:     2, Başarılı:    13, Atlanan:     0, Toplam:    15, Süre: 7 s - Momentum.Persistence.Tests.dll (net10.0)
+
+==========================================================
+MUTANT 2/3: IZIN_PRE'in SCOPE kolu (kaynak proje uyeligi) kaldirildi -- kosulsuz true
+==========================================================
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.Persistence.Tests -> C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll
+C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:10.18]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "PreScopeUyeDegilim", postCase: "PostSahibim", expectedCode: "RejectedForbidden") [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "PreScopeUyeDegilim", postCase: "PostSahibim", expectedCode: "RejectedForbidden") [433 ms]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : result.Applied.ShouldHaveSingleItem().Code
+    should be
+"RejectedForbidden"
+    but was
+"Applied"
+    difference
+Difference     |  |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |   
+               | \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  
+Index          | 0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   
+Expected Value | R    e    j    e    c    t    e    d    F    o    r    b    i    d    d    e    n    
+Actual Value   | A    p    p    l    i    e    d                                                      
+Expected Code  | 82   101  106  101  99   116  101  100  70   111  114  98   105  100  100  101  110  
+Actual Code    | 65   112  112  108  105  101  100                                                    
+
+Additional Info:
+    preCase=PreScopeUyeDegilim postCase=PostSahibim
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+[xUnit.net 00:00:13.23]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "PreScopeUyeDegilim", postCase: "PostNull", expectedCode: "RejectedForbidden") [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "PreScopeUyeDegilim", postCase: "PostNull", expectedCode: "RejectedForbidden") [400 ms]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : result.Applied.ShouldHaveSingleItem().Code
+    should be
+"RejectedForbidden"
+    but was
+"Applied"
+    difference
+Difference     |  |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |   
+               | \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  
+Index          | 0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   
+Expected Value | R    e    j    e    c    t    e    d    F    o    r    b    i    d    d    e    n    
+Actual Value   | A    p    p    l    i    e    d                                                      
+Expected Code  | 82   101  106  101  99   116  101  100  70   111  114  98   105  100  100  101  110  
+Actual Code    | 65   112  112  108  105  101  100                                                    
+
+Additional Info:
+    preCase=PreScopeUyeDegilim postCase=PostNull
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+
+Başarısız! - Başarısız:     2, Başarılı:    13, Atlanan:     0, Toplam:    15, Süre: 8 s - Momentum.Persistence.Tests.dll (net10.0)
+
+==========================================================
+MUTANT 3/3: IZIN_POST'un SCOPE kolu (hedef proje uyeligi) kaldirildi -- kosulsuz true
+==========================================================
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.Persistence.Tests -> C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll
+C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:08.48]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "PreScopeUyeyim", postCase: "PostUyeDegilim", expectedCode: "RejectedForbidden") [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "PreScopeUyeyim", postCase: "PostUyeDegilim", expectedCode: "RejectedForbidden") [2 s]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : result.Applied.ShouldHaveSingleItem().Code
+    should be
+"RejectedForbidden"
+    but was
+"Applied"
+    difference
+Difference     |  |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |   
+               | \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  
+Index          | 0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   
+Expected Value | R    e    j    e    c    t    e    d    F    o    r    b    i    d    d    e    n    
+Actual Value   | A    p    p    l    i    e    d                                                      
+Expected Code  | 82   101  106  101  99   116  101  100  70   111  114  98   105  100  100  101  110  
+Actual Code    | 65   112  112  108  105  101  100                                                    
+
+Additional Info:
+    preCase=PreScopeUyeyim postCase=PostUyeDegilim
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+[xUnit.net 00:00:12.13]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "Yeni", postCase: "PostUyeDegilim", expectedCode: "RejectedForbidden") [FAIL]
+[xUnit.net 00:00:12.99]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "PreNullBenim", postCase: "PostUyeDegilim", expectedCode: "RejectedForbidden") [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "Yeni", postCase: "PostUyeDegilim", expectedCode: "RejectedForbidden") [351 ms]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : result.Applied.ShouldHaveSingleItem().Code
+    should be
+"RejectedForbidden"
+    but was
+"Applied"
+    difference
+Difference     |  |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |   
+               | \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  
+Index          | 0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   
+Expected Value | R    e    j    e    c    t    e    d    F    o    r    b    i    d    d    e    n    
+Actual Value   | A    p    p    l    i    e    d                                                      
+Expected Code  | 82   101  106  101  99   116  101  100  70   111  114  98   105  100  100  101  110  
+Actual Code    | 65   112  112  108  105  101  100                                                    
+
+Additional Info:
+    preCase=Yeni postCase=PostUyeDegilim
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(preCase: "PreNullBenim", postCase: "PostUyeDegilim", expectedCode: "RejectedForbidden") [366 ms]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : result.Applied.ShouldHaveSingleItem().Code
+    should be
+"RejectedForbidden"
+    but was
+"Applied"
+    difference
+Difference     |  |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |   
+               | \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  \|/  
+Index          | 0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   
+Expected Value | R    e    j    e    c    t    e    d    F    o    r    b    i    d    d    e    n    
+Actual Value   | A    p    p    l    i    e    d                                                      
+Expected Code  | 82   101  106  101  99   116  101  100  70   111  114  98   105  100  100  101  110  
+Actual Code    | 65   112  112  108  105  101  100                                                    
+
+Additional Info:
+    preCase=PreNullBenim postCase=PostUyeDegilim
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8(String preCase, String postCase, String expectedCode) in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 729
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+
+Başarısız! - Başarısız:     3, Başarılı:    12, Atlanan:     0, Toplam:    15, Süre: 7 s - Momentum.Persistence.Tests.dll (net10.0)

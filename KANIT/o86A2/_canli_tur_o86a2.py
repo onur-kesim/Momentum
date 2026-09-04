@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""IS-EMRI-o86-A2 §F icin CANLI olcum uretici. o86-A'nin AYNI sekiz adimi (protokol
-seviyesinde, dogrudan HTTP -- o86-B henuz yok) + DENETIMIN bulduklarini kapatan DORT
-YENI adim (9-12). Ayrica adim 7 DEGISTI: o86-A'yi YANLISLIKLA gecirmis olan TAZE
-snapshot olcumu yerine artik A'nin KENDI ARTIMLI (incremental) pull'u kullanilir --
-o86-A2 is emrinin kendi tespiti: "TAZE snapshot ile OLCME -- o86-A'yi yanlislikla
-gecirmis tam buydu (snapshot, T'yi A'nin ESKI yaratim satirindan bulup GUNCEL CRDT
+"""IS-EMRI-o86-A2 §F icin CANLI olcum uretici (IS-EMRI-o86-A3 §D'de 13-14 ile GENISLETILDI --
+yeni betik YAZILMADI). o86-A'nin AYNI sekiz adimi (protokol seviyesinde, dogrudan HTTP -- o86-B
+henuz yok) + DENETIMIN bulduklarini kapatan adimlar (9-14). Ayrica adim 7 DEGISTI: o86-A'yi
+YANLISLIKLA gecirmis olan TAZE snapshot olcumu yerine artik A'nin KENDI ARTIMLI (incremental)
+pull'u kullanilir -- o86-A2 is emrinin kendi tespiti: "TAZE snapshot ile OLCME -- o86-A'yi
+yanlislikla gecirmis tam buydu (snapshot, T'yi A'nin ESKI yaratim satirindan bulup GUNCEL CRDT
 durumunu donduruyor => iddia BASKA sebeple yesil oluyor)."
 
-Senaryo: UC hesap (A/B/C), on iki adim:
+Senaryo: UC hesap (A/B/C), on dort adim:
   1) A, B, C kayit olur.
   2) A proje P + P'de gorev T yaratir. (a_cursor: T'nin yaratimindan HEMEN SONRAKI
      horizon -- adim 7'nin ARTIMLI olcumu buradan baslar.)
@@ -26,6 +26,12 @@ Senaryo: UC hesap (A/B/C), on iki adim:
       (IZIN(post=Q) true olsa BILE IZIN(pre=P) artik false).
   12) [YENI] yabanci C, TAHMIN ETTIGI projectId=P ile YEPYENI bir gorev ENJEKTE etmeye
       calisir -> RejectedForbidden (bulgu 2 §D).
+  13) [o86-A3 §D] A kendi Gelen Kutusu'nda T2 yaratir -> yabanci C (T2'nin id'sini bilir)
+      T2'ye baslik yazmaya calisir -> RejectedForbidden (bulgu 5: scope'suz gorevin
+      sahipligi artik IsTaskOwnerAsync ile dogrulanir).
+  14) [o86-A3 §D] yabanci C, T2'yi KENDI projesine TASIMAYA (CALMAYA) calisir ->
+      RejectedForbidden. POZITIF KONTROL: A (GERCEK sahip) AYNI IKI OP'U (yazma +
+      tasima) yapabilir -- kutu kilitlenmedi.
 
 HER iddia TAM DEGER esleşmesiyle kontrol edilir -- o83-G/o85-A'nin "bos liste her
 iddiayi gecirir" dersinin PAZARLIKSIZ uygulanmasi (bos liste GORMEDI diye
@@ -299,6 +305,57 @@ def main():
     if r_enjekte["applied"][0]["code"] != "RejectedForbidden":
         raise SystemExit("[DUS] yabanci C'nin enjeksiyonu REDDEDILMEDI (kod=%s) -- enjeksiyon deligi ACIK!" % r_enjekte["applied"][0]["code"])
 
+    # --- 13) [IS-EMRI-o86-A3 §D] A kendi Gelen Kutusu'nda T2 yaratir -> C (yabanci, T2'nin
+    #      id'sini bilir) T2'ye baslik yazmaya calisir -- REDDEDILMELI (bulgu 5) ---
+    gorev2_id = str(uuid.uuid4())
+    op_t2 = alan_op("Task", gorev2_id, a["userId"], CLIENT_A, {"title": "A'nin kisisel gorevi T2"})
+    r_t2 = sync(a["accessToken"], CLIENT_A, None, [op_t2])
+    if r_t2["applied"][0]["code"] != "Applied":
+        raise SystemExit("[DUS] A'nin T2 yaratimi Applied DONMEDI: %s" % r_t2["applied"])
+    kaydet("13a) A kendi Gelen Kutusu'nda T2 yaratir", "gorev2_id=%s -> Applied" % gorev2_id)
+
+    op_c_yaz = alan_op("Task", gorev2_id, c["userId"], CLIENT_C, {"title": "C'nin yazmaya calistigi"})
+    r_c_yaz = sync(c["accessToken"], CLIENT_C, None, [op_c_yaz])
+    kaydet("13b) C (yabanci, T2'nin id'sini bilir) -- T2'ye baslik yazmaya calisir -- "
+           "REDDEDILMELI (RejectedForbidden, bulgu 5: IZIN_PRE'in null kolu artik IsTaskOwnerAsync sorar)",
+           json.dumps(r_c_yaz, ensure_ascii=False, indent=2))
+    if r_c_yaz["applied"][0]["code"] != "RejectedForbidden":
+        raise SystemExit("[DUS] yabanci C'nin T2'ye yazimi REDDEDILMEDI (kod=%s) -- bulgu 5 kapanmadi!" % r_c_yaz["applied"][0]["code"])
+
+    # --- 14) [IS-EMRI-o86-A3 §D] C, T2'yi KENDI projesi Q_C'ye TASIMAYA calisir -- REDDEDILMELI.
+    #      POZITIF KONTROL: A (GERCEK sahip) AYNI IKI OP'U (yazma + tasima) yapabilir -- kutu
+    #      kilitlenmedi. ---
+    proje_qc_id = str(uuid.uuid4())
+    op_qc = alan_op("Project", proje_qc_id, c["userId"], CLIENT_C, {"name": "C'nin kendi projesi"})
+    r_qc = sync(c["accessToken"], CLIENT_C, None, [op_qc])
+    if r_qc["applied"][0]["code"] != "Applied":
+        raise SystemExit("[DUS] C'nin KENDI projesinin yaratimi Applied DONMEDI: %s" % r_qc["applied"])
+    op_c_tasi = alan_op("Task", gorev2_id, c["userId"], CLIENT_C, {"projectId": proje_qc_id})
+    r_c_tasi = sync(c["accessToken"], CLIENT_C, None, [op_c_tasi])
+    kaydet("14a) C -- T2'yi KENDI projesine TASIMAYA calisir -- REDDEDILMELI (RejectedForbidden, bulgu 5 CALMA)",
+           json.dumps(r_c_tasi, ensure_ascii=False, indent=2))
+    if r_c_tasi["applied"][0]["code"] != "RejectedForbidden":
+        raise SystemExit("[DUS] yabanci C'nin T2'yi CALMASI REDDEDILMEDI (kod=%s)!" % r_c_tasi["applied"][0]["code"])
+
+    # POZITIF KONTROL: A (GERCEK sahip) AYNI IKI OP'U (yazma + tasima) yapabilir -- kutu kilitlenmedi.
+    op_a_yaz = alan_op("Task", gorev2_id, a["userId"], CLIENT_A, {"title": "A duzenledi"})
+    r_a_yaz = sync(a["accessToken"], CLIENT_A, None, [op_a_yaz])
+    kaydet("14b) POZITIF KONTROL -- A (GERCEK sahip) T2'ye YAZABILIR", json.dumps(r_a_yaz, ensure_ascii=False, indent=2))
+    if r_a_yaz["applied"][0]["code"] != "Applied":
+        raise SystemExit("[DUS] POZITIF KONTROL DUSTU: A kendi gorevine YAZAMADI (kod=%s)!" % r_a_yaz["applied"][0]["code"])
+
+    proje_qa_id = str(uuid.uuid4())
+    op_qa = alan_op("Project", proje_qa_id, a["userId"], CLIENT_A, {"name": "A'nin kendi ikinci projesi"})
+    r_qa = sync(a["accessToken"], CLIENT_A, None, [op_qa])
+    if r_qa["applied"][0]["code"] != "Applied":
+        raise SystemExit("[DUS] A'nin ikinci projesinin yaratimi Applied DONMEDI: %s" % r_qa["applied"])
+    op_a_tasi = alan_op("Task", gorev2_id, a["userId"], CLIENT_A, {"projectId": proje_qa_id})
+    r_a_tasi = sync(a["accessToken"], CLIENT_A, None, [op_a_tasi])
+    kaydet("14c) POZITIF KONTROL -- A (GERCEK sahip) T2'yi KENDI projesine TASIYABILIR (kutu kilitlenmedi)",
+           json.dumps(r_a_tasi, ensure_ascii=False, indent=2))
+    if r_a_tasi["applied"][0]["code"] != "Applied":
+        raise SystemExit("[DUS] POZITIF KONTROL DUSTU: A kendi gorevini KENDI projesine TASIYAMADI (kod=%s)!" % r_a_tasi["applied"][0]["code"])
+
     ozet = [
         "1) A, B, C kayit oldu",
         "2) A proje P + P'de gorev T yaratti -> Applied",
@@ -313,10 +370,15 @@ def main():
         "10) eski uye B, T'yi Gelen Kutusu'na KOPARAMADI -- RejectedForbidden",
         "11) eski uye B, T'yi KENDI projesi Q'ya TASIYAMADI -- RejectedForbidden (IZIN(pre) VE IZIN(post))",
         "12) yabanci C, TAHMIN ETTIGI projectId ile YEPYENI gorev ENJEKTE EDEMEDI -- RejectedForbidden",
-        "SONUC: TUM ON IKI ADIM GECTI -- isbirligi kapisi calisir, gorunurluk GERI ALINABILIR, "
-        "kaynak/hedef scope IKISI DE dogrulanir, yabanci enjeksiyonu KAPALI.",
+        "13) A kendi Gelen Kutusu'nda T2 yaratti -> yabanci C, T2'nin id'sini bilse bile baslik "
+        "YAZAMADI -- RejectedForbidden (bulgu 5)",
+        "14) yabanci C, T2'yi KENDI projesine TASIYAMADI (calamadi) -- RejectedForbidden; "
+        "POZITIF KONTROL: A (GERCEK sahip) AYNI IKI OP'U (yazma + tasima) yapabildi -- kutu kilitlenmedi",
+        "SONUC: TUM ON DORT ADIM GECTI -- isbirligi kapisi calisir, gorunurluk GERI ALINABILIR, "
+        "kaynak/hedef scope IKISI DE dogrulanir, yabanci enjeksiyonu KAPALI, scope'suz (Gelen "
+        "Kutusu) gorevlerin sahipligi de ARTIK dogrulaniyor (bulgu 5 kapandi).",
     ]
-    kaydet("OZET (12/12)", "\n".join(ozet))
+    kaydet("OZET (14/14)", "\n".join(ozet))
 
     with open(cikti_yolu, "w", encoding="utf-8") as f:
         f.write("\n".join(KANIT))
