@@ -37,13 +37,23 @@ public sealed class SyncPuller(SyncDbContext db) : ISyncPuller
         // IS-EMRI-o86-A §D1 (IKI YOL DA PAZARLIKSIZ): sahip OR scope-uye OR old_scope-uye (bir gorev
         // projeden cikarilinca old_scope_id'si eski projedir -- bu kol dusseydi uye ekraninda hayalet
         // satir kalirdi). o84 dersi: ORDER BY nitelikli (o.) kalir, gölgelenmez.
+        // IS-EMRI-o86-A2 §B: project_access GORUNUMU uzerinden (sahip uyelik tablosuna
+        // YAZILMAZ, §C3 -- gorunum olmadan sahip kendi PROJESININ uyelerinin yazdigi
+        // degisiklikleri artimli pull'da GOREMEZDI, bulgu 1'in ta kendisi). §G: bu dosyada
+        // uyelik tablosunun adi GECMEZ -- erisim YALNIZ gorunum uzerindendir (mekanik kapi).
+        // Onur kilidi (4. bulgu, o86-A2 canli tur adim 9): `o.owner_id = @actorId` TEK BASINA
+        // sonsuz bir arka kapiydi -- bir op'u YAZDIGI o SATIR (outbox degismez/append-only) actor
+        // projeden cikarildiktan SONRA bile actor'in KENDI owner_id'siyle damgali KALIR, bu sart
+        // eskiden HER ZAMAN gecerdi. Artik yalniz scope'suz (kisisel, Gelen Kutusu) satirlarda
+        // gecerlidir -- scope tasiyan bir satir icin gorunurluk SADECE guncel uyelikten (project_access)
+        // gelir, o satiri KIMIN yazdigindan degil.
         await using var command = await db.CreateRawCommandAsync(
             "SELECT o.commit_xid::text AS commit_xid_text, o.server_seq, o.payload::text AS payload_text FROM outbox_messages o " +
             "WHERE commit_xid < pg_snapshot_xmin(pg_current_snapshot()) " +
             "AND (commit_xid, server_seq) > (@sinceXid::xid8, @sinceSeq) " +
-            "AND ( o.owner_id = @actorId " +
-            "   OR o.scope_id     IN (SELECT project_id FROM project_members WHERE user_id = @actorId) " +
-            "   OR o.old_scope_id IN (SELECT project_id FROM project_members WHERE user_id = @actorId) ) " +
+            "AND ( ( o.owner_id = @actorId AND o.scope_id IS NULL AND o.old_scope_id IS NULL ) " +
+            "   OR o.scope_id     IN (SELECT project_id FROM project_access WHERE user_id = @actorId) " +
+            "   OR o.old_scope_id IN (SELECT project_id FROM project_access WHERE user_id = @actorId) ) " +
             "ORDER BY o.commit_xid, o.server_seq LIMIT " + PageSize,
             cancellationToken);
         command.Parameters.AddWithValue("sinceXid", since.Xid.ToString(CultureInfo.InvariantCulture));
@@ -95,12 +105,30 @@ public sealed class SyncPuller(SyncDbContext db) : ISyncPuller
     {
         // IS-EMRI-o86-A §D2: PullIncrementalAsync ile AYNI uc-kollu kural -- olmadan taze kurulmus bir
         // istemci paylasilan hicbir seyi gormez (o85-A'nin C2 kaniti tam buydu), dilim yarim kalir.
+        // IS-EMRI-o86-A2 §B: PullIncrementalAsync ile AYNI gorunum-tabanli kural (project_access).
+        // Onur kilidi (4. bulgu, o86-A2 canli tur adim 9 -- H7b): outbox GECMISINE bakan tek bir
+        // uc-kollu kural burada YETMEZ -- bu sorgu YALNIZ "hangi entityId'ler" listesini uretir,
+        // HydrateAsync ardindan varligin GUNCEL durumunu doner. Bir gorev ONCE kisisel (scope'suz,
+        // owner_id=actor) yaratilip SONRA bir projeye TASINMIS olabilir -- o eski kisisel outbox
+        // satiri (scope_id IS NULL) narrow edilmis kurali bile GECER, entity listeye girer, hidrasyon
+        // GUNCEL (proje-ici) durumu sizdirir. Tek dogru olcum GUNCEL materyalize durumdur:
+        // Task icin tasks.project_id/owner_id, Project icin project_access (sahip zaten onun ICINDE).
+        // Diger tipler (TaskList/Tag) hic scope tasimaz (ReadProjectId yalniz Task'ta calisir) --
+        // bugunku outbox-tabanli davranista KALIR, degismez.
         await using var command = await db.CreateRawCommandAsync(
+            "SELECT 'Task' AS aggregate_type, t.entity_id AS aggregate_id FROM tasks t " +
+            "WHERE (t.project_id IS NULL AND t.owner_id = @actorId) " +
+            "   OR t.project_id IN (SELECT project_id FROM project_access WHERE user_id = @actorId) " +
+            "UNION " +
+            "SELECT 'Project' AS aggregate_type, p.entity_id AS aggregate_id FROM projects p " +
+            "WHERE p.entity_id IN (SELECT project_id FROM project_access WHERE user_id = @actorId) " +
+            "UNION " +
             "SELECT DISTINCT o.aggregate_type, o.aggregate_id FROM outbox_messages o " +
-            "WHERE ( o.owner_id = @actorId " +
-            "   OR o.scope_id     IN (SELECT project_id FROM project_members WHERE user_id = @actorId) " +
-            "   OR o.old_scope_id IN (SELECT project_id FROM project_members WHERE user_id = @actorId) ) " +
-            "ORDER BY o.aggregate_type, o.aggregate_id", cancellationToken);
+            "WHERE o.aggregate_type NOT IN ('Task', 'Project') " +
+            "  AND ( ( o.owner_id = @actorId AND o.scope_id IS NULL AND o.old_scope_id IS NULL ) " +
+            "     OR o.scope_id     IN (SELECT project_id FROM project_access WHERE user_id = @actorId) " +
+            "     OR o.old_scope_id IN (SELECT project_id FROM project_access WHERE user_id = @actorId) ) " +
+            "ORDER BY aggregate_type, aggregate_id", cancellationToken);
         command.Parameters.AddWithValue("actorId", actorId);
 
         var result = new List<(string, Guid)>();

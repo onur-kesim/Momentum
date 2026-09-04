@@ -291,4 +291,339 @@ public sealed class D9OwnerIdVisibilityTests(PostgresFixture fixture)
             "SELECT count(*) FROM project_members WHERE project_id = @p AND user_id = @o", ("p", project), ("o", outsider)))
             .ShouldBe(1L);
     }
+
+    /// <summary>
+    /// IS-EMRI-o86-A2 §E H1 (🔴 BU DILIMIN ASIL KAPISI, bulgu 1): SAHIP A, UYE B'nin yazdigi
+    /// degisikligi kendi ARTIMLI (incremental) pull'unda GORUR -- eskiden sahip project_members'e
+    /// YAZILMADIGI icin (§C3) kendi projesindeki UYE-yazili degisiklikleri GOREMIYORDU (outbox
+    /// satirinin owner_id'si YAZAN'dir, projenin sahibi degil). POZITIF KONTROL: uye OLMAYAN C
+    /// hicbir sey GORMEZ.
+    /// </summary>
+    [Fact]
+    public async Task Owner_sees_members_write_via_incremental_pull_non_member_sees_nothing_H1()
+    {
+        var connectionString = await TestDatabase.CreateAsync(fixture);
+        await using var app = new SyncTestApp(connectionString);
+        var owner = Guid.NewGuid();
+        var member = Guid.NewGuid();
+        var nonMember = Guid.NewGuid();
+        var project = Guid.NewGuid();
+        var task = Guid.NewGuid();
+
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 1,
+            fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P", Wire.Hlc(owner, 1)) },
+            entityType: "Project")));
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 2,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new([new WireSetAdd(member.ToString(), Guid.CreateVersion7(), Wire.Hlc(owner, 2))], null),
+            },
+            entityType: "Project")));
+        await app.SyncAsync(owner, Wire.PushNoPull(owner,
+            Wire.TaskField(Guid.CreateVersion7(), owner, task, owner, "projectId", project.ToString(), counter: 3)));
+
+        // SAHIP'in GERCEK bir imlecten (0,0) baslayan artimli pull'u -- snapshot-horizon karisikligina
+        // GIRMEDEN dogrudan PullIncrementalAsync'i cagirir (app.PullAsync, TestSupport.cs).
+        var ownerCursor = (await app.PullAsync(owner, new SyncCursor(0, 0))).NextCursor;
+
+        // UYE (member), gorevi duzenler.
+        await app.SyncAsync(member, Wire.PushNoPull(member,
+            Wire.TaskField(Guid.CreateVersion7(), member, task, member, "title", "Uye duzenledi", counter: 1)));
+
+        var afterEdit = await app.PullAsync(owner, ownerCursor);
+        var ownerGorurMu = afterEdit.Changes.Any(c =>
+            JsonDocument.Parse(c.PayloadJson).RootElement.GetProperty("entityId").GetGuid() == task);
+        ownerGorurMu.ShouldBeTrue("H1: SAHIP, UYENIN yazdigini ARTIMLI pull'da GORMELI");
+
+        // POZITIF KONTROL: uye OLMAYAN C hicbir sey gormez.
+        var nonMemberPull = await app.PullAsync(nonMember, new SyncCursor(0, 0));
+        nonMemberPull.Changes.ShouldBeEmpty();
+    }
+
+    /// <summary>
+    /// IS-EMRI-o86-A2 §E H3: uyelikten CIKARILMIS B, T'yi `projectId=null` yaparak KOPARAMAZ ⇒
+    /// RejectedForbidden. POZITIF KONTROL: hala UYE olan digeri AYNI turden bir op'u yapabilir.
+    /// </summary>
+    [Fact]
+    public async Task Ex_member_cannot_detach_task_still_member_can_H3()
+    {
+        var connectionString = await TestDatabase.CreateAsync(fixture);
+        await using var app = new SyncTestApp(connectionString);
+        var owner = Guid.NewGuid();
+        var exMember = Guid.NewGuid();
+        var stillMember = Guid.NewGuid();
+        var project = Guid.NewGuid();
+        var taskForExMember = Guid.NewGuid();
+        var taskForStillMember = Guid.NewGuid();
+        var exMemberTag = Guid.CreateVersion7();
+
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 1,
+            fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P", Wire.Hlc(owner, 1)) },
+            entityType: "Project")));
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 2,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new(
+                    [
+                        new WireSetAdd(exMember.ToString(), exMemberTag, Wire.Hlc(owner, 2)),
+                        new WireSetAdd(stillMember.ToString(), Guid.CreateVersion7(), Wire.Hlc(owner, 2)),
+                    ], null),
+            },
+            entityType: "Project")));
+        await app.SyncAsync(owner, Wire.PushNoPull(owner,
+            Wire.TaskField(Guid.CreateVersion7(), owner, taskForExMember, owner, "projectId", project.ToString(), counter: 3)));
+        await app.SyncAsync(owner, Wire.PushNoPull(owner,
+            Wire.TaskField(Guid.CreateVersion7(), owner, taskForStillMember, owner, "projectId", project.ToString(), counter: 4)));
+
+        // owner exMember'i uyelikten CIKARIR.
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 5,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new(null, [new WireSetRemove(exMember.ToString(), [exMemberTag], Wire.Hlc(owner, 5))]),
+            },
+            entityType: "Project")));
+
+        // ESKI uye exMember, kendi (eskiden erisimi olan) gorevini Gelen Kutusu'na KOPARMAYA calisir -- RED.
+        // wallOffset: HLC'nin wallMs'i sabit BaseWall'dir (gercek saat degil) -- owner'in "projectId"yi
+        // KOYAN daha ONCEKI op'u (counter:3, wallOffset:0) ile AYNI wallMs'te kalirsak, LWW'nin
+        // sayac-esitligi kirilma kurali (tie-break) exMember'in KUCUK sayacini (1) DEGIL owner'in
+        // BUYUK sayacini (3) kazandirir -- yani alan HICBIR ZAMAN gercekten null'a DONMEZ ve red baska
+        // (kazara dogru) bir sebepten cikar, mutant hicbir sey degistirmez. wallOffset ile bu op'u
+        // gercekten KRONOLOJIK OLARAK SONRA yapar.
+        var rEx = await app.SyncAsync(exMember, Wire.PushNoPull(exMember,
+            Wire.TaskField(Guid.CreateVersion7(), exMember, taskForExMember, exMember, "projectId", null, counter: 1, wallOffset: 100)));
+        rEx.Applied.ShouldHaveSingleItem().Code.ShouldBe(nameof(IngestResultCode.RejectedForbidden));
+
+        // POZITIF KONTROL: hala UYE olan stillMember AYNI turden bir op'u yapabilir (ayni HLC nedeni).
+        var rStill = await app.SyncAsync(stillMember, Wire.PushNoPull(stillMember,
+            Wire.TaskField(Guid.CreateVersion7(), stillMember, taskForStillMember, stillMember, "projectId", null, counter: 1, wallOffset: 100)));
+        rStill.Applied.ShouldHaveSingleItem().Code.ShouldBe(nameof(IngestResultCode.Applied));
+    }
+
+    /// <summary>IS-EMRI-o86-A2 §E H4: uyelikten cikarilmis B, T'yi KENDI projesi Q'ya TASIYAMAZ ⇒ RejectedForbidden.</summary>
+    [Fact]
+    public async Task Ex_member_cannot_move_task_to_own_project_H4()
+    {
+        var connectionString = await TestDatabase.CreateAsync(fixture);
+        await using var app = new SyncTestApp(connectionString);
+        var owner = Guid.NewGuid();
+        var exMember = Guid.NewGuid();
+        var projectP = Guid.NewGuid();
+        var projectQ = Guid.NewGuid();
+        var task = Guid.NewGuid();
+        var exMemberTag = Guid.CreateVersion7();
+
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, projectP, owner, 1,
+            fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P", Wire.Hlc(owner, 1)) },
+            entityType: "Project")));
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, projectP, owner, 2,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new([new WireSetAdd(exMember.ToString(), exMemberTag, Wire.Hlc(owner, 2))], null),
+            },
+            entityType: "Project")));
+        await app.SyncAsync(owner, Wire.PushNoPull(owner,
+            Wire.TaskField(Guid.CreateVersion7(), owner, task, owner, "projectId", projectP.ToString(), counter: 3)));
+        // exMember KENDI projesi Q'yu yaratir (Q'nun GERCEK sahibi -- IZIN(Q) exMember icin HER ZAMAN true).
+        await app.SyncAsync(exMember, Wire.PushNoPull(exMember, Wire.Op(Guid.CreateVersion7(), exMember, projectQ, exMember, 1,
+            fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("Q", Wire.Hlc(exMember, 1)) },
+            entityType: "Project")));
+
+        // owner exMember'i P'nin uyeliginden CIKARIR.
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, projectP, owner, 5,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new(null, [new WireSetRemove(exMember.ToString(), [exMemberTag], Wire.Hlc(owner, 5))]),
+            },
+            entityType: "Project")));
+
+        // ESKI uye exMember, T'yi KENDI projesi Q'ya tasimaya calisir -- IZIN(post=Q) true olsa BILE
+        // IZIN(pre=P) artik false oldugu icin RED (IZIN(pre) VE IZIN(post) formulu).
+        // wallOffset: H3'teki AYNI HLC tie-break sebebiyle -- owner'in "projectId"yi P'ye KOYAN
+        // op'u (counter:3, wallOffset:0) ile ayni wallMs'te kalirsak sayac-esitligi kirilma kurali
+        // exMember'in DAHA KUCUK sayacini (2) degil owner'in BUYUGUNU (3) kazandirir, alan asla Q'ya
+        // GECMEZ ve red baska (kazara dogru) bir sebepten cikar.
+        var r = await app.SyncAsync(exMember, Wire.PushNoPull(exMember,
+            Wire.TaskField(Guid.CreateVersion7(), exMember, task, exMember, "projectId", projectQ.ToString(), counter: 2, wallOffset: 100)));
+        r.Applied.ShouldHaveSingleItem().Code.ShouldBe(nameof(IngestResultCode.RejectedForbidden));
+    }
+
+    /// <summary>
+    /// IS-EMRI-o86-A2 §E H5: yabanci C, TAHMIN ETTIGI bir `projectId=P` ile YEPYENI bir gorev
+    /// DOGURAMAZ ⇒ RejectedForbidden. POZITIF KONTROL: GERCEK uye B AYNI op turuyle yeni gorev dogurabilir.
+    /// </summary>
+    [Fact]
+    public async Task Stranger_cannot_inject_new_task_into_guessed_project_member_can_H5()
+    {
+        var connectionString = await TestDatabase.CreateAsync(fixture);
+        await using var app = new SyncTestApp(connectionString);
+        var owner = Guid.NewGuid();
+        var member = Guid.NewGuid();
+        var stranger = Guid.NewGuid();
+        var project = Guid.NewGuid();
+
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 1,
+            fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P", Wire.Hlc(owner, 1)) },
+            entityType: "Project")));
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 2,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new([new WireSetAdd(member.ToString(), Guid.CreateVersion7(), Wire.Hlc(owner, 2))], null),
+            },
+            entityType: "Project")));
+
+        // Yabanci, TAHMIN ETTIGI projectId=P ile YEPYENI bir gorev yaratmaya calisir -- RED.
+        var strangerTask = Guid.NewGuid();
+        var rStranger = await app.SyncAsync(stranger, Wire.PushNoPull(stranger,
+            Wire.TaskFields(Guid.CreateVersion7(), stranger, strangerTask, stranger, 1, ("title", "enjekte"), ("projectId", project.ToString()))));
+        rStranger.Applied.ShouldHaveSingleItem().Code.ShouldBe(nameof(IngestResultCode.RejectedForbidden));
+        (await Db.ScalarAsync<long>(connectionString, "SELECT count(*) FROM tasks WHERE entity_id = @e", ("e", strangerTask)))
+            .ShouldBe(0L, "enjekte edilen gorev materyalize OLMAMALI");
+
+        // POZITIF KONTROL: GERCEK uye, AYNI turden (yeni gorev + projectId TEK op'ta) bir op yapabilir.
+        var memberTask = Guid.NewGuid();
+        var rMember = await app.SyncAsync(member, Wire.PushNoPull(member,
+            Wire.TaskFields(Guid.CreateVersion7(), member, memberTask, member, 1, ("title", "uye yeni gorev"), ("projectId", project.ToString()))));
+        rMember.Applied.ShouldHaveSingleItem().Code.ShouldBe(nameof(IngestResultCode.Applied));
+    }
+
+    /// <summary>
+    /// IS-EMRI-o86-A2 4. bulgu (Onur kilidi, o86-A2 canli tur adim 9'da bulundu, is emrinin KENDI
+    /// H1-H6 setinin DISINDA): eski `PullIncrementalAsync`nin `owner_id = @actorId` kolu bir op'u
+    /// YAZDIGI outbox satirini (append-only, degismez) SONSUZA DEK gorunur tutuyordu -- uye
+    /// CIKARILDIKTAN SONRA bile, UYEYKEN yazdigi (scope tasiyan) kendi eski satiri kendi
+    /// `owner_id`siyle eslesmeye devam ediyordu. Duzeltme: bu kol artik YALNIZ scope'suz (kisisel,
+    /// Gelen Kutusu) satirlarda gecerli -- scope tasiyan bir satinin gorunurlugu SADECE GUNCEL
+    /// uyelikten (project_access) gelir, o satiri KIMIN yazdigindan degil.
+    /// H7a: ARTIMLI (incremental) kanal. POZITIF KONTROL: B UYEYKEN kendi duzenlemesini kendi
+    /// ARTIMLI pull'unda gorur. ANA IDDIA: B CIKARILDIKTAN SONRA, AYNI (eski) cursor'dan tekrar
+    /// pull yapinca kendi eski duzenleme op'unu ARTIK GORMEZ.
+    /// </summary>
+    [Fact]
+    public async Task Ex_member_own_past_scoped_write_no_longer_grants_incremental_visibility_H7a()
+    {
+        var connectionString = await TestDatabase.CreateAsync(fixture);
+        await using var app = new SyncTestApp(connectionString);
+        var owner = Guid.NewGuid();
+        var member = Guid.NewGuid();
+        var project = Guid.NewGuid();
+        var task = Guid.NewGuid();
+        var memberTag = Guid.CreateVersion7();
+
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 1,
+            fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P", Wire.Hlc(owner, 1)) },
+            entityType: "Project")));
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 2,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new([new WireSetAdd(member.ToString(), memberTag, Wire.Hlc(owner, 2))], null),
+            },
+            entityType: "Project")));
+        await app.SyncAsync(owner, Wire.PushNoPull(owner,
+            Wire.TaskField(Guid.CreateVersion7(), owner, task, owner, "projectId", project.ToString(), counter: 3)));
+
+        // B'nin KENDI baslangic cursor'u -- eski (uyelikten cikarilmadan ONCEKI) bir horizon, kasitli
+        // olarak SAKLANIR: ana iddia bu AYNI eski cursor'dan TEKRAR pull yapmaktir.
+        var bCursorEski = (await app.PullAsync(member, new SyncCursor(0, 0))).NextCursor;
+
+        // B, UYEYKEN, T'yi duzenler -- outbox satiri owner_id=B, scope_id=P (GERCEK hatanin ta kendisi).
+        await app.SyncAsync(member, Wire.PushNoPull(member,
+            Wire.TaskField(Guid.CreateVersion7(), member, task, member, "title", "Uye duzenledi", counter: 1)));
+
+        // POZITIF KONTROL: B, HALA UYEYKEN, KENDI eski cursor'undan ARTIMLI pull'da kendi
+        // duzenlemesini GORUR (scope_id IN project_access(B) uzerinden -- owner_id kolu GEREKMEZ).
+        var whileMember = await app.PullAsync(member, bCursorEski);
+        whileMember.Changes.Any(c => JsonDocument.Parse(c.PayloadJson).RootElement.GetProperty("entityId").GetGuid() == task)
+            .ShouldBeTrue("H7a POZITIF KONTROL: B UYEYKEN kendi duzenlemesini ARTIMLI pull'da GORMELI");
+
+        // owner, B'yi uyelikten CIKARIR.
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 4,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new(null, [new WireSetRemove(member.ToString(), [memberTag], Wire.Hlc(owner, 4))]),
+            },
+            entityType: "Project")));
+
+        // ANA IDDIA: B, AYNI eski cursor'dan (bCursorEski) TEKRAR pull yapar -- KENDI eski
+        // duzenlemesi ARTIK GORUNMEMELI (owner_id kolu artik gecersiz, scope_id IN project_access(B)
+        // de artik false -- B cikarildi).
+        var afterRemoval = await app.PullAsync(member, bCursorEski);
+        afterRemoval.Changes.Any(c => JsonDocument.Parse(c.PayloadJson).RootElement.GetProperty("entityId").GetGuid() == task)
+            .ShouldBeFalse("H7a ANA IDDIA: B CIKARILDIKTAN SONRA kendi ESKI duzenlemesini ARTIK GORMEMELI");
+    }
+
+    /// <summary>
+    /// IS-EMRI-o86-A2 4. bulgu, H7b: SNAPSHOT kanali. Onur'un ISARET ETTIGI EN SIKI senaryo: B
+    /// gorevi ONCE KENDI Gelen Kutusu'nda (scope NULL/NULL) yaratir, SONRA P'ye TASIR -- bu eski
+    /// KISISEL outbox satiri (scope_id IS NULL) narrow edilmis outbox-tabanli bir kural bile
+    /// GECERDI. Dogru olcum GUNCEL materyalize durumdur (tasks.project_id/owner_id) -- bu test
+    /// TAM O SENARYOYU sinar. POZITIF KONTROL: B UYEYKEN snapshot'ta gorevi gorur. ANA IDDIA: B
+    /// CIKARILDIKTAN SONRA ayni gorev snapshot'ta ARTIK YOK.
+    /// </summary>
+    [Fact]
+    public async Task Ex_member_task_created_personally_then_moved_into_project_disappears_from_snapshot_after_removal_H7b()
+    {
+        var connectionString = await TestDatabase.CreateAsync(fixture);
+        await using var app = new SyncTestApp(connectionString);
+        var owner = Guid.NewGuid();
+        var member = Guid.NewGuid();
+        var project = Guid.NewGuid();
+        var task = Guid.NewGuid();
+        var memberTag = Guid.CreateVersion7();
+
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 1,
+            fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P", Wire.Hlc(owner, 1)) },
+            entityType: "Project")));
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 2,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new([new WireSetAdd(member.ToString(), memberTag, Wire.Hlc(owner, 2))], null),
+            },
+            entityType: "Project")));
+
+        // B, T'yi ONCE KENDI Gelen Kutusu'nda yaratir (scope NULL/NULL, outbox owner_id=B).
+        await app.SyncAsync(member, Wire.PushNoPull(member,
+            Wire.TaskField(Guid.CreateVersion7(), member, task, member, "title", "Kisisel gorev", counter: 1)));
+        // B, SONRA T'yi P'ye TASIR (uye oldugu icin IZIN(post=P) true) -- guncel materyalize durum
+        // artik tasks.project_id=P, ama ESKI kisisel yaratim satiri outbox'ta scope NULL/NULL KALIR.
+        await app.SyncAsync(member, Wire.PushNoPull(member,
+            Wire.TaskField(Guid.CreateVersion7(), member, task, member, "projectId", project.ToString(), counter: 2)));
+
+        // POZITIF KONTROL: B, HALA UYEYKEN, snapshot'ta T'yi GORUR.
+        var whileMember = await app.SnapshotAsync(member);
+        whileMember.Entities.ShouldContain(e => e.EntityId == task, "H7b POZITIF KONTROL: B UYEYKEN T snapshot'ta GORULMELI");
+
+        // owner, B'yi uyelikten CIKARIR.
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 3,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new(null, [new WireSetRemove(member.ToString(), [memberTag], Wire.Hlc(owner, 3))]),
+            },
+            entityType: "Project")));
+
+        // ANA IDDIA: B, CIKARILDIKTAN SONRA, snapshot'ta T'yi ARTIK GORMEZ -- ESKI kisisel yaratim
+        // satiri (scope NULL/NULL) entity listesine SIZDIRMAMALI (materyalize tasks.project_id
+        // uzerinden olculur, outbox GECMISI degil).
+        var afterRemoval = await app.SnapshotAsync(member);
+        afterRemoval.Entities.ShouldNotContain(e => e.EntityId == task, "H7b ANA IDDIA: B CIKARILDIKTAN SONRA T'yi ARTIK GORMEMELI");
+    }
+
+    /// <summary>
+    /// IS-EMRI-o86-A2 §E H6 (REGRESYON, mutantsiz -- ISLEYIS md.8): sahip kendi Gelen Kutusu'na
+    /// (scope null) yeni gorev yazabilir -- §C/§D'nin pre/post-scope daralmasi Inbox'i ETKILEMEDI.
+    /// </summary>
+    [Fact]
+    public async Task Owner_can_still_write_to_own_inbox_H6()
+    {
+        var connectionString = await TestDatabase.CreateAsync(fixture);
+        await using var app = new SyncTestApp(connectionString);
+        var owner = Guid.NewGuid();
+        var task = Guid.NewGuid();
+
+        var r = await app.SyncAsync(owner, Wire.PushNoPull(owner,
+            Wire.TaskFields(Guid.CreateVersion7(), owner, task, owner, 1, ("title", "Gelen Kutusu gorevi"))));
+        r.Applied.ShouldHaveSingleItem().Code.ShouldBe(nameof(IngestResultCode.Applied));
+        (await Db.ScalarAsync<string>(connectionString, "SELECT title FROM tasks WHERE entity_id = @e", ("e", task)))
+            .ShouldBe("Gelen Kutusu gorevi");
+    }
 }

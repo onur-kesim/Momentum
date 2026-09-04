@@ -1,0 +1,252 @@
+==========================================================
+H1 MUTANT: project_access gorunumunun OWNER kolunu kaldir (yalniz project_members kalir)
+==========================================================
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.Persistence.Tests -> C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll
+C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:07.07]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Owner_sees_members_write_via_incremental_pull_non_member_sees_nothing_H1 [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Owner_sees_members_write_via_incremental_pull_non_member_sees_nothing_H1 [1 s]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : ownerGorurMu
+    should be
+True
+    but was
+False
+
+Additional Info:
+    H1: SAHIP, UYENIN yazdigini ARTIMLI pull'da GORMELI
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Owner_sees_members_write_via_incremental_pull_non_member_sees_nothing_H1() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 336
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Owner_sees_members_write_via_incremental_pull_non_member_sees_nothing_H1() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 340
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+
+Başarısız! - Başarısız:     1, Başarılı:     0, Atlanan:     0, Toplam:     1, Süre: 1 s - Momentum.Persistence.Tests.dll (net10.0)
+EXIT:1
+==========================================================
+H2 MUTANT: GetScopesAsync'i project_members'e geri al (project_access DEGIL)
+==========================================================
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.Persistence.Tests -> C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll
+C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:06.88]     Momentum.Persistence.Tests.RealtimeMembershipTests.Owner_joins_own_scope_group_on_connect_H2 [FAIL]
+  Başarısız Momentum.Persistence.Tests.RealtimeMembershipTests.Owner_joins_own_scope_group_on_connect_H2 [1 s]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : actual
+    should contain
+"scope:9fbe6885-1d6b-486c-be81-69224a2f060d"
+    but was actually
+["user:95c6bb93-624f-4b58-bd09-e5b998df4321"]
+
+Additional Info:
+    H2: sahip project_members'e YAZILMAZ ama project_access uzerinden scope grubuna KATILMALI
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.RealtimeMembershipTests.Owner_joins_own_scope_group_on_connect_H2() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\RealtimeMembershipTests.cs:line 190
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Momentum.Persistence.Tests.RealtimeMembershipTests.Owner_joins_own_scope_group_on_connect_H2() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\RealtimeMembershipTests.cs:line 190
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Momentum.Persistence.Tests.RealtimeMembershipTests.Owner_joins_own_scope_group_on_connect_H2() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\RealtimeMembershipTests.cs:line 190
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+
+Başarısız! - Başarısız:     1, Başarılı:     0, Atlanan:     0, Toplam:     1, Süre: 1 s - Momentum.Persistence.Tests.dll (net10.0)
+EXIT:1
+==========================================================
+H3+H4 MUTANT: IZIN(preScope) kolunu kaldir (yalniz postScope kalir)
+-- NOT: ilk deneme YANLIS YESIL verdi (test'in KENDI HLC kurulumu, exMember'in
+-- op'unu owner'in ayni-wallMs'teki DAHA BUYUK counter'i karsisinda kaybettiriyordu --
+-- mutant hic calismadan da red cikiyordu, yanlis sebepten). Duzeltme: H3/H4'un son
+-- Wire.TaskField cagrisina wallOffset:100 eklendi (Wire.Hlc wallMs'i sabit BaseWall'dir,
+-- gercek saat degil -- ayni wallOffset'siz iki op HER ZAMAN sayaca gore kirilir).
+-- Asagidaki kosu DUZELTILMIS testlerle, mutant GERCEKTEN kirmizi.
+==========================================================
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.Persistence.Tests -> C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll
+C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:07.21]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Ex_member_cannot_move_task_to_own_project_H4 [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Ex_member_cannot_move_task_to_own_project_H4 [1 s]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : r.Applied.ShouldHaveSingleItem().Code
+    should be
+"RejectedForbidden"
+    but was
+"Applied"
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Ex_member_cannot_move_task_to_own_project_H4() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 448
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+[xUnit.net 00:00:07.68]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Ex_member_cannot_detach_task_still_member_can_H3 [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Ex_member_cannot_detach_task_still_member_can_H3 [463 ms]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : rEx.Applied.ShouldHaveSingleItem().Code
+    should be
+"RejectedForbidden"
+    but was
+"Applied"
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Ex_member_cannot_detach_task_still_member_can_H3() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 400
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+
+Başarısız! - Başarısız:     2, Başarılı:     0, Atlanan:     0, Toplam:     2, Süre: 2 s - Momentum.Persistence.Tests.dll (net10.0)
+EXIT:1
+==========================================================
+H5 MUTANT: Task icin eski kosulsuz "yeni varlik -> KABUL" istisnasi GERI GETIRILDI (§D narrowing kaldirildi)
+==========================================================
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.Persistence.Tests -> C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll
+C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:07.00]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Stranger_cannot_inject_new_task_into_guessed_project_member_can_H5 [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Stranger_cannot_inject_new_task_into_guessed_project_member_can_H5 [1 s]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : rStranger.Applied.ShouldHaveSingleItem().Code
+    should be
+"RejectedForbidden"
+    but was
+"Applied"
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Stranger_cannot_inject_new_task_into_guessed_project_member_can_H5() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 487
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+
+Başarısız! - Başarısız:     1, Başarılı:     0, Atlanan:     0, Toplam:     1, Süre: 1 s - Momentum.Persistence.Tests.dll (net10.0)
+EXIT:1
+==========================================================
+§G MUTANT: ScopeMembershipSource.cs'e yasak literal `project_members` GERI KONULDU
+==========================================================
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.ArchitectureTests -> C:\dev\Momentum\tests\Momentum.ArchitectureTests\bin\Debug\net10.0\Momentum.ArchitectureTests.dll
+C:\dev\Momentum\tests\Momentum.ArchitectureTests\bin\Debug\net10.0\Momentum.ArchitectureTests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:00.31]     Momentum.ArchitectureTests.ArchitectureRuleTests.Rule5_Sync_read_paths_reach_membership_only_through_the_project_access_view [FAIL]
+  Başarısız Momentum.ArchitectureTests.ArchitectureRuleTests.Rule5_Sync_read_paths_reach_membership_only_through_the_project_access_view [65 ms]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : scopeMembershipSource
+    should not contain (case insensitive comparison)
+"project_members"
+    but was actually
+"using Momentum.Application.Abstractions.Sync;
+using Momentum.Infrastructure.Persistence;
+
+namespace ..."
+
+Additional Info:
+    ScopeMembershipSource.cs project_access GORUNUMU yerine dogrudan project_members'i sorguluyor
+  Yığın İzleme:
+     at Momentum.ArchitectureTests.ArchitectureRuleTests.Rule5_Sync_read_paths_reach_membership_only_through_the_project_access_view() in C:\dev\Momentum\tests\Momentum.ArchitectureTests\ArchitectureRuleTests.cs:line 103
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+Başarısız! - Başarısız:     1, Başarılı:     0, Atlanan:     0, Toplam:     1, Süre: 65 ms - Momentum.ArchitectureTests.dll (net10.0)
+EXIT:1
+==========================================================
+H7a MUTANT (4. bulgu, Onur kilidi -- ADIM 9'da bulunan, is emrinin H1-H6'sinin DISINDA kalan
+ek deger sizintisi): PullIncrementalAsync'in daraltilmis owner_id kolu (AND scope_id IS NULL
+AND old_scope_id IS NULL) kaldirildi -- eski (kosulsuz) owner_id = @actorId'e geri donuldu.
+==========================================================
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.Persistence.Tests -> C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll
+C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:09.85]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Ex_member_own_past_scoped_write_no_longer_grants_incremental_visibility_H7a [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Ex_member_own_past_scoped_write_no_longer_grants_incremental_visibility_H7a [3 s]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : afterRemoval.Changes.Any(c => JsonDocument.Parse(c.PayloadJson).RootElement.GetProperty("entityId").GetGuid() == task)
+    should be
+False
+    but was
+True
+
+Additional Info:
+    H7a ANA IDDIA: B CIKARILDIKTAN SONRA kendi ESKI duzenlemesini ARTIK GORMEMELI
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Ex_member_own_past_scoped_write_no_longer_grants_incremental_visibility_H7a() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 551
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+
+Başarısız! - Başarısız:     1, Başarılı:     0, Atlanan:     0, Toplam:     1, Süre: 3 s - Momentum.Persistence.Tests.dll (net10.0)
+EXIT:1
+==========================================================
+H7b MUTANT (4. bulgu, Onur kilidi -- ADIM 9'da bulunan): ReadOwnedEntitiesAsync'in materyalize-
+tabanli duzeltmesi kaldirildi -- eski saf outbox-tabanli uc-kollu kurala (Task/Project icin de
+tasks/projects yerine outbox GECMISI) geri donuldu.
+==========================================================
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.Persistence.Tests -> C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll
+C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:10.21]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Ex_member_task_created_personally_then_moved_into_project_disappears_from_snapshot_after_removal_H7b [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Ex_member_task_created_personally_then_moved_into_project_disappears_from_snapshot_after_removal_H7b [3 s]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : afterRemoval.Entities
+    should not contain an element satisfying the condition
+(e.EntityId == task)
+    but does
+
+Additional Info:
+    H7b ANA IDDIA: B CIKARILDIKTAN SONRA T'yi ARTIK GORMEMELI
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Ex_member_task_created_personally_then_moved_into_project_disappears_from_snapshot_after_removal_H7b() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 608
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+
+Başarısız! - Başarısız:     1, Başarılı:     0, Atlanan:     0, Toplam:     1, Süre: 3 s - Momentum.Persistence.Tests.dll (net10.0)
+EXIT:1

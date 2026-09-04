@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Momentum.Infrastructure.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Momentum.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(SyncDbContext))]
-    partial class SyncDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260904131012_AddProjectAccessView")]
+    partial class AddProjectAccessView
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -501,9 +504,6 @@ namespace Momentum.Infrastructure.Persistence.Migrations
                         .HasColumnName("title");
 
                     b.HasKey("EntityId");
-
-                    b.HasIndex("ProjectId")
-                        .HasDatabaseName("ix_tasks_project_id");
 
                     b.HasIndex("OwnerId", "ProjectId")
                         .HasDatabaseName("ix_tasks_owner_project");

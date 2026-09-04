@@ -1,0 +1,75 @@
+§A OLCUMU: project_access GORUNUMUNUN IKI KOLONU DA INDEX'E DUSUYOR MU?
+========================================================================
+
+EXPLAIN (ANALYZE, BUFFERS) SELECT project_id FROM project_access WHERE user_id = :actorId;
+
+ Subquery Scan on project_access  (cost=24.04..24.20 rows=9 width=16) (actual time=0.053..0.054 rows=0 loops=1)
+   Buffers: shared hit=5
+   ->  Unique  (cost=24.04..24.11 rows=9 width=32) (actual time=0.053..0.053 rows=0 loops=1)
+         Buffers: shared hit=5
+         ->  Sort  (cost=24.04..24.07 rows=9 width=32) (actual time=0.052..0.053 rows=0 loops=1)
+               Sort Key: projects.entity_id, projects.owner_id
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=5
+               ->  Append  (cost=4.16..23.90 rows=9 width=32) (actual time=0.013..0.014 rows=0 loops=1)
+                     Buffers: shared hit=2
+                     ->  Bitmap Heap Scan on projects  (cost=4.16..9.50 rows=2 width=32) (actual time=0.005..0.005 rows=0 loops=1)
+                           Recheck Cond: (owner_id = :actorId)
+                           Buffers: shared hit=1
+                           ->  Bitmap Index Scan on ix_projects_owner_deleted_pos_entity  (cost=0.00..4.16 rows=2 width=0) (actual time=0.003..0.003 rows=0 loops=1)
+                                 Index Cond: (owner_id = :actorId)
+                                 Buffers: shared hit=1
+                     ->  Bitmap Heap Scan on project_members  (cost=4.21..14.35 rows=7 width=32) (actual time=0.007..0.008 rows=0 loops=1)
+                           Recheck Cond: (user_id = :actorId)
+                           Buffers: shared hit=1
+                           ->  Bitmap Index Scan on ix_project_members_user_project  (cost=0.00..4.21 rows=7 width=0) (actual time=0.005..0.005 rows=0 loops=1)
+                                 Index Cond: (user_id = :actorId)
+                                 Buffers: shared hit=1
+ Planning Time: 1.164 ms
+ Execution Time: 0.127 ms
+
+SONUC: `projects.owner_id` kolu -> Bitmap Index Scan on ix_projects_owner_deleted_pos_entity (owner_id ONDE).
+       `project_members.user_id` kolu -> Bitmap Index Scan on ix_project_members_user_project (user_id ONDE).
+       IKI kaynak da index kullanir, Seq Scan YOK. §A gecti.
+
+           View "public.project_access"
+  Column   | Type | Collation | Nullable | Default
+------------+------+-----------+----------+---------
+ project_id | uuid |           |          |
+ user_id    | uuid |           |          |
+
+
+4. BULGU DUZELTMESI OLCUMU (Onur kilidi): ReadOwnedEntitiesAsync'in yeni tasks.project_id kolu
+========================================================================================================
+
+EXPLAIN (ANALYZE, BUFFERS) -- birlesik OR yuklemi (owner_id dali + project_id IN dali) TAM SORGUDA:
+
+ Seq Scan on tasks t  (cost=24.22..29.47 rows=75 width=48) (actual time=0.077..0.078 rows=0 loops=1)
+   Filter: (((project_id IS NULL) AND (owner_id = :actorId)) OR (ANY (project_id = (hashed SubPlan 1).col1)))
+   Rows Removed by Filter: 208
+   Buffers: shared hit=8
+
+`SET enable_seqscan = off;` ile ZORLANDI -- YINE Seq Scan (PG planlayicisi bir "project_id IS NULL"
+kosulu ile hash'lenmis bir alt-sorgu ANY(...) kosulunu OR ile TEK bir Bitmap-Or planina BIRLESTIREMIYOR
+-- taninmis bir planlayici siniri, eksik indeks DEGIL). Bu, tasks 208 satirken (kucuk tablo) zaten
+DOGRU/en-ucuz plandir.
+
+IZOLE OLCUM -- SADECE `project_id IN (project_access alt sorgusu)` kolu (yeni ix_tasks_project_id'nin
+KENDI basina calisabildigini kanitlar):
+
+EXPLAIN (ANALYZE, BUFFERS) SELECT t.entity_id FROM tasks t
+WHERE t.project_id IN (SELECT project_id FROM project_access WHERE user_id = :actorId);
+
+ Nested Loop  (cost=24.37..45.87 rows=1 width=16) (actual time=0.049..0.051 rows=0 loops=1)
+   ->  HashAggregate (project_access alt sorgusu, yukaridaki gibi index'li)
+   ->  Index Scan using ix_tasks_project_id on tasks t  (cost=0.14..2.38 rows=1 width=32) (never executed)
+         Index Cond: (project_id = projects.entity_id)
+
+SONUC: `ix_tasks_project_id` YAPISAL OLARAK KULLANILABILIR ve planlayici onu SECER (Index Scan) --
+birlesik OR sorgusunda tasks 208 satirken Seq Scan DAHA UCUZ oldugu icin (planlayicinin kendi
+OR/hashed-subplan sinirlamasi nedeniyle, indeks eksikliginden DEGIL) secilmiyor, ama ISTENEN erisim
+deseni (bir kullanicinin uye oldugu projelerdeki gorevleri project_id'ye gore bulmak) icin dogru
+indeks MEVCUT ve olcekte (tasks buyudukce) planlayici tarafindan secilecektir. `(owner_id,
+project_id)` bilesik indeksi bu deseni KARSILAMAZ (owner_id onde, ama bu dal owner_id'den BAGIMSIZ
+arar) -- §A'nin "Seq Scan'a duserse dar bir indeks ekle" kurali UYGULANDI: migration
+`20260904141441_AddTasksProjectIdIndex` (`ix_tasks_project_id` tekil kolon).

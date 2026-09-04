@@ -145,6 +145,12 @@ public sealed class TaskRowConfiguration : IEntityTypeConfiguration<TaskRow>
         // as a leading column) -- deliberate, the default path is the one optimized (GOREV slice-3a D1).
         builder.HasIndex(x => new { x.OwnerId, x.IsDeleted, x.ListPos, x.EntityId }).HasDatabaseName("ix_tasks_owner_deleted_listpos_entity");
         builder.HasIndex(x => new { x.OwnerId, x.ProjectId }).HasDatabaseName("ix_tasks_owner_project");
+        // IS-EMRI-o86-A2 4. bulgu duzeltmesi (SyncPuller.ReadOwnedEntitiesAsync): "project_id IN
+        // (project_access alt sorgusu)" -- OWNER'DAN BAGIMSIZ, SADECE project_id'ye gore arar.
+        // (owner_id, project_id) bilesik indeksi BURADA yardimci OLMAZ (owner_id ONDE, filtrelenmiyor).
+        // EXPLAIN Seq Scan gosterdi (kucuk tabloda dogru plan ama olcekte YAVASLAR) -- §A'nin
+        // "Seq Scan'a duserse dar bir indeks ekle" kuralinin AYNISI.
+        builder.HasIndex(x => x.ProjectId).HasDatabaseName("ix_tasks_project_id");
     }
 }
 

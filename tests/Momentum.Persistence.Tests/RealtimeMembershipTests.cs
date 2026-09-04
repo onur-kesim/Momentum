@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Momentum.Api.Realtime;
 using Momentum.Application.Abstractions;
 using Momentum.Application.Abstractions.Sync;
+using Momentum.Application.Features.Sync;
 using Momentum.Domain.Sync;
 using Momentum.Infrastructure;
 using Momentum.Infrastructure.Sync;
@@ -152,5 +153,40 @@ public sealed class RealtimeMembershipTests(PostgresFixture fixture)
         await using var puller = new SyncTestApp(connectionString);
         var page = await puller.PullAsync(user, new SyncCursor(0, 0));
         page.Changes.Count.ShouldBe(changeCount); // the real cursor, unaffected by the hub, returns everything
+    }
+
+    /// <summary>
+    /// IS-EMRI-o86-A2 §E H2: SAHIP A, kendi projesine baglaninca `scope:{P}` grubuna KATILIR --
+    /// sahip `project_members`e YAZILMAZ (§C3), ama `project_access` GORUNUMU onu `projects.owner_id`
+    /// uzerinden zaten kapsar.
+    /// </summary>
+    [Fact]
+    public async Task Owner_joins_own_scope_group_on_connect_H2()
+    {
+        var connectionString = await TestDatabase.CreateAsync(fixture);
+        var owner = Guid.NewGuid();
+        var project = Guid.NewGuid();
+
+        await using (var app = new SyncTestApp(connectionString))
+        {
+            await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 1,
+                fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P", Wire.Hlc(owner, 1)) },
+                entityType: "Project")));
+        }
+
+        var services = new ServiceCollection();
+        services.AddSyncInfrastructure(connectionString);
+        await using var provider = services.BuildServiceProvider();
+
+        await using var scope = provider.CreateAsyncScope();
+        var membership = scope.ServiceProvider.GetRequiredService<IScopeMembershipSource>();
+        var groups = new RecordingGroupManager();
+        var context = new FakeHubCallerContext(Guid.NewGuid().ToString());
+        var hub = new SyncHub(new FakeCurrentUser(owner), membership) { Groups = groups, Context = context };
+
+        await hub.OnConnectedAsync();
+
+        var actual = groups.GroupsFor(context.ConnectionId).ToHashSet(StringComparer.Ordinal);
+        actual.ShouldContain($"scope:{project}", "H2: sahip project_members'e YAZILMAZ ama project_access uzerinden scope grubuna KATILMALI");
     }
 }

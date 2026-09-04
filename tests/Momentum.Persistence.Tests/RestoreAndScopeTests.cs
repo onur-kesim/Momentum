@@ -72,10 +72,21 @@ public sealed class RestoreAndScopeTests(PostgresFixture fixture)
         var connectionString = await TestDatabase.CreateAsync(fixture);
         await using var app = new SyncTestApp(connectionString);
         var client = Guid.NewGuid();
+        var project = Guid.NewGuid();
 
-        // projectId points at a Project that does not exist -> no FK -> accepted.
+        // IS-EMRI-o86-A2: bu testin ORIJINAL iddiasi ("projectId TAMAMEN var olmayan/erisimsiz bir
+        // Projeye isaret eder -> FK yok -> kabul") ARTIK dogru DEGIL -- tam da bu senaryo (yabancinin
+        // TAHMIN ETTIGI bir projectId ile yeni gorev dogurmasi) bilerek KAPATILDI (D9OwnerIdVisibilityTests.
+        // Stranger_cannot_inject_new_task_into_guessed_project_member_can_H5, ayni sinifin bir uyesi --
+        // authorization ve schema-FK-yoklugu AYRI katmanlardir). Bu test artik SADECE schema iddiasini
+        // (tasks.project_id -> projects.entity_id foreign key YOKTUR, K2-E5 soft-ref deseni) client'in
+        // KENDI (gercek, erisimi olan) projesiyle sinar -- authorization ayrica gerekli, kapanmadi.
+        await app.SyncAsync(client, Wire.PushNoPull(client, Wire.Op(Guid.CreateVersion7(), client, project, client, 1,
+            fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P", Wire.Hlc(client, 1)) },
+            entityType: "Project")));
+
         var response = await app.SyncAsync(client, Wire.PushNoPull(client,
-            Wire.TaskField(Guid.CreateVersion7(), client, Guid.NewGuid(), client, "projectId", Guid.NewGuid().ToString())));
+            Wire.TaskField(Guid.CreateVersion7(), client, Guid.NewGuid(), client, "projectId", project.ToString())));
 
         response.Applied.ShouldHaveSingleItem().Code.ShouldBe("Applied");
     }

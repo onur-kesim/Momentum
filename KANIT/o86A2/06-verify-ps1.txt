@@ -1,0 +1,32 @@
+﻿  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.SyncCore.Tests -> C:\dev\Momentum\tests\Momentum.SyncCore.Tests\bin\Debug\net10.0\Momentum.SyncCore.Tests.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.ArchitectureTests -> C:\dev\Momentum\tests\Momentum.ArchitectureTests\bin\Debug\net10.0\Momentum.ArchitectureTests.dll
+  Momentum.Api.Tests -> C:\dev\Momentum\tests\Momentum.Api.Tests\bin\Debug\net10.0\Momentum.Api.Tests.dll
+  Momentum.Persistence.Tests -> C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll
+
+Oluşturma başarılı oldu.
+    0 Uyarı
+    0 Hata
+
+Geçen Süre 00:00:02.95
+C:\dev\Momentum\tests\Momentum.ArchitectureTests\bin\Debug\net10.0\Momentum.ArchitectureTests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+C:\dev\Momentum\tests\Momentum.Api.Tests\bin\Debug\net10.0\Momentum.Api.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+C:\dev\Momentum\tests\Momentum.SyncCore.Tests\bin\Debug\net10.0\Momentum.SyncCore.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+
+Başarılı!  - Başarısız:     0, Başarılı:     6, Atlanan:     0, Toplam:     6, Süre: 565 ms - Momentum.ArchitectureTests.dll (net10.0)
+
+Başarılı!  - Başarısız:     0, Başarılı:    44, Atlanan:     0, Toplam:    44, Süre: 3 s - Momentum.SyncCore.Tests.dll (net10.0)
+
+Başarılı!  - Başarısız:     0, Başarılı:    22, Atlanan:     0, Toplam:    22, Süre: 11 s - Momentum.Api.Tests.dll (net10.0)
+
+Başarılı!  - Başarısız:     0, Başarılı:    88, Atlanan:     0, Toplam:    88, Süre: 58 s - Momentum.Persistence.Tests.dll (net10.0)

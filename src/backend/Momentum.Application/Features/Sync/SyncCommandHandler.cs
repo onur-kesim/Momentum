@@ -159,7 +159,7 @@ public sealed class SyncCommandHandler : ICommandHandler<SyncCommand, SyncRespon
             // IS-EMRI-o86-A §E: yazma yetkisi kapisi. `entity` burada POST-op durumdadir (Ingest
             // yukarida zaten uyguladi) -- hedef scope (Task'in yeni projectId'si) BUNDAN okunur.
             // PersistDeltaAsync/MaterializeAsync'ten ONCE, hic yan etki olusmadan kontrol edilir.
-            if (!await IsAuthorizedAsync(op, entity, isNewEntity, authenticatedActorId, cancellationToken))
+            if (!await IsAuthorizedAsync(op, entity, isNewEntity, preProjectId, authenticatedActorId, cancellationToken))
             {
                 // RejectedInvalid ile AYNI ERRATA deseni (A3): KAYDEDILMEZ -- uyelik zamanla
                 // degisebilir, sonraki bir retry (uye yapilinca) yeniden degerlendirilebilmeli.
@@ -222,31 +222,35 @@ public sealed class SyncCommandHandler : ICommandHandler<SyncCommand, SyncRespon
     }
 
     /// <summary>
-    /// IS-EMRI-o86-A §E karar tablosu (BIREBIR, Cowork+Onur kilidi 20 Agu):
-    ///   Varlik yeni                              -> KABUL (yazan sahip olur)
-    ///   Task op, hedef scope NULL (Gelen Kutusu) -> KABUL (yazan kendi kutusuna yaziyor)
-    ///   Task op, hedef scope P                   -> P'nin sahibi VEYA uyesi ise KABUL
-    ///   Project op, alan `members`               -> YALNIZ projects.owner_id ise KABUL (en sert kural --
-    ///                                                bir uye members'tan sahibi SILEBILSEYDI projeyi calardi)
-    ///   Project op, diger alanlar                -> sahip VEYA uye ise KABUL
-    ///   TaskList/Tag                              -> bu dilimin kapsami disi, davranis DEGISMEZ
+    /// IS-EMRI-o86-A2 §C/§D (Cowork+Onur kilidi 4 Eyl -- o86-A denetiminde dusen iki bulguyu, ayni
+    /// sinifin uyeleri olarak, birlikte kapatir): eski karar tablosu YALNIZ POST-op (hedef) scope'a
+    /// bakiyordu -- (1) eski bir uye projectId'yi null'a ya da KENDI projesine cevirerek gorevi
+    /// KOPARABILIYOR/CALABILIYORDU (§C), (2) `isNewEntity` kosulsuz KABUL ettigi icin bir yabanci,
+    /// TAHMIN ETTIGI bir projectId ile baskasinin projesine YEPYENI bir gorev ENJEKTE edebiliyordu
+    /// (§D). Tek duzeltme: Task dali artik KAYNAK VE HEDEF scope'un IKISINI de sorar --
+    ///   IZIN(null) = true;  IZIN(P) = IsProjectOwnerOrMemberAsync(P, actor)
+    ///   KABUL(Task op) <=> IZIN(preScope) VE IZIN(postScope)
+    /// Task icin AYRICA bir "yeni varlik" istisnasi YAZILMAZ: hic hidratlanmamis (Fields bos) bir
+    /// entity'de preScope zaten dogal olarak null'dur (IZIN(null)=true), formul KENDILIGINDEN
+    /// "yeni gorev + hedef scope P -> yalniz IZIN(P) sart" sonucunu uretir -- §D'nin istedigi tam budur.
+    ///   Varlik yeni (Project/TaskList/Tag)  -> KABUL (kendi kabini yaratiyor, DEGISMEDI)
+    ///   Project op, alan `members`          -> YALNIZ projects.owner_id ise KABUL (en sert kural --
+    ///                                          bir uye members'tan sahibi SILEBILSEYDI projeyi calardi)
+    ///   Project op, diger alanlar           -> sahip VEYA uye ise KABUL
+    ///   TaskList/Tag (mevcut)                -> bu dilimin kapsami disi, davranis DEGISMEZ
     /// </summary>
-    private async Task<bool> IsAuthorizedAsync(ChangeOperation op, EntityState entity, bool isNewEntity, Guid actorId, CancellationToken cancellationToken)
+    private async Task<bool> IsAuthorizedAsync(ChangeOperation op, EntityState entity, bool isNewEntity, string? preProjectId, Guid actorId, CancellationToken cancellationToken)
     {
+        if (op.EntityType == "Task")
+        {
+            var preScope = TryScope(preProjectId);
+            var postScope = TryScope(ReadProjectId(op.EntityType, entity)); // POST-op (Ingest zaten uyguladi)
+            return await IzinAsync(preScope, actorId, cancellationToken) && await IzinAsync(postScope, actorId, cancellationToken);
+        }
+
         if (isNewEntity)
         {
             return true;
-        }
-
-        if (op.EntityType == "Task")
-        {
-            var targetScope = TryScope(ReadProjectId(op.EntityType, entity)); // POST-op (Ingest zaten uyguladi)
-            if (targetScope is null)
-            {
-                return true;
-            }
-
-            return await _store.IsProjectOwnerOrMemberAsync(targetScope.Value, actorId, cancellationToken);
         }
 
         if (op.EntityType == "Project")
@@ -261,6 +265,9 @@ public sealed class SyncCommandHandler : ICommandHandler<SyncCommand, SyncRespon
 
         return true;
     }
+
+    private Task<bool> IzinAsync(Guid? scope, Guid actorId, CancellationToken cancellationToken) =>
+        scope is null ? Task.FromResult(true) : _store.IsProjectOwnerOrMemberAsync(scope.Value, actorId, cancellationToken);
 
     private static string? ReadProjectId(string entityType, EntityState entity) =>
         entityType == "Task" && entity.Fields.TryGetValue(ProjectIdField, out var register) && register.HasValue

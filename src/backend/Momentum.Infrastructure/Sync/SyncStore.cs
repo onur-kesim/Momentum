@@ -204,11 +204,13 @@ public sealed class SyncStore(SyncDbContext db) : ISyncStore
         return (bool)(await command.ExecuteScalarAsync(cancellationToken))!;
     }
 
+    // IS-EMRI-o86-A2 §B: project_access GORUNUMU uzerinden tek EXISTS (ad/imza SABIT kalir --
+    // arayuz ve cagri yerleri degismez). IsProjectOwnerAsync (yukarida) DEGISMEZ -- members yazimi
+    // yalniz GERCEK sahibindir, §C3.
     public async Task<bool> IsProjectOwnerOrMemberAsync(Guid projectId, Guid actorId, CancellationToken cancellationToken)
     {
         await using var command = await db.CreateRawCommandAsync(
-            "SELECT EXISTS (SELECT 1 FROM projects WHERE entity_id = @p AND owner_id = @a) " +
-            "OR EXISTS (SELECT 1 FROM project_members WHERE project_id = @p AND user_id = @a)", cancellationToken);
+            "SELECT EXISTS (SELECT 1 FROM project_access WHERE project_id = @p AND user_id = @a)", cancellationToken);
         command.Parameters.AddWithValue("p", projectId);
         command.Parameters.AddWithValue("a", actorId);
         return (bool)(await command.ExecuteScalarAsync(cancellationToken))!;
