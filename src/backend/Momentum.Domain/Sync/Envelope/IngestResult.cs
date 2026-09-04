@@ -9,6 +9,10 @@ public enum IngestResultCode
     RejectedAbsurdHlc,
     RejectedSetCapExceeded,
     RejectedInvalid,
+    // IS-EMRI-o86-A §A3/§E: writer lacks scope/ownership rights (§E karar tablosu). Not recorded in
+    // processed_operations -- SAME ERRATA class as RejectedInvalid, but a DIFFERENT reason: authorization
+    // (membership) can change over time, so caching it forever would wrongly block a later legitimate retry.
+    RejectedForbidden,
 }
 
 /// <summary>

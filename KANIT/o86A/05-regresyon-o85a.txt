@@ -1,0 +1,360 @@
+=== 0) POST /v1/auth/register (TEK hesap, IKI istemci bunu paylasir) ===
+HTTP 201
+{"userId":"01a02151-c11d-71d1-aca0-070d0d410bd5","accessToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMWEwMjE1MS1jMTFkLTcxZDEtYWNhMC0wNzBkMGQ0MTBiZDUiLCJuYmYiOjE3ODcyNjU0MDEsImV4cCI6MTc4NzI2NjMwMSwiaXNzIjoiTW9tZW50dW0iLCJhdWQiOiJNb21lbnR1bSJ9.N5PT9jVcq-HKtgKx8TpbO6a-Avijzf-nT0aqTFYKRcM","accessTokenExpiresAt":"2026-08-20T22:51:41.239199+00:00","refreshToken":"c/UaFPZXKIbjnMyzSWEidDj1m8CJRIDx2ZKsXHG1cRY="}
+
+=== TAZE KIMLIKLER ===
+proje_id = b7c0444a-b581-4912-b7c1-000f0c2124ac
+gorev_id = c3cb2ef9-b929-453c-99e5-bd5fcde44888
+CLIENT_A = aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa
+CLIENT_B = bbbbbbbb-2222-4bbb-8bbb-bbbbbbbbbbbb
+
+=== 1) Istemci A -- POST /v1/sync (liste 'İş' yaratir) ===
+{
+  "serverHlc": {
+    "wallMs": 1787265401245,
+    "counter": 0,
+    "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "nextCursor": {
+    "xid": 1537,
+    "seq": 0
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [
+    {
+      "operationId": "01a02151-c19d-749c-89d3-472323fe52cd",
+      "code": "Applied",
+      "effectiveOpHlc": {
+        "wallMs": 1787265401245,
+        "counter": 0,
+        "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+      }
+    }
+  ],
+  "changes": [],
+  "snapshot": [
+    {
+      "entityType": "Project",
+      "entityId": "b7c0444a-b581-4912-b7c1-000f0c2124ac",
+      "scalars": [
+        {
+          "field": "name",
+          "value": "İş",
+          "hlc": {
+            "wallMs": 1787265401245,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-c19d-749c-89d3-472323fe52cd"
+        }
+      ],
+      "sets": [],
+      "groups": []
+    }
+  ]
+}
+
+=== 2) Istemci B -- POST /v1/sync (TAZE kurulum, sinceCursor:null, POZITIF: A'nin listesini gorur mu) ===
+{
+  "serverHlc": {
+    "wallMs": 1787265392308,
+    "counter": 0,
+    "clientId": "bbbbbbbb-2222-4bbb-8bbb-bbbbbbbbbbbb"
+  },
+  "nextCursor": {
+    "xid": 1537,
+    "seq": 0
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [],
+  "changes": [],
+  "snapshot": [
+    {
+      "entityType": "Project",
+      "entityId": "b7c0444a-b581-4912-b7c1-000f0c2124ac",
+      "scalars": [
+        {
+          "field": "name",
+          "value": "İş",
+          "hlc": {
+            "wallMs": 1787265401245,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-c19d-749c-89d3-472323fe52cd"
+        }
+      ],
+      "sets": [],
+      "groups": []
+    }
+  ]
+}
+
+=== 3) Istemci A -- POST /v1/sync ('İş' listesinde 'Rapor yaz' gorevi dogar, projectId AYNI op'ta) ===
+{
+  "serverHlc": {
+    "wallMs": 1787265401290,
+    "counter": 0,
+    "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "nextCursor": {
+    "xid": 1538,
+    "seq": 0
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [
+    {
+      "operationId": "01a02151-c1ca-7108-abd7-d6e43ad7ce69",
+      "code": "Applied",
+      "effectiveOpHlc": {
+        "wallMs": 1787265401290,
+        "counter": 0,
+        "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+      }
+    }
+  ],
+  "changes": [],
+  "snapshot": [
+    {
+      "entityType": "Project",
+      "entityId": "b7c0444a-b581-4912-b7c1-000f0c2124ac",
+      "scalars": [
+        {
+          "field": "name",
+          "value": "İş",
+          "hlc": {
+            "wallMs": 1787265401245,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-c19d-749c-89d3-472323fe52cd"
+        }
+      ],
+      "sets": [],
+      "groups": []
+    },
+    {
+      "entityType": "Task",
+      "entityId": "c3cb2ef9-b929-453c-99e5-bd5fcde44888",
+      "scalars": [
+        {
+          "field": "projectId",
+          "value": "b7c0444a-b581-4912-b7c1-000f0c2124ac",
+          "hlc": {
+            "wallMs": 1787265401290,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-c1ca-7108-abd7-d6e43ad7ce69"
+        },
+        {
+          "field": "title",
+          "value": "Rapor yaz",
+          "hlc": {
+            "wallMs": 1787265401290,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-c1ca-7108-abd7-d6e43ad7ce69"
+        }
+      ],
+      "sets": [],
+      "groups": []
+    }
+  ]
+}
+
+=== 4) Istemci B -- POST /v1/sync (ARTIMLI, kendi cursor'undan, POZITIF: yeni gorevi gorur mu) ===
+{
+  "serverHlc": {
+    "wallMs": 1787265392308,
+    "counter": 0,
+    "clientId": "bbbbbbbb-2222-4bbb-8bbb-bbbbbbbbbbbb"
+  },
+  "nextCursor": {
+    "xid": 1537,
+    "seq": 366
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [],
+  "changes": [
+    {
+      "cursor": {
+        "xid": 1537,
+        "seq": 366
+      },
+      "payload": {
+        "sets": null,
+        "opHlc": {
+          "wallMs": 1787265401290,
+          "counter": 0,
+          "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+        },
+        "order": null,
+        "fields": {
+          "title": {
+            "hlc": {
+              "wallMs": 1787265401290,
+              "counter": 0,
+              "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+            },
+            "value": "Rapor yaz"
+          },
+          "projectId": {
+            "hlc": {
+              "wallMs": 1787265401290,
+              "counter": 0,
+              "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+            },
+            "value": "b7c0444a-b581-4912-b7c1-000f0c2124ac"
+          }
+        },
+        "groups": null,
+        "actorId": "01a02151-c11d-71d1-aca0-070d0d410bd5",
+        "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa",
+        "entityId": "c3cb2ef9-b929-453c-99e5-bd5fcde44888",
+        "entityType": "Task",
+        "operationId": "01a02151-c1ca-7108-abd7-d6e43ad7ce69"
+      }
+    }
+  ],
+  "snapshot": null
+}
+
+=== 5) Istemci A -- POST /v1/sync (gorevi Gelen Kutusu'na tasir, projectId:null) ===
+{
+  "serverHlc": {
+    "wallMs": 1787265401351,
+    "counter": 0,
+    "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "nextCursor": {
+    "xid": 1539,
+    "seq": 0
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [
+    {
+      "operationId": "01a02151-c207-729d-8535-140028d334f3",
+      "code": "Applied",
+      "effectiveOpHlc": {
+        "wallMs": 1787265401351,
+        "counter": 0,
+        "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+      }
+    }
+  ],
+  "changes": [],
+  "snapshot": [
+    {
+      "entityType": "Project",
+      "entityId": "b7c0444a-b581-4912-b7c1-000f0c2124ac",
+      "scalars": [
+        {
+          "field": "name",
+          "value": "İş",
+          "hlc": {
+            "wallMs": 1787265401245,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-c19d-749c-89d3-472323fe52cd"
+        }
+      ],
+      "sets": [],
+      "groups": []
+    },
+    {
+      "entityType": "Task",
+      "entityId": "c3cb2ef9-b929-453c-99e5-bd5fcde44888",
+      "scalars": [
+        {
+          "field": "projectId",
+          "value": null,
+          "hlc": {
+            "wallMs": 1787265401351,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-c207-729d-8535-140028d334f3"
+        },
+        {
+          "field": "title",
+          "value": "Rapor yaz",
+          "hlc": {
+            "wallMs": 1787265401290,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-c1ca-7108-abd7-d6e43ad7ce69"
+        }
+      ],
+      "sets": [],
+      "groups": []
+    }
+  ]
+}
+
+=== 6) Istemci B -- POST /v1/sync (ARTIMLI, POZITIF: tasimayi gorur mu -- projectId artik null) ===
+{
+  "serverHlc": {
+    "wallMs": 1787265392308,
+    "counter": 0,
+    "clientId": "bbbbbbbb-2222-4bbb-8bbb-bbbbbbbbbbbb"
+  },
+  "nextCursor": {
+    "xid": 1538,
+    "seq": 367
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [],
+  "changes": [
+    {
+      "cursor": {
+        "xid": 1538,
+        "seq": 367
+      },
+      "payload": {
+        "sets": null,
+        "opHlc": {
+          "wallMs": 1787265401351,
+          "counter": 0,
+          "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+        },
+        "order": null,
+        "fields": {
+          "projectId": {
+            "hlc": {
+              "wallMs": 1787265401351,
+              "counter": 0,
+              "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+            },
+            "value": null
+          }
+        },
+        "groups": null,
+        "actorId": "01a02151-c11d-71d1-aca0-070d0d410bd5",
+        "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa",
+        "entityId": "c3cb2ef9-b929-453c-99e5-bd5fcde44888",
+        "entityType": "Task",
+        "operationId": "01a02151-c207-729d-8535-140028d334f3"
+      }
+    }
+  ],
+  "snapshot": null
+}
+
+=== OZET ===
+1) A liste yaratti -> Applied
+2) B (TAZE kurulum) A'nin listesini GORDU (snapshot, C2 kaniti)
+3) A o listede gorev yaratti (title+projectId TEK op, B3) -> Applied
+4) B (ARTIMLI) yeni gorevi GORDU, projectId DOGRU (changes, senkron kaniti)
+5) A gorevi Gelen Kutusu'na tasidi (projectId:null, B2) -> Applied
+6) B (ARTIMLI) tasimayi GORDU, projectId NULL (changes, senkron kaniti)
+SONUC: TUM adimlar GECTI -- iki istemci gercekten mirror'landi.

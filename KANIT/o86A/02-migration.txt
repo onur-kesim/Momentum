@@ -1,0 +1,53 @@
+=== AddProjectMembers migration (tam metin) ===
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace Momentum.Infrastructure.Persistence.Migrations
+{
+    /// <inheritdoc />
+    public partial class AddProjectMembers : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: "project_members",
+                columns: table => new
+                {
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_project_members", x => new { x.project_id, x.user_id });
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_project_members_user_project",
+                table: "project_members",
+                columns: new[] { "user_id", "project_id" });
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "project_members");
+        }
+    }
+}
+
+=== dotnet ef migrations list ===
+Build started...
+Build succeeded.
+An error occurred using the connection to database 'momentum' on server 'tcp://localhost:5432'.
+An error occurred while accessing the database. Continuing without the information provided by the database. Error: Failed to connect to 127.0.0.1:5432
+20260718202450_InitialSync
+20260719072330_DispatcherIndexes
+20260719162721_MaterializeTasksAndTaskLists
+20260817214901_AddUsersAndRefreshTokens
+20260819212451_AddProjects
+20260820215545_AddProjectMembers
+Pending status not shown. Unable to determine which migrations have been applied. This can happen when your project uses a version of Entity Framework Core lower than 5.0.0 or when an error occurs while accessing the database.

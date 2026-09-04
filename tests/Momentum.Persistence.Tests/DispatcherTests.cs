@@ -280,6 +280,23 @@ public sealed class DispatcherTests(PostgresFixture fixture)
         var projectA = Guid.NewGuid();
         var projectB = Guid.NewGuid();
 
+        // IS-EMRI-o86-A §E: bir Task'in HEDEF scope'u sahip/uye gerektirir (varlik yeni DEGILSE) --
+        // client'in ikisinin de GERCEK sahibi olmasi icin once Project'ler yaratilir (kendi dispatch
+        // turunda drenilir, asagidaki "tek satir" sayimlarini KIRLETMEZ).
+        await using (var app = new SyncTestApp(connectionString))
+        {
+            await app.SyncAsync(client, Wire.PushNoPull(client, Wire.Op(Guid.CreateVersion7(), client, projectA, client, 1,
+                fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("A", Wire.Hlc(client, 1)) },
+                entityType: "Project")));
+            await app.SyncAsync(client, Wire.PushNoPull(client, Wire.Op(Guid.CreateVersion7(), client, projectB, client, 1,
+                fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("B", Wire.Hlc(client, 1)) },
+                entityType: "Project")));
+        }
+
+        var priorPublisher = new RecordingSignalPublisher();
+        var priorDispatcher = DispatcherHarness.Create(connectionString, priorPublisher, new OutboxDispatcherOptions { BatchSize = 10 }, TimeProvider.System);
+        (await priorDispatcher.PumpOnceAsync(CancellationToken.None)).ShouldBe(2);
+
         await using (var app = new SyncTestApp(connectionString))
         {
             await app.SyncAsync(client, Wire.PushNoPull(client,

@@ -248,6 +248,7 @@ ApiVersionSet versionSet = app.NewApiVersionSet()
 HealthEndpoints.Map(app);
 DiagnosticsEndpoints.Map(app, versionSet);
 AuthEndpoints.Map(app, versionSet); // IS-EMRI-o83 D1: POST /v1/auth/{register,login,refresh,logout}
+UserLookupEndpoints.Map(app, versionSet); // IS-EMRI-o86-A §F: POST /v1/users/lookup
 SyncEndpoints.Map(app, versionSet); // slice-2b1: POST /v1/sync
 TaskEndpoints.Map(app, versionSet); // slice-3a D4: GET /v1/tasks(/{id})
 TaskListEndpoints.Map(app, versionSet); // slice-3a D4: GET /v1/task-lists

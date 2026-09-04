@@ -19,12 +19,12 @@ public sealed class RealtimeMembershipTests(PostgresFixture fixture)
 {
     /// <summary>
     /// D8-v: <c>SyncHub</c> is instantiated directly (no mock library -- Hub exposes <c>Groups</c>/
-    /// <c>Context</c> as public settable properties for exactly this). KB-C: V's write into a DIFFERENT
-    /// scope T is REQUIRED in the fixture -- without a foreign-scope row in the table, mutant-7 (dropping
-    /// the <c>owner_id</c> filter) is unobservable, since <c>DISTINCT scope_id</c> over an owner-only
-    /// table already equals the owner-filtered result. KB-B: outbox is append-only, so withdrawing U's
-    /// visibility into S is arranged with an explicit DELETE (a test-arrange action, not a dispatcher
-    /// behavior -- §5's "no row ever discarded" rule binds the dispatcher/production code, not this fixture).
+    /// <c>Context</c> as public settable properties for exactly this). IS-EMRI-o86-A §D3: membership is
+    /// now `project_members`, not outbox -- fixture arranges rows DIRECTLY. KB-C: V's membership in a
+    /// DIFFERENT scope T is REQUIRED in the fixture -- without a foreign-scope row in the table,
+    /// mutant-7 (dropping the <c>user_id</c> filter) is unobservable, since the table would otherwise
+    /// hold only U's own row. KB-B: withdrawing U's membership in S is an explicit DELETE (a test-arrange
+    /// action, not a dispatcher behavior).
     /// </summary>
     [Fact]
     public async Task Hub_recomputes_group_membership_on_each_connect()
@@ -35,13 +35,8 @@ public sealed class RealtimeMembershipTests(PostgresFixture fixture)
         var s = Guid.NewGuid();
         var t = Guid.NewGuid();
 
-        await using (var app = new SyncTestApp(connectionString))
-        {
-            await app.SyncAsync(u, Wire.PushNoPull(u,
-                Wire.TaskField(Guid.CreateVersion7(), u, Guid.NewGuid(), u, "projectId", s.ToString())));
-            await app.SyncAsync(v, Wire.PushNoPull(v,
-                Wire.TaskField(Guid.CreateVersion7(), v, Guid.NewGuid(), v, "projectId", t.ToString())));
-        }
+        await Db.ExecuteAsync(connectionString, "INSERT INTO project_members (project_id, user_id) VALUES (@s, @u)", ("s", s), ("u", u));
+        await Db.ExecuteAsync(connectionString, "INSERT INTO project_members (project_id, user_id) VALUES (@t, @v)", ("t", t), ("v", v));
 
         var services = new ServiceCollection();
         services.AddSyncInfrastructure(connectionString);
@@ -62,8 +57,8 @@ public sealed class RealtimeMembershipTests(PostgresFixture fixture)
                 $"unexpected group set: [{string.Join(", ", actual)}]");
         }
 
-        // --- Phase 2: U's visibility into S withdrawn (test-arrange DELETE, KB-B) -> reconnect recomputes. ---
-        await Db.ExecuteAsync(connectionString, "DELETE FROM outbox_messages WHERE owner_id = @u AND scope_id = @s", ("u", u), ("s", s));
+        // --- Phase 2: U's membership in S withdrawn (test-arrange DELETE, KB-B) -> reconnect recomputes. ---
+        await Db.ExecuteAsync(connectionString, "DELETE FROM project_members WHERE user_id = @u AND project_id = @s", ("u", u), ("s", s));
 
         await using (var scope2 = provider.CreateAsyncScope())
         {

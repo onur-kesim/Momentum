@@ -1,0 +1,124 @@
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.Persistence.Tests -> C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll
+C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:19.61]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Project_op_scope_id_kendi_entity_id_sidir_old_scope_id_her_zaman_null [FAIL]
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Project_op_scope_id_kendi_entity_id_sidir_old_scope_id_her_zaman_null [1 s]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : scopeId
+    should be
+69071ca3-68d4-4b10-bac1-0f28fa4dde4b
+    but was
+null
+
+Additional Info:
+    Project op'unun scope_id'si kendi entityId'sidir
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Project_op_scope_id_kendi_entity_id_sidir_old_scope_id_her_zaman_null() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 39
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.Project_op_scope_id_kendi_entity_id_sidir_old_scope_id_her_zaman_null() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 40
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+
+Başarısız! - Başarısız:     1, Başarılı:     0, Atlanan:     0, Toplam:     1, Süre: 1 s - Momentum.Persistence.Tests.dll (net10.0)
+EXIT:1
+
+======================================================================
+IS-EMRI-o86-A SS2 -- OLCUM (kod yazilmadan ONCE, HEAD 0058703)
+======================================================================
+
+A1) Project tipi bir op'ta postProjectId (dolayisiyla scope_id) null mu?
+--------------------------------------------------------------------
+KAYNAK: SyncCommandHandler.cs
+  ReadProjectId(entityType, entity) =>
+    entityType == "Task" && entity.Fields.TryGetValue("projectId", ...) && register.HasValue
+      ? register.Value : null;
+  BuildOutbox icinde: postProjectId = ReadProjectId(op.EntityType, entity); scopeId = TryScope(postProjectId);
+
+C#'in && kisa-devre kurali geregi entityType=="Task" YANLIS oldugunda
+entity.Fields.TryGetValue(...) HIC CAGRILMAZ -- Project'in Fields'inda
+"projectId" anahtari (registry'de name/color/isDeleted) OLMASA BILE hicbir
+istisna/yanlis-alan-okuma riski YOK, sonuc HER ZAMAN null.
+
+TEK TESTLE GOSTERIM (yukaridaki ham xunit ciktisi, HEAD 0058703 -- §B
+uygulanmadan ONCE kosuldu):
+  Project_op_scope_id_kendi_entity_id_sidir_old_scope_id_her_zaman_null [FAIL]
+    scopeId should be 69071ca3-68d4-4b10-bac1-0f28fa4dde4b but was null
+
+SONUC: postProjectId GERCEKTEN null. Tasarimin varsayimi DOGRULANDI --
+"DUR ve bildir" tetiklenmedi, §B'ye gecildi.
+
+A2) task_tags materyalizasyonu OrSet'in canli durumunu NASIL hesapliyor?
+--------------------------------------------------------------------
+Zincir (sync_orset_tags + sync_orset_removes + cancelled):
+  1. HIDRATLAMA (SyncRowHydration.cs): sync_orset_tags (set_name, element,
+     add_tag, hlc, cancelled) + sync_orset_removes (set_name, element, hlc)
+     entity_type+entity_id'ye gore okunur, OrSetField.LoadTag/LoadRemoveStamp
+     ile bellek-ici CRDT'ye yuklenir. Set adina gore SUZGEC YOK -- entity'nin
+     TUM setleri (Project icin "members" dahil) HALIHAZIRDA hidratlaniyor.
+  2. CANLI DURUM (OrSetField.PresentElements() -> Contains(element)): bir
+     eleman "present" sayilir <=> en az bir add_tag'i cancelled=false.
+  3. PROJEKSIYON (TaskProjection.From): state.TryGetSet("tags", ...) ?
+     tagSet.PresentElements().OrderBy(...).ToList() : [] -- Tags alanina yazilir.
+  4. MATERYALIZASYON (EntityMaterializer.ReplaceTagsAsync): entity_id'nin
+     task_tags satirlarini SIL, sonra projection.Tags'teki HER eleman icin
+     TEK satir INSERT et (DELETE-ALL-REINSERT, kismi delta YOK).
+  5. YAZMA TARAFI (SyncStore.PersistSetAsync/UpsertTagAsync/TombstoneTagAsync):
+     entityType + setName parametreli, HICBIR YERDE "tags"/"Task" sabit
+     dizgesi YOK -- zaten TAMAMEN JENERIK.
+
+SONUC: project_members bu zincirin BIREBIR TEKRARIDIR (adim 5 hic
+degismez, zaten jenerik): ProjectProjection.From'a ayni TryGetSet("members")
+satiri + EntityMaterializer'a ayni desende ReplaceMembersAsync eklenir.
+Tek fark: eleman Task.tags'ta serbest metin, Project.members'ta bir
+userId (Guid) -- Guid.TryParse basarisiz olursa satir YAZILMAZ (C2).
+
+A3) IngestResult bugun hangi sonuclari tasiyor? Yeni sonuc mu gerekiyor?
+--------------------------------------------------------------------
+IngestResultCode (Momentum.Domain/Sync/Envelope/IngestResult.cs), ALTI deger:
+  Applied, Duplicate, RejectedRegistryViolation, RejectedAbsurdHlc,
+  RejectedSetCapExceeded, RejectedInvalid.
+Hicbiri "yetkisiz/yasak" anlamina gelmiyor -- YENI bir deger GEREKIYOR:
+**RejectedForbidden** eklendi (IngestResult.cs).
+
+RejectedInvalid'in ozel davranisi (SyncCommandHandler.cs satir 146-150):
+KAYDEDILMEZ (_processed.RecordAsync CAGRILMAZ) -- "ERRATA: RejectedInvalid
+is NOT recorded (receive-time-independent op-sekli kusuru)".
+KARAR: RejectedForbidden AYNI deseni izler (KAYDEDILMEZ) ama FARKLI
+gerekceyle: yetki durumu (uyelik) ZAMANLA DEGISEBILIR -- op-sekli kusuru
+DEGIL, DIS DURUM'a bagli. Eger kaydedilseydi, kullanici sonradan uye
+yapilsa bile AYNI operationId'nin retry'i sonsuza dek CACHE'lenmis red
+alirdi (yanlis). RejectedInvalid'inkiyle AYNI erken-donus yoluna eklendi.
+
+A4) Istemci reddedilen op'a ne yapiyor? Sessiz sonsuz yeniden deneme mi?
+--------------------------------------------------------------------
+KAYNAK: src/client/lib/veri/senkron_dongusu.dart, _tekSonucIsle (satir ~341-377).
+  case 'Applied'/'Duplicate': kuyruk satiri SILINIR (basarili).
+  default (RejectedRegistryViolation/RejectedAbsurdHlc/RejectedInvalid/
+    RejectedSetCapExceeded/TANINMAYAN HERHANGI BIR KOD -- RejectedForbidden
+    dahil, Dart switch'in default kolu HERHANGI bir stringi yakalar):
+    satir SILINMEZ, durum='zehirli' yazilir, sonHataKodu=ham kod, entity'ye
+    'cakisma' rozeti yazilir.
+  _bekleyenleriSec() YALNIZ durum='bekliyor' satirlari secer -- 'zehirli'
+  satirlar bu suzgecten DUSER, bir daha OTOMATIK gonderilmez.
+
+SONUC (PAZARLIKSIZ SORUNUN CEVABI): HAYIR, sessiz sonsuz yeniden deneme
+YOK. Reddedilen op KALICI OLARAK 'zehirli' durumunda PARKLANIR, kullaniciya
+'cakisma' rozetiyle GORUNUR kalir (sessiz veri kaybi yok, sessiz retry-firtinasi
+da yok). Istemci YENI RejectedForbidden kodunu ozel olarak TANIMAZ ama
+default kolu zaten HER TANINMAYAN kodu ayni (guvenli) sekilde isliyor --
+istemci DEGISIKLIGI GEREKMEZ (o86-B'nin isi kalir, ama bu emrin acisindan
+risk DOGRULANMADI/olcum SONUCU: risk yok).

@@ -113,8 +113,8 @@ public sealed class EntityMaterializer(SyncDbContext db) : IEntityMaterializer
         await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    // IS-EMRI-o85-B: MaterializeTaskListAsync'in birebir deseni (+ color sutunu). `members` (OrSet)
-    // burada YAZILMAZ -- bu dilimde materyalize edilmiyor (§B, ProjectProjection.cs).
+    // IS-EMRI-o85-B: MaterializeTaskListAsync'in birebir deseni (+ color sutunu). IS-EMRI-o86-A ile
+    // `members` (OrSet) artik ReplaceMembersAsync'e (asagida) yaziliyor -- ReplaceTagsAsync'in birebir deseni.
     private async Task MaterializeProjectAsync(Guid entityId, EntityState state, Guid ownerId, CancellationToken cancellationToken)
     {
         var projection = ProjectProjection.From(entityId, state);
@@ -135,5 +135,26 @@ public sealed class EntityMaterializer(SyncDbContext db) : IEntityMaterializer
         command.Parameters.AddWithValue("hasConflict", projection.HasDeleteEditConflict);
         command.Parameters.AddWithValue("malformed", projection.MalformedFields.ToArray());
         await command.ExecuteNonQueryAsync(cancellationToken);
+
+        await ReplaceMembersAsync(entityId, projection.Members, cancellationToken);
+    }
+
+    /// <summary>IS-EMRI-o86-A §C2: ReplaceTagsAsync'in birebir deseni -- delete-all-reinsert for this project_id (TAM-SATIR UPSERT's set-channel analog).</summary>
+    private async Task ReplaceMembersAsync(Guid projectId, IReadOnlyList<Guid> members, CancellationToken cancellationToken)
+    {
+        await using (var delete = await db.CreateRawCommandAsync("DELETE FROM project_members WHERE project_id = @id", cancellationToken))
+        {
+            delete.Parameters.AddWithValue("id", projectId);
+            await delete.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        foreach (var userId in members)
+        {
+            await using var insert = await db.CreateRawCommandAsync(
+                "INSERT INTO project_members (project_id, user_id) VALUES (@id, @user)", cancellationToken);
+            insert.Parameters.AddWithValue("id", projectId);
+            insert.Parameters.AddWithValue("user", userId);
+            await insert.ExecuteNonQueryAsync(cancellationToken);
+        }
     }
 }

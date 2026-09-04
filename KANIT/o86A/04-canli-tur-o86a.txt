@@ -1,0 +1,484 @@
+=== 1) A, B, C kayit olur (POST /v1/auth/register) ===
+A userId=01a02151-9c8c-73ee-a989-d73ba2ccf5a7
+B userId=01a02151-9d13-784c-96a2-d56896587f18
+C userId=01a02151-9d9e-73f8-83ea-91348a30cebf
+
+=== 2) A proje P + P'de gorev T yaratir ===
+proje_id=3e0ff9aa-0297-4353-bc81-d4424bc3c508
+gorev_id=10d61862-f675-463d-a42a-83b4c05cbe36
+ikisi de Applied
+
+=== 3) B -- ILK pull (TAZE kurulum) -- NEGATIF KONTROL: hicbir sey gormemeli ===
+{
+  "serverHlc": {
+    "wallMs": 1787265375053,
+    "counter": 0,
+    "clientId": "bbbbbbbb-2222-4bbb-8bbb-bbbbbbbbbbbb"
+  },
+  "nextCursor": {
+    "xid": 1529,
+    "seq": 0
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [],
+  "changes": [],
+  "snapshot": []
+}
+
+=== 4) A -- POST /v1/users/lookup (B'nin e-postasi) ===
+HTTP 200
+{"userId":"01a02151-9d13-784c-96a2-d56896587f18"}
+
+=== 5) A -- members op'u (P'ye B eklenir) ===
+{
+  "serverHlc": {
+    "wallMs": 1787265392246,
+    "counter": 0,
+    "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "nextCursor": {
+    "xid": 1530,
+    "seq": 0
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [
+    {
+      "operationId": "01a02151-9e76-7b6f-a7bb-0ed91f968707",
+      "code": "Applied",
+      "effectiveOpHlc": {
+        "wallMs": 1787265392246,
+        "counter": 0,
+        "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+      }
+    }
+  ],
+  "changes": [],
+  "snapshot": [
+    {
+      "entityType": "Project",
+      "entityId": "3e0ff9aa-0297-4353-bc81-d4424bc3c508",
+      "scalars": [
+        {
+          "field": "name",
+          "value": "Ortak Proje",
+          "hlc": {
+            "wallMs": 1787265392162,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-9e22-7ee2-9154-e56b32aa0400"
+        }
+      ],
+      "sets": [
+        {
+          "setName": "members",
+          "elements": [
+            {
+              "element": "01a02151-9d13-784c-96a2-d56896587f18",
+              "activeTags": [
+                {
+                  "tag": "01a02151-9e76-70de-a1d2-3e389ebf1d07",
+                  "hlc": {
+                    "wallMs": 1787265392246,
+                    "counter": 0,
+                    "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "groups": []
+    },
+    {
+      "entityType": "Task",
+      "entityId": "10d61862-f675-463d-a42a-83b4c05cbe36",
+      "scalars": [
+        {
+          "field": "projectId",
+          "value": "3e0ff9aa-0297-4353-bc81-d4424bc3c508",
+          "hlc": {
+            "wallMs": 1787265392191,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-9e3f-768e-b9d6-48a107d82127"
+        },
+        {
+          "field": "title",
+          "value": "Ortak gorev",
+          "hlc": {
+            "wallMs": 1787265392191,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-9e3f-768e-b9d6-48a107d82127"
+        }
+      ],
+      "sets": [],
+      "groups": []
+    }
+  ]
+}
+
+=== 6a) B -- TAZE ikinci client (snapshot), uyelik SONRASI -- P VE T gorulmeli ===
+{
+  "serverHlc": null,
+  "nextCursor": {
+    "xid": 1530,
+    "seq": 0
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [],
+  "changes": [],
+  "snapshot": [
+    {
+      "entityType": "Project",
+      "entityId": "3e0ff9aa-0297-4353-bc81-d4424bc3c508",
+      "scalars": [
+        {
+          "field": "name",
+          "value": "Ortak Proje",
+          "hlc": {
+            "wallMs": 1787265392162,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-9e22-7ee2-9154-e56b32aa0400"
+        }
+      ],
+      "sets": [
+        {
+          "setName": "members",
+          "elements": [
+            {
+              "element": "01a02151-9d13-784c-96a2-d56896587f18",
+              "activeTags": [
+                {
+                  "tag": "01a02151-9e76-70de-a1d2-3e389ebf1d07",
+                  "hlc": {
+                    "wallMs": 1787265392246,
+                    "counter": 0,
+                    "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "groups": []
+    },
+    {
+      "entityType": "Task",
+      "entityId": "10d61862-f675-463d-a42a-83b4c05cbe36",
+      "scalars": [
+        {
+          "field": "projectId",
+          "value": "3e0ff9aa-0297-4353-bc81-d4424bc3c508",
+          "hlc": {
+            "wallMs": 1787265392191,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-9e3f-768e-b9d6-48a107d82127"
+        },
+        {
+          "field": "title",
+          "value": "Ortak gorev",
+          "hlc": {
+            "wallMs": 1787265392191,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-9e3f-768e-b9d6-48a107d82127"
+        }
+      ],
+      "sets": [],
+      "groups": []
+    }
+  ]
+}
+
+=== 6b) B -- AYNI clientId, ARTIMLI (kendi ESKI/uyelik-ONCESI cursor'undan) -- PROTOKOL GERCEGI: b_cursor uyelik-ONCESI bir HORIZON'dur, P/T'nin ORIJINAL yaratimi o horizon'dan ONCEKI outbox satirlaridir ve artik GERIYE DONUK teslim EDILMEZ (bu yuzden 6a'nin TAZE snapshot'i var -- gecmis backlog'un DOGRU yolu odur). Artimli burada YALNIZ horizon'dan SONRAKI degisikligi (uyelik ekleme op'unun kendisi) tasimali -- SIFIR degil, TAM OLARAK budur. ===
+{
+  "serverHlc": {
+    "wallMs": 1787265375053,
+    "counter": 0,
+    "clientId": "bbbbbbbb-2222-4bbb-8bbb-bbbbbbbbbbbb"
+  },
+  "nextCursor": {
+    "xid": 1529,
+    "seq": 363
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [],
+  "changes": [
+    {
+      "cursor": {
+        "xid": 1529,
+        "seq": 363
+      },
+      "payload": {
+        "sets": {
+          "members": {
+            "adds": [
+              {
+                "el": "01a02151-9d13-784c-96a2-d56896587f18",
+                "hlc": {
+                  "wallMs": 1787265392246,
+                  "counter": 0,
+                  "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+                },
+                "tag": "01a02151-9e76-70de-a1d2-3e389ebf1d07"
+              }
+            ],
+            "removes": null
+          }
+        },
+        "opHlc": {
+          "wallMs": 1787265392246,
+          "counter": 0,
+          "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+        },
+        "order": null,
+        "fields": null,
+        "groups": null,
+        "actorId": "01a02151-9c8c-73ee-a989-d73ba2ccf5a7",
+        "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa",
+        "entityId": "3e0ff9aa-0297-4353-bc81-d4424bc3c508",
+        "entityType": "Project",
+        "operationId": "01a02151-9e76-7b6f-a7bb-0ed91f968707"
+      }
+    }
+  ],
+  "snapshot": null
+}
+
+=== 7a) B -- T'yi duzenler (title degistirir) ===
+{
+  "serverHlc": {
+    "wallMs": 1787265392308,
+    "counter": 0,
+    "clientId": "bbbbbbbb-2222-4bbb-8bbb-bbbbbbbbbbbb"
+  },
+  "nextCursor": {
+    "xid": 1531,
+    "seq": 0
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [
+    {
+      "operationId": "01a02151-9eb4-7662-be2c-0395ad84507c",
+      "code": "Applied",
+      "effectiveOpHlc": {
+        "wallMs": 1787265392308,
+        "counter": 0,
+        "clientId": "bbbbbbbb-2222-4bbb-8bbb-bbbbbbbbbbbb"
+      }
+    }
+  ],
+  "changes": [],
+  "snapshot": [
+    {
+      "entityType": "Project",
+      "entityId": "3e0ff9aa-0297-4353-bc81-d4424bc3c508",
+      "scalars": [
+        {
+          "field": "name",
+          "value": "Ortak Proje",
+          "hlc": {
+            "wallMs": 1787265392162,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-9e22-7ee2-9154-e56b32aa0400"
+        }
+      ],
+      "sets": [
+        {
+          "setName": "members",
+          "elements": [
+            {
+              "element": "01a02151-9d13-784c-96a2-d56896587f18",
+              "activeTags": [
+                {
+                  "tag": "01a02151-9e76-70de-a1d2-3e389ebf1d07",
+                  "hlc": {
+                    "wallMs": 1787265392246,
+                    "counter": 0,
+                    "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "groups": []
+    },
+    {
+      "entityType": "Task",
+      "entityId": "10d61862-f675-463d-a42a-83b4c05cbe36",
+      "scalars": [
+        {
+          "field": "projectId",
+          "value": "3e0ff9aa-0297-4353-bc81-d4424bc3c508",
+          "hlc": {
+            "wallMs": 1787265392191,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-9e3f-768e-b9d6-48a107d82127"
+        },
+        {
+          "field": "title",
+          "value": "B duzenledi",
+          "hlc": {
+            "wallMs": 1787265392308,
+            "counter": 0,
+            "clientId": "bbbbbbbb-2222-4bbb-8bbb-bbbbbbbbbbbb"
+          },
+          "winOperationId": "01a02151-9eb4-7662-be2c-0395ad84507c"
+        }
+      ],
+      "sets": [],
+      "groups": []
+    }
+  ]
+}
+
+=== 7b) A -- pull (TAZE) -- B'nin duzenlemesini GORMELI (cift yonlu yakinsama) ===
+{
+  "serverHlc": {
+    "wallMs": 1787265392246,
+    "counter": 0,
+    "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "nextCursor": {
+    "xid": 1531,
+    "seq": 0
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [],
+  "changes": [],
+  "snapshot": [
+    {
+      "entityType": "Project",
+      "entityId": "3e0ff9aa-0297-4353-bc81-d4424bc3c508",
+      "scalars": [
+        {
+          "field": "name",
+          "value": "Ortak Proje",
+          "hlc": {
+            "wallMs": 1787265392162,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-9e22-7ee2-9154-e56b32aa0400"
+        }
+      ],
+      "sets": [
+        {
+          "setName": "members",
+          "elements": [
+            {
+              "element": "01a02151-9d13-784c-96a2-d56896587f18",
+              "activeTags": [
+                {
+                  "tag": "01a02151-9e76-70de-a1d2-3e389ebf1d07",
+                  "hlc": {
+                    "wallMs": 1787265392246,
+                    "counter": 0,
+                    "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "groups": []
+    },
+    {
+      "entityType": "Task",
+      "entityId": "10d61862-f675-463d-a42a-83b4c05cbe36",
+      "scalars": [
+        {
+          "field": "projectId",
+          "value": "3e0ff9aa-0297-4353-bc81-d4424bc3c508",
+          "hlc": {
+            "wallMs": 1787265392191,
+            "counter": 0,
+            "clientId": "aaaaaaaa-1111-4aaa-8aaa-aaaaaaaaaaaa"
+          },
+          "winOperationId": "01a02151-9e3f-768e-b9d6-48a107d82127"
+        },
+        {
+          "field": "title",
+          "value": "B duzenledi",
+          "hlc": {
+            "wallMs": 1787265392308,
+            "counter": 0,
+            "clientId": "bbbbbbbb-2222-4bbb-8bbb-bbbbbbbbbbbb"
+          },
+          "winOperationId": "01a02151-9eb4-7662-be2c-0395ad84507c"
+        }
+      ],
+      "sets": [],
+      "groups": []
+    }
+  ]
+}
+
+=== 8a) C -- pull -- NEGATIF KONTROL: hicbir sey gormemeli (uye degil) ===
+{
+  "serverHlc": null,
+  "nextCursor": {
+    "xid": 1531,
+    "seq": 0
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [],
+  "changes": [],
+  "snapshot": []
+}
+
+=== 8b) C -- P kapsamindaki T'ye yazmaya calisir -- REDDEDILMELI (RejectedForbidden) ===
+{
+  "serverHlc": null,
+  "nextCursor": {
+    "xid": 1531,
+    "seq": 0
+  },
+  "hasMore": false,
+  "resyncRequired": false,
+  "applied": [
+    {
+      "operationId": "01a02151-9efc-7f40-845b-ebc4ca683cd8",
+      "code": "RejectedForbidden",
+      "effectiveOpHlc": null
+    }
+  ],
+  "changes": [],
+  "snapshot": []
+}
+
+=== OZET (8/8) ===
+1) A, B, C kayit oldu
+2) A proje P + P'de gorev T yaratti -> Applied
+3) B (uye DEGILKEN) ILK pull'da HICBIR SEY gormedi -- NEGATIF KONTROL GECTI
+4) A, B'nin e-postasini lookup'ladi -> dogru userId, yanit YALNIZ userId
+5) A, B'yi members'a ekledi -> Applied
+6) B, snapshot'ta VE artimlida P'yi VE T'yi GORDU (uyelik sonrasi)
+7) B, T'yi duzenledi (uye olarak KABUL edildi) -> A, pull'da B'nin degisikligini GORDU (cift yonlu yakinsama)
+8) C (uye DEGIL) pull'da HICBIR SEY gormedi VE P'ye yazimi REDDEDILDI (RejectedForbidden)
+SONUC: TUM SEKIZ ADIM GECTI -- isbirligi kapisi calisir, yetkisiz erisim/yazim REDDEDILIR.

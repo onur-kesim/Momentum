@@ -133,6 +133,11 @@ public sealed class SyncCommandHandler : ICommandHandler<SyncCommand, SyncRespon
         var entity = syncState.GetOrCreateEntity(op.EntityType, op.EntityId);
         await _store.HydrateAsync(entity, op.EntityType, op.EntityId, cancellationToken);
 
+        // IS-EMRI-o86-A §E karar tablosu satir 1 ("Varlik yeni"): PRE-op (hydrate SONRASI, Ingest'ten
+        // ONCE) olculur -- hic hidratlanan kanal yoksa bu entityId'ye bugune kadar HIC op gelmemistir.
+        var isNewEntity = entity.Fields.Count == 0 && entity.Orders.Count == 0
+            && entity.Groups.Count == 0 && entity.Sets.Count == 0;
+
         var preProjectId = ReadProjectId(op.EntityType, entity);
 
         var clockStore = new ClientClockStore();
@@ -151,6 +156,17 @@ public sealed class SyncCommandHandler : ICommandHandler<SyncCommand, SyncRespon
 
         if (result is { Code: IngestResultCode.Applied, EffectiveOpHlc: { } effective })
         {
+            // IS-EMRI-o86-A §E: yazma yetkisi kapisi. `entity` burada POST-op durumdadir (Ingest
+            // yukarida zaten uyguladi) -- hedef scope (Task'in yeni projectId'si) BUNDAN okunur.
+            // PersistDeltaAsync/MaterializeAsync'ten ONCE, hic yan etki olusmadan kontrol edilir.
+            if (!await IsAuthorizedAsync(op, entity, isNewEntity, authenticatedActorId, cancellationToken))
+            {
+                // RejectedInvalid ile AYNI ERRATA deseni (A3): KAYDEDILMEZ -- uyelik zamanla
+                // degisebilir, sonraki bir retry (uye yapilinca) yeniden degerlendirilebilmeli.
+                await scope.CommitAsync(cancellationToken);
+                return new IngestResult(op.OperationId, IngestResultCode.RejectedForbidden, null);
+            }
+
             await _store.PersistDeltaAsync(op, entity, cancellationToken);
             // slice-3a F1: SAME op-transaction, right after PersistDeltaAsync, Applied branch ONLY.
             // ownerId is the AUTHENTICATED actor -- NEVER op.ActorId (F5, mutant-3's target).
@@ -172,8 +188,11 @@ public sealed class SyncCommandHandler : ICommandHandler<SyncCommand, SyncRespon
     private OutboxRecord BuildOutbox(WireOp wireOp, ChangeOperation op, EntityState entity, Hlc effective, string? preProjectId, long receiveWall, Guid authenticatedActorId)
     {
         var postProjectId = ReadProjectId(op.EntityType, entity);
-        var scopeId = TryScope(postProjectId);
-        Guid? oldScopeId = null;
+        // IS-EMRI-o86-A §B (PAZARLIKSIZ): bir Project op'unun scope'u PROJENIN KENDISIDIR --
+        // davet op'u (members yazimi) bir Project op'udur; scope tasimazsa ne hub yayar ne pull
+        // tasir, davet edilen kisi asla ogrenemez. Diger tipler bugunku davranista kalir.
+        var scopeId = op.EntityType == "Project" ? op.EntityId : TryScope(postProjectId);
+        Guid? oldScopeId = null; // bir projenin scope'u degismez -- Project icin HER ZAMAN null.
         if (op.EntityType == "Task"
             && op.Fields.ContainsKey(ProjectIdField)
             && !string.Equals(preProjectId, postProjectId, StringComparison.Ordinal))
@@ -200,6 +219,47 @@ public sealed class SyncCommandHandler : ICommandHandler<SyncCommand, SyncRespon
             Hlc: effective.Encode(),
             OccurredAt: now,
             AvailableAt: now); // slice-2b2 D6-1: ONE clock source (TimeProvider) -- no SQL now() default
+    }
+
+    /// <summary>
+    /// IS-EMRI-o86-A §E karar tablosu (BIREBIR, Cowork+Onur kilidi 20 Agu):
+    ///   Varlik yeni                              -> KABUL (yazan sahip olur)
+    ///   Task op, hedef scope NULL (Gelen Kutusu) -> KABUL (yazan kendi kutusuna yaziyor)
+    ///   Task op, hedef scope P                   -> P'nin sahibi VEYA uyesi ise KABUL
+    ///   Project op, alan `members`               -> YALNIZ projects.owner_id ise KABUL (en sert kural --
+    ///                                                bir uye members'tan sahibi SILEBILSEYDI projeyi calardi)
+    ///   Project op, diger alanlar                -> sahip VEYA uye ise KABUL
+    ///   TaskList/Tag                              -> bu dilimin kapsami disi, davranis DEGISMEZ
+    /// </summary>
+    private async Task<bool> IsAuthorizedAsync(ChangeOperation op, EntityState entity, bool isNewEntity, Guid actorId, CancellationToken cancellationToken)
+    {
+        if (isNewEntity)
+        {
+            return true;
+        }
+
+        if (op.EntityType == "Task")
+        {
+            var targetScope = TryScope(ReadProjectId(op.EntityType, entity)); // POST-op (Ingest zaten uyguladi)
+            if (targetScope is null)
+            {
+                return true;
+            }
+
+            return await _store.IsProjectOwnerOrMemberAsync(targetScope.Value, actorId, cancellationToken);
+        }
+
+        if (op.EntityType == "Project")
+        {
+            if (op.Sets.ContainsKey("members"))
+            {
+                return await _store.IsProjectOwnerAsync(op.EntityId, actorId, cancellationToken);
+            }
+
+            return await _store.IsProjectOwnerOrMemberAsync(op.EntityId, actorId, cancellationToken);
+        }
+
+        return true;
     }
 
     private static string? ReadProjectId(string entityType, EntityState entity) =>

@@ -197,3 +197,18 @@ public sealed class TaskTagRowConfiguration : IEntityTypeConfiguration<TaskTagRo
         builder.Property(x => x.Tag).HasColumnName("tag").UseCollation("C");
     }
 }
+
+// IS-EMRI-o86-A §C1: TaskTagRowConfiguration'in birebir deseni. PK (project_id, user_id); pull
+// sorgusu user_id'den gittigi icin AYRICA ters-sirali indeks (ix_project_members_user_project).
+public sealed class ProjectMemberRowConfiguration : IEntityTypeConfiguration<ProjectMemberRow>
+{
+    public void Configure(EntityTypeBuilder<ProjectMemberRow> builder)
+    {
+        builder.ToTable("project_members");
+        builder.HasKey(x => new { x.ProjectId, x.UserId });
+        builder.Property(x => x.ProjectId).HasColumnName("project_id");
+        // K2-E5 soft-ref deseni (TaskTagRowConfiguration'daki gibi): projects.entity_id'ye FK yok.
+        builder.Property(x => x.UserId).HasColumnName("user_id");
+        builder.HasIndex(x => new { x.UserId, x.ProjectId }).HasDatabaseName("ix_project_members_user_project");
+    }
+}

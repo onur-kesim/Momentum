@@ -155,7 +155,10 @@ public sealed class TaskReadStore(SyncDbContext db) : ITaskReadStore
                 IsDeleted: reader.GetBoolean(3),
                 Pos: reader.IsDBNull(4) ? null : reader.GetString(4),
                 HasDeleteEditConflict: reader.GetBoolean(5),
-                MalformedFields: reader.GetFieldValue<string[]>(6)));
+                MalformedFields: reader.GetFieldValue<string[]>(6),
+                // IS-EMRI-o86-A: GET /v1/projects vitrin/API paritesi icindir, uyelik dondurmez
+                // (§F kapsam disi -- lookup ayri bir uc); bu read-yolu Members'i hic sormaz.
+                Members: []));
         }
 
         return results;

@@ -1,3 +1,4 @@
+using Momentum.Application.Features.Sync;
 using Shouldly;
 using Xunit;
 
@@ -44,6 +45,15 @@ public sealed class RestoreAndScopeTests(PostgresFixture fixture)
         var project1 = Guid.NewGuid();
         var project2 = Guid.NewGuid();
         var op2 = Guid.CreateVersion7();
+
+        // IS-EMRI-o86-A §E: Task'in hedef scope'u sahip/uye gerektirir -- client'in GERCEK sahibi
+        // olmasi icin once iki Project yaratilir.
+        await app.SyncAsync(client, Wire.PushNoPull(client, Wire.Op(Guid.CreateVersion7(), client, project1, client, 1,
+            fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P1", Wire.Hlc(client, 1)) },
+            entityType: "Project")));
+        await app.SyncAsync(client, Wire.PushNoPull(client, Wire.Op(Guid.CreateVersion7(), client, project2, client, 1,
+            fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P2", Wire.Hlc(client, 1)) },
+            entityType: "Project")));
 
         await app.SyncAsync(client, Wire.PushNoPull(client,
             Wire.TaskField(Guid.CreateVersion7(), client, entity, client, "projectId", project1.ToString(), counter: 1)));

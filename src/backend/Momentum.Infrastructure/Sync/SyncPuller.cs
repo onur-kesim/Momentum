@@ -34,11 +34,16 @@ public sealed class SyncPuller(SyncDbContext db) : ISyncPuller
     {
         // xid8 has no bigint cast in Postgres (M1): pass sinceXid as text + ::xid8.
         // KANIT/o84: a bare ORDER BY name binds to the SELECT list's ::text alias first (shadowing, sorted lexicographically) -- qualified ORDER BY + distinct cast names fix that.
+        // IS-EMRI-o86-A §D1 (IKI YOL DA PAZARLIKSIZ): sahip OR scope-uye OR old_scope-uye (bir gorev
+        // projeden cikarilinca old_scope_id'si eski projedir -- bu kol dusseydi uye ekraninda hayalet
+        // satir kalirdi). o84 dersi: ORDER BY nitelikli (o.) kalir, gölgelenmez.
         await using var command = await db.CreateRawCommandAsync(
             "SELECT o.commit_xid::text AS commit_xid_text, o.server_seq, o.payload::text AS payload_text FROM outbox_messages o " +
             "WHERE commit_xid < pg_snapshot_xmin(pg_current_snapshot()) " +
             "AND (commit_xid, server_seq) > (@sinceXid::xid8, @sinceSeq) " +
-            "AND owner_id = @actorId " +
+            "AND ( o.owner_id = @actorId " +
+            "   OR o.scope_id     IN (SELECT project_id FROM project_members WHERE user_id = @actorId) " +
+            "   OR o.old_scope_id IN (SELECT project_id FROM project_members WHERE user_id = @actorId) ) " +
             "ORDER BY o.commit_xid, o.server_seq LIMIT " + PageSize,
             cancellationToken);
         command.Parameters.AddWithValue("sinceXid", since.Xid.ToString(CultureInfo.InvariantCulture));
@@ -88,9 +93,14 @@ public sealed class SyncPuller(SyncDbContext db) : ISyncPuller
 
     private async Task<List<(string EntityType, Guid EntityId)>> ReadOwnedEntitiesAsync(Guid actorId, CancellationToken cancellationToken)
     {
+        // IS-EMRI-o86-A §D2: PullIncrementalAsync ile AYNI uc-kollu kural -- olmadan taze kurulmus bir
+        // istemci paylasilan hicbir seyi gormez (o85-A'nin C2 kaniti tam buydu), dilim yarim kalir.
         await using var command = await db.CreateRawCommandAsync(
-            "SELECT DISTINCT aggregate_type, aggregate_id FROM outbox_messages WHERE owner_id = @actorId " +
-            "ORDER BY aggregate_type, aggregate_id", cancellationToken);
+            "SELECT DISTINCT o.aggregate_type, o.aggregate_id FROM outbox_messages o " +
+            "WHERE ( o.owner_id = @actorId " +
+            "   OR o.scope_id     IN (SELECT project_id FROM project_members WHERE user_id = @actorId) " +
+            "   OR o.old_scope_id IN (SELECT project_id FROM project_members WHERE user_id = @actorId) ) " +
+            "ORDER BY o.aggregate_type, o.aggregate_id", cancellationToken);
         command.Parameters.AddWithValue("actorId", actorId);
 
         var result = new List<(string, Guid)>();

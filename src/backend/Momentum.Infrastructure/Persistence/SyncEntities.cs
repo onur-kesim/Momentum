@@ -131,3 +131,11 @@ public sealed class TaskTagRow
     public Guid TaskId { get; set; }
     public string Tag { get; set; } = string.Empty;
 }
+
+// IS-EMRI-o86-A §C: TaskTagRow'un birebir deseni (task_tags <-> project_members), tek fark eleman
+// bir userId'dir (Guid) -- Element string'i C2'de Guid.TryParse'tan GECMIS olarak gelir.
+public sealed class ProjectMemberRow
+{
+    public Guid ProjectId { get; set; }
+    public Guid UserId { get; set; }
+}

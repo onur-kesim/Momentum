@@ -1,0 +1,27 @@
+sorgu: PullIncrementalAsync (member actor'u ile, uc kollu WHERE)
+
+Limit  (cost=44.77..44.82 rows=22 width=80) (actual time=0.146..0.148 rows=3 loops=1)
+  ->  Sort  (cost=44.77..44.82 rows=22 width=80) (actual time=0.145..0.146 rows=3 loops=1)
+        Sort Key: o.commit_xid, o.server_seq
+        Sort Method: quicksort  Memory: 28kB
+        ->  Bitmap Heap Scan on outbox_messages o  (cost=33.19..44.28 rows=22 width=80) (actual time=0.105..0.136 rows=3 loops=1)
+              Recheck Cond: ((commit_xid < pg_snapshot_xmin(pg_current_snapshot())) AND (ROW(commit_xid, server_seq) > ROW('0'::xid8, 0)))
+              Filter: ((owner_id = 'e0aaf92a-d32e-40ee-bc44-3d16eaa5dfbe'::uuid) OR (ANY (scope_id = (hashed SubPlan 1).col1)) OR (ANY (old_scope_id = (hashed SubPlan 2).col1)))
+              Rows Removed by Filter: 20
+              Heap Blocks: exact=3
+              ->  Bitmap Index Scan on ux_outbox_messages_commit  (cost=0.00..4.44 rows=29 width=0) (actual time=0.016..0.016 rows=23 loops=1)
+                    Index Cond: ((commit_xid < pg_snapshot_xmin(pg_current_snapshot())) AND (ROW(commit_xid, server_seq) > ROW('0'::xid8, 0)))
+              SubPlan 1
+                ->  Bitmap Heap Scan on project_members  (cost=4.21..14.35 rows=7 width=16) (actual time=0.006..0.007 rows=1 loops=1)
+                      Recheck Cond: (user_id = 'e0aaf92a-d32e-40ee-bc44-3d16eaa5dfbe'::uuid)
+                      Heap Blocks: exact=1
+                      ->  Bitmap Index Scan on ix_project_members_user_project  (cost=0.00..4.21 rows=7 width=0) (actual time=0.003..0.003 rows=1 loops=1)
+                            Index Cond: (user_id = 'e0aaf92a-d32e-40ee-bc44-3d16eaa5dfbe'::uuid)
+              SubPlan 2
+                ->  Bitmap Heap Scan on project_members project_members_1  (cost=4.21..14.35 rows=7 width=16) (actual time=0.005..0.005 rows=1 loops=1)
+                      Recheck Cond: (user_id = 'e0aaf92a-d32e-40ee-bc44-3d16eaa5dfbe'::uuid)
+                      Heap Blocks: exact=1
+                      ->  Bitmap Index Scan on ix_project_members_user_project  (cost=0.00..4.21 rows=7 width=0) (actual time=0.002..0.002 rows=1 loops=1)
+                            Index Cond: (user_id = 'e0aaf92a-d32e-40ee-bc44-3d16eaa5dfbe'::uuid)
+Planning Time: 0.149 ms
+Execution Time: 0.288 ms

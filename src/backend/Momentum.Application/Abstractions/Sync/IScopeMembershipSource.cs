@@ -3,9 +3,8 @@ namespace Momentum.Application.Abstractions.Sync;
 /// <summary>
 /// Scope membership for realtime group assignment (ADR 0002 K2-G2 half, GOREV slice-2b2 D5). Consulted
 /// on EVERY hub connect (never cached) so a connection's group set reflects current visibility, not a
-/// stale snapshot. Known gap (named, not silently accepted): a read-only collaborator who has never
-/// written to a shared scope has no outbox row for it, so they join no <c>scope:</c> group until the
-/// auth slice wires a real membership table.
+/// stale snapshot. IS-EMRI-o86-A §D3: backed by the real `project_members` table now -- the "named gap"
+/// (read-only collaborators who never wrote couldn't join their scope group) is closed.
 /// </summary>
 public interface IScopeMembershipSource
 {

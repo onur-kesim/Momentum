@@ -194,4 +194,23 @@ public sealed class SyncStore(SyncDbContext db) : ISyncStore
         command.Parameters.AddWithValue("el", element);
         command.Parameters.AddWithValue("tag", tag);
     }
+
+    public async Task<bool> IsProjectOwnerAsync(Guid projectId, Guid actorId, CancellationToken cancellationToken)
+    {
+        await using var command = await db.CreateRawCommandAsync(
+            "SELECT EXISTS (SELECT 1 FROM projects WHERE entity_id = @p AND owner_id = @a)", cancellationToken);
+        command.Parameters.AddWithValue("p", projectId);
+        command.Parameters.AddWithValue("a", actorId);
+        return (bool)(await command.ExecuteScalarAsync(cancellationToken))!;
+    }
+
+    public async Task<bool> IsProjectOwnerOrMemberAsync(Guid projectId, Guid actorId, CancellationToken cancellationToken)
+    {
+        await using var command = await db.CreateRawCommandAsync(
+            "SELECT EXISTS (SELECT 1 FROM projects WHERE entity_id = @p AND owner_id = @a) " +
+            "OR EXISTS (SELECT 1 FROM project_members WHERE project_id = @p AND user_id = @a)", cancellationToken);
+        command.Parameters.AddWithValue("p", projectId);
+        command.Parameters.AddWithValue("a", actorId);
+        return (bool)(await command.ExecuteScalarAsync(cancellationToken))!;
+    }
 }

@@ -123,8 +123,16 @@ public sealed class MaterializationRoundTripTests(PostgresFixture fixture)
         (await Db.ScalarAsync<string>(connectionString, "SELECT pos FROM projects WHERE entity_id = @e", ("e", entity))).ShouldBe(projected1.Pos);
         (await Db.ScalarAsync<Guid>(connectionString, "SELECT owner_id FROM projects WHERE entity_id = @e", ("e", entity))).ShouldBe(ownerA);
 
-        // 2) BASKA bir aktor (ownerB) ayni entity'ye yazar: name gunceller + isDeleted=true isaretler.
-        // Kabul edilir (LWW), ama sahiplik CALINAMAZ.
+        // 1b) IS-EMRI-o86-A §E: ownerB'nin yazabilmesi icin ownerA onu UYE yapar (members, sahip-yalniz kural).
+        await app.SyncAsync(ownerA, Wire.PushNoPull(ownerA, Wire.Op(Guid.CreateVersion7(), ownerA, entity, ownerA, 3,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new([new WireSetAdd(ownerB.ToString(), Guid.CreateVersion7(), Wire.Hlc(ownerA, 3))], null),
+            },
+            entityType: "Project")));
+
+        // 2) UYE ownerB ayni entity'ye yazar: name gunceller + isDeleted=true isaretler. Kabul edilir
+        // (yetkili -- uye), ama sahiplik CALINAMAZ (F2, §E'den BAGIMSIZ bir kural).
         await app.SyncAsync(ownerB, Wire.PushNoPull(ownerB, Wire.Op(Guid.CreateVersion7(), ownerB, entity, ownerB, 3,
             fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal)
             {
@@ -147,6 +155,49 @@ public sealed class MaterializationRoundTripTests(PostgresFixture fixture)
 
         // TAM-SATIR UPSERT: ikinci yazim yeni satir DOGURMADI, ayni entity_id icin tam olarak bir satir var.
         (await Db.ScalarAsync<long>(connectionString, "SELECT count(*) FROM projects WHERE entity_id = @e", ("e", entity))).ShouldBe(1L);
+    }
+
+    /// <summary>
+    /// IS-EMRI-o86-A G2: members ekleme -> project_members satiri DOGAR (POZITIF); kaldirma -> satir
+    /// GIDER (NEGATIF). ReplaceTagsAsync/task_tags'in birebir mutant-sinifi.
+    /// </summary>
+    [Fact]
+    public async Task Project_members_add_materializes_row_remove_deletes_it()
+    {
+        var connectionString = await TestDatabase.CreateAsync(fixture);
+        await using var app = new SyncTestApp(connectionString);
+        var owner = Guid.NewGuid();
+        var member = Guid.NewGuid();
+        var entity = Guid.NewGuid();
+        var tag = Guid.CreateVersion7();
+
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, entity, owner, 1,
+            fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P", Wire.Hlc(owner, 1)) },
+            entityType: "Project")));
+
+        // Ekleme -- POZITIF: satir DOGAR.
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, entity, owner, 2,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new([new WireSetAdd(member.ToString(), tag, Wire.Hlc(owner, 2))], null),
+            },
+            entityType: "Project")));
+
+        (await Db.ScalarAsync<long>(connectionString,
+            "SELECT count(*) FROM project_members WHERE project_id = @p AND user_id = @m", ("p", entity), ("m", member)))
+            .ShouldBe(1L);
+
+        // Kaldirma -- NEGATIF: satir GIDER (bos liste her iddiayi gecirir -- pozitif kontrol yukarida zaten var).
+        await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, entity, owner, 3,
+            sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+            {
+                ["members"] = new(null, [new WireSetRemove(member.ToString(), [tag], Wire.Hlc(owner, 3))]),
+            },
+            entityType: "Project")));
+
+        (await Db.ScalarAsync<long>(connectionString,
+            "SELECT count(*) FROM project_members WHERE project_id = @p AND user_id = @m", ("p", entity), ("m", member)))
+            .ShouldBe(0L);
     }
 
     /// <summary>ORDER KANALI PINI: WireOp built INLINE (Wire has no Order helper).</summary>

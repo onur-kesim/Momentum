@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Momentum.Application.Features.Auth;
@@ -195,5 +196,64 @@ public sealed class AuthEndpointTests(PostgresFixture fixture) : IAsyncLifetime
 
         (await aGorur.Content.ReadAsStringAsync()).ShouldContain(entity.ToString(), customMessage: "A kendi gorevini GORMELI");
         (await bGormez.Content.ReadAsStringAsync()).ShouldNotContain(entity.ToString(), customMessage: "B, A'nin gorevini GORMEMELI");
+    }
+
+    /// <summary>IS-EMRI-o86-A §F/G7: POST /v1/users/lookup -- 401 (kimliksiz) · 404 (bilinmeyen e-posta) · 200 + yanit YALNIZ userId.</summary>
+    [Fact]
+    public async Task UserLookup_401_404_200_ve_yanit_yalniz_userId_tasir()
+    {
+        var a = await (await _client.PostAsJsonAsync("/v1/auth/register", new RegisterRequest("lookup-a@ornek.test", "sifre12345")))
+            .Content.ReadFromJsonAsync<AuthTokenResponse>();
+        var b = await (await _client.PostAsJsonAsync("/v1/auth/register", new RegisterRequest("lookup-b@ornek.test", "sifre12345")))
+            .Content.ReadFromJsonAsync<AuthTokenResponse>();
+
+        var lookupUri = new Uri("/v1/users/lookup", UriKind.Relative);
+
+        // 401: kimlik dogrulamasiz -- GET+query-string YOK, POST govde ile.
+        var anonIstek = new HttpRequestMessage(HttpMethod.Post, lookupUri) { Content = JsonContent.Create(new { email = "lookup-a@ornek.test" }) };
+        (await _client.SendAsync(anonIstek)).StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+
+        // 404: bilinmeyen e-posta -- acik kullanici sayim yuzeyi doğurmadan (govde ProblemDetails, sadece status olculur).
+        var yokIstek = Yetkili(HttpMethod.Post, lookupUri, b!.AccessToken);
+        yokIstek.Content = JsonContent.Create(new { email = "hic-yok-boyle-biri@ornek.test" });
+        (await _client.SendAsync(yokIstek)).StatusCode.ShouldBe(HttpStatusCode.NotFound);
+
+        // 200: gecerli e-posta -- yanit YALNIZ userId tasir (ad/e-posta/olusturma tarihi DONMEZ).
+        var varIstek = Yetkili(HttpMethod.Post, lookupUri, b.AccessToken);
+        varIstek.Content = JsonContent.Create(new { email = "lookup-a@ornek.test" });
+        var yanit = await _client.SendAsync(varIstek);
+        yanit.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        var govde = await yanit.Content.ReadFromJsonAsync<JsonElement>();
+        var alanlar = govde.EnumerateObject().Select(p => p.Name).ToList();
+        alanlar.ShouldBe(["userId"], "yanit YALNIZ userId tasimali -- fazla alan varsa bu satir kirmizi olur");
+        govde.GetProperty("userId").GetGuid().ShouldBe(a!.UserId);
+    }
+
+    /// <summary>
+    /// IS-EMRI-o86-A §F (OLCULDU): EmailNormalizer = Trim().ToLowerInvariant(), kultur-DUYARSIZ.
+    /// 'İ' (U+0130) ToLowerInvariant() ALTINDA duz ASCII 'i' DEGIL, 'i' + BIRLESIK NOKTA (U+0069 U+0307)
+    /// uretir -- ayni e-postanin ASCII 'i' varyanti bu yuzden FARKLI normalize sonucu alir, BULUNAMAZ.
+    /// </summary>
+    [Fact]
+    public async Task UserLookup_email_normalized_Turkce_I_harflerini_KATLAMAZ()
+    {
+        var kayit = await _client.PostAsJsonAsync("/v1/auth/register", new RegisterRequest("İrem.test@ornek.test", "sifre12345"));
+        kayit.StatusCode.ShouldBe(HttpStatusCode.Created, "kayit basarili olmali -- normalizasyon olcumu buna dayanir");
+        var arayan = await (await _client.PostAsJsonAsync("/v1/auth/register", new RegisterRequest("arayan-tr@ornek.test", "sifre12345")))
+            .Content.ReadFromJsonAsync<AuthTokenResponse>();
+
+        var lookupUri = new Uri("/v1/users/lookup", UriKind.Relative);
+
+        // AYNI dizgeyle (kayittaki BIREBIR, 'İ' ile) arama -- BULUNUR.
+        var ayniIstek = Yetkili(HttpMethod.Post, lookupUri, arayan!.AccessToken);
+        ayniIstek.Content = JsonContent.Create(new { email = "İrem.test@ornek.test" });
+        (await _client.SendAsync(ayniIstek)).StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        // ASCII 'i' varyantiyla arama -- Turkce katlama OLMADIGI icin BULUNAMAZ (404).
+        var asciiIstek = Yetkili(HttpMethod.Post, lookupUri, arayan.AccessToken);
+        asciiIstek.Content = JsonContent.Create(new { email = "irem.test@ornek.test" });
+        (await _client.SendAsync(asciiIstek)).StatusCode.ShouldBe(HttpStatusCode.NotFound,
+            "EmailNormalizer ToLowerInvariant kullanir -- 'İ' duz ASCII 'i'ye KATLANMAZ, farkli normalize sonucu uretir");
     }
 }
