@@ -1,6 +1,6 @@
 # DURUM.md — Momentum
 
-**BİTTİ: 12/14 · kutu 9 Eyl · dilim 3/5 sunucu ayağı KABUL · HEAD `adfcaae`. AŞAMA: push + üç kapı, sonra `o86-B`.** Teslim biçimi paketlenmiş build (docker imajı + APK); yeni teslim `v1.1.0`.
+**BİTTİ: 12/14 · kutu 9 Eyl · dilim 3/5 sunucu ayağı KABUL+PUSH · HEAD `12dc0a0`. AŞAMA: `o86-B` (istemci).** Teslim biçimi paketlenmiş build (docker imajı + APK); yeni teslim `v1.1.0`.
 
 > Açılış ≤3 komut: ① `git --no-optional-locks log --oneline -1` + `status --porcelain -- src`
 > ② bu dosya ③ CI durumu — **cihaz Chrome'undan** (bulut tarayıcısı kanıt değil). `arsiv/` AÇILMAZ.
@@ -18,15 +18,16 @@ doğrulanır, liste satırı yanıltır (o81: `pages #8` = o78 kodu ⇒ canlı d
 🔴 **Pozitif kontrol:** boş liste her iddiayı geçirir — her "görünüyor" iddiasının yanına bir
 "görünmemeli" iddiası konur.
 
-## DİLİM 3 — İŞBİRLİĞİ (sunucu ayağı KABUL EDİLDİ, push bekliyor)
+## DİLİM 3 — İŞBİRLİĞİ (sunucu ayağı KABUL EDİLDİ ve PUSH'LANDI)
 
 **Kilitler [Onur, 20 Ağu]:** üyelik = `Project.members` OrSet → `project_members` · davet e-posta
 ile · rol kademesi YOK · sahip OrSet'e YAZILMAZ; erişim = **`project_access`** (sahip ∪ üye).
 
-**Üç commit** (`86d04f9`·`8855ca8`·`adfcaae`), **push YOK**. İki denetim turu **beş** bulgu çıkardı
-(hepsi sınır 38'in sınıfı), beşi de kapandı; kapı proza değil **doğruluk tablosu**
-(`Dogruluk_tablosu_IZIN_PRE_IZIN_POST_H8`, 15 satır, 3 mutant). Canlı tur **14/14** · regresyon
-**6/6** ve **8/8** · `verify` EXIT 0 / **175** test · kanıt `KANIT/o86A*`.
+**Kapı beyanı (cihaz Chrome, 4 Eyl):** `ci #79`·`paket #14`·`pages #15` — üçü de **`12dc0a0`**
+ve yeşil; `pages` elle tetiklendi, sha'sı **run kaydından** okundu (liste satırından DEĞİL).
+Dört commit push'lu. İki denetim turu **beş** bulgu çıkardı (hepsi sınır 38'in sınıfı), beşi de
+kapandı; kapı proza değil **doğruluk tablosu** (15 satır, 3 mutant). Canlı tur **14/14** ·
+regresyon **6/6** ve **8/8** · `verify` EXIT 0 / **175** test · kanıt `KANIT/o86A*`.
 
 **DİLİM 2 — LİSTE BİTTİ** (20 Ağu; kapı beyanları `arsiv/DURUM-arsiv-o85.md`). **Kilitler [Onur,
 19 Ağu]:** Liste = sunucudaki **`Project`** · klasör KESİLDİ · `listPos`/`order` kanalı AÇILMADI ·
@@ -82,16 +83,15 @@ ile · rol kademesi YOK · sahip OrSet'e YAZILMAZ; erişim = **`project_access`*
     Bugün etkisiz; kanal açılınca o84'le AYNI SINIF sessiz-kayıp riski — **İLK ÖLÇÜLECEK yer**.
 34. **[o85-A · o86-A] Dilim 2-3'ün canlı ölçümü PROTOKOL SEVİYESİNDEDİR** (`/v1/sync` HTTP betiği);
     **Flutter UI canlı koşturulmadı**, ekran widget testleriyle ölçüldü (o83-G ile aynı sınır).
-36. **[İŞLEYİŞ md.4] Builder beyanı örneklemesi TUTTU (iki dilim üst üste):** o85-A2'de test-only
-    iddiası bayt-özdeşlikle; o86-A'da `verify` EXIT 0 / 151 test, `EXPLAIN` indeksi ve istemcinin
-    `zehirli` yolu bağımsız doğrulandı. Hiçbir dilim %100 doğrulamaya DÖNMEDİ.
+36. **[İŞLEYİŞ md.4] Builder beyanı örneklemesi üç dilim üst üste TUTTU** (o85-A2 bayt-özdeşlik ·
+    o86-A verify/EXPLAIN · o86-A3 test sayısı) — hiçbir dilim %100 doğrulamaya DÖNMEDİ.
 37. 🔴 **[o86] `outbox.owner_id` = YAZAN; `projects.owner_id` = PROJE SAHİBİ.** Erişim kümesi
     `project_access` görünümüdür, ham `project_members` sormak yasak (mimari testi). Snapshot varlık
-    listesi outbox GEÇMİŞİNDEN değil GÜNCEL `tasks`/`projects`ten okunur (geçmiş sızdırır).
+    listesi outbox GEÇMİŞİNDEN değil GÜNCEL `tasks`/`projects`ten okunur.
 38. 🔴 **[o86 · BEŞ ISIRIK] Yetki/görünürlük op'un KENDİ beyanına bakarsa kaçış doğar:** POST-op
     scope · `isNewEntity` koşulsuz KABUL · tahmin edilen `projectId` · `owner_id`in sonsuz
     görünürlüğü · scope'suz görevde sahipliğin sorulmaması. KAYNAK ve HEDEF scope'un ikisi,
     kapsamsızda `tasks.owner_id` sorulur. "A pull" TAZE snapshot'la ölçülürse YALAN söyler.
 39. **[o86-A3 BEYAN] `tasks.owner_id` ON CONFLICT'ta güncellenmez** (ilk yazan sabit) ⇒ üyenin
     projede yarattığı görevi sahip koparırsa görev **üyenin** kutusuna düşer ve sahip artık ona
-    yazamaz. Sahiplik devri op'u YOK (kapsam dışı, README'de).
+    yazamaz. Sahiplik devri op'u YOK (README'de).
