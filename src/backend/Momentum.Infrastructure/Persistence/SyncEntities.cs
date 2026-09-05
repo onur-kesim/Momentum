@@ -76,6 +76,15 @@ public sealed class SyncGcState
     public long GcHorizonSeq { get; set; }
 }
 
+// IS-EMRI-o86-D D1: sync_gc_state'in BIREBIR deseni -- tek fark, tekil satir (id=1) yerine
+// KULLANICI-BASINA satir (PK user_id). horizon_xid (xid8, unmapped -- ayni sync_gc_state.gc_horizon_xid
+// gibi migrationBuilder.Sql ile eklenir, EF'in bigint cast'i olmadigi icin) bu sinifta YOK.
+public sealed class UserResyncHorizon
+{
+    public Guid UserId { get; set; }
+    public long HorizonSeq { get; set; }
+}
+
 // GOREV slice-3a D1: materialized read rows. Reads/writes go through RAW SQL (EntityMaterializer /
 // TaskReadStore), mirroring every other Sync/* table -- these entities exist for migrations + model
 // validation only (ADR 0002 K2-I2).

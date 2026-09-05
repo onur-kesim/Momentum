@@ -105,10 +105,10 @@ public sealed class SyncTestApp : IAsyncDisposable
         return await scope.ServiceProvider.GetRequiredService<ISyncPuller>().PullIncrementalAsync(actorId, since, cancellationToken);
     }
 
-    public async Task<bool> ShouldResyncAsync(SyncCursor since, CancellationToken cancellationToken = default)
+    public async Task<bool> ShouldResyncAsync(Guid actorId, SyncCursor since, CancellationToken cancellationToken = default)
     {
         await using var scope = _provider.CreateAsyncScope();
-        return await scope.ServiceProvider.GetRequiredService<ISyncPuller>().ShouldResyncAsync(since, cancellationToken);
+        return await scope.ServiceProvider.GetRequiredService<ISyncPuller>().ShouldResyncAsync(actorId, since, cancellationToken);
     }
 
     public async Task<Hlc?> GetClientClockAsync(Guid clientId, CancellationToken cancellationToken = default)

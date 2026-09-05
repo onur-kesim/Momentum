@@ -26,6 +26,8 @@ public sealed class SyncDbContext(DbContextOptions<SyncDbContext> options) : DbC
 
     public DbSet<SyncGcState> SyncGcState => Set<SyncGcState>();
 
+    public DbSet<UserResyncHorizon> UserResyncHorizons => Set<UserResyncHorizon>();
+
     public DbSet<TaskRow> Tasks => Set<TaskRow>();
 
     public DbSet<TaskListRow> TaskLists => Set<TaskListRow>();

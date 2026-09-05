@@ -115,6 +115,20 @@ public sealed class SyncGcStateConfiguration : IEntityTypeConfiguration<SyncGcSt
     }
 }
 
+// IS-EMRI-o86-D D1: SyncGcStateConfiguration'in birebir deseni -- PK yalniz user_id (tekil-satir
+// CHECK kisiti yok, bu tablo kullanici-basina cok-satirlidir). horizon_xid ayni gc_horizon_xid gibi
+// bu Configuration'da GECMEZ, migration'da RAW SQL ile eklenir (EF'in xid8 destegi yok).
+public sealed class UserResyncHorizonConfiguration : IEntityTypeConfiguration<UserResyncHorizon>
+{
+    public void Configure(EntityTypeBuilder<UserResyncHorizon> builder)
+    {
+        builder.ToTable("user_resync_horizon");
+        builder.HasKey(x => x.UserId);
+        builder.Property(x => x.UserId).HasColumnName("user_id").ValueGeneratedNever();
+        builder.Property(x => x.HorizonSeq).HasColumnName("horizon_seq").HasDefaultValue(0L);
+    }
+}
+
 // GOREV slice-3a D1: materialized read rows (ADR 0002 K2-I2). Position/tag columns COLLATE "C" (D3b) --
 // fractional-index keys carry punctuation a linguistic collation may ignore at the primary level;
 // OrSetField already compares element identity via StringComparer.Ordinal.

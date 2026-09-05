@@ -9,8 +9,14 @@ namespace Momentum.Application.Abstractions.Sync;
 /// </summary>
 public interface ISyncPuller
 {
-    /// <summary><c>since &lt; (gc_horizon_xid, gc_horizon_seq)</c> -> caller must resync (horizon NULL -> never).</summary>
-    Task<bool> ShouldResyncAsync(SyncCursor since, CancellationToken cancellationToken);
+    /// <summary>
+    /// IS-EMRI-o86-D D3: <c>since &lt; </c> the EFFECTIVE horizon -> caller must resync (both horizons
+    /// absent -> never). Effective horizon is the GREATER of the GC horizon (<c>sync_gc_state</c>,
+    /// global) and <paramref name="actorId"/>'s per-user resync horizon (<c>user_resync_horizon</c>,
+    /// set when the actor gains access to a scope AFTER their cursor already passed its history) --
+    /// a scope-join backfill debt, same shape as the GC-horizon trigger.
+    /// </summary>
+    Task<bool> ShouldResyncAsync(Guid actorId, SyncCursor since, CancellationToken cancellationToken);
 
     /// <summary>Incremental changes visible below the xmin horizon, after <paramref name="since"/>, owned by the actor.</summary>
     Task<PullPage> PullIncrementalAsync(Guid actorId, SyncCursor since, CancellationToken cancellationToken);

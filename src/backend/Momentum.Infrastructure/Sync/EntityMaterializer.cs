@@ -139,9 +139,33 @@ public sealed class EntityMaterializer(SyncDbContext db) : IEntityMaterializer
         await ReplaceMembersAsync(entityId, projection.Members, cancellationToken);
     }
 
-    /// <summary>IS-EMRI-o86-A §C2: ReplaceTagsAsync'in birebir deseni -- delete-all-reinsert for this project_id (TAM-SATIR UPSERT's set-channel analog).</summary>
+    /// <summary>
+    /// IS-EMRI-o86-A §C2: ReplaceTagsAsync'in birebir deseni -- delete-all-reinsert for this project_id
+    /// (TAM-SATIR UPSERT's set-channel analog). IS-EMRI-o86-D D2 EKLENDI: DELETE'ten ONCE mevcut (eski)
+    /// uye kumesi okunur; `eklenen = members \ eski` -- kaynak `members` OP'UN BEYANI degil, cagiran
+    /// (MaterializeProjectAsync) tarafindan `ProjectProjection.From(...)`den GECIRILMIS GUNCEL kumedir
+    /// (sinir 38'in tam sinifi: op kendi beyanina bakarsa kacis dogar). `eklenen`in her uyesi icin
+    /// `user_resync_horizon` AYNI op txn'inde yazilir -- deger bu txn'in `pg_current_xact_id()`si.
+    /// Sahip `eklenen`e hic girmez (sahip OrSet'e yazilmaz, §C3) -- dogru davranis, sahibin erisimi
+    /// hic kesilmedi. Monotonluk: `ON CONFLICT ... WHERE` mevcut satiri YALNIZ ILERI gunceller (xid8
+    /// uzerinde `&gt;` -- SyncPuller.cs'teki composite karsilastirmayla AYNI operator, zaten olculdu).
+    /// Idempotans: ayni op yeniden materyalize edilirse `eski` zaten bu uyeleri icerir, `eklenen` BOS
+    /// cikar, yeni borc DOGMAZ.
+    /// </summary>
     private async Task ReplaceMembersAsync(Guid projectId, IReadOnlyList<Guid> members, CancellationToken cancellationToken)
     {
+        var eski = new HashSet<Guid>();
+        await using (var oku = await db.CreateRawCommandAsync(
+            "SELECT user_id FROM project_members WHERE project_id = @id", cancellationToken))
+        {
+            oku.Parameters.AddWithValue("id", projectId);
+            await using var reader = await oku.ExecuteReaderAsync(cancellationToken);
+            while (await reader.ReadAsync(cancellationToken))
+            {
+                eski.Add(reader.GetGuid(0));
+            }
+        }
+
         await using (var delete = await db.CreateRawCommandAsync("DELETE FROM project_members WHERE project_id = @id", cancellationToken))
         {
             delete.Parameters.AddWithValue("id", projectId);
@@ -155,6 +179,23 @@ public sealed class EntityMaterializer(SyncDbContext db) : IEntityMaterializer
             insert.Parameters.AddWithValue("id", projectId);
             insert.Parameters.AddWithValue("user", userId);
             await insert.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        foreach (var userId in members)
+        {
+            if (eski.Contains(userId))
+            {
+                continue; // zaten uyeydi -- resync borcu YOK (idempotans + "sadece eklenen" siniri).
+            }
+
+            await using var horizon = await db.CreateRawCommandAsync(
+                "INSERT INTO user_resync_horizon (user_id, horizon_xid, horizon_seq) " +
+                "VALUES (@user, pg_current_xact_id(), 0) " +
+                "ON CONFLICT (user_id) DO UPDATE SET horizon_xid = excluded.horizon_xid " +
+                "WHERE user_resync_horizon.horizon_xid IS NULL OR excluded.horizon_xid > user_resync_horizon.horizon_xid",
+                cancellationToken);
+            horizon.Parameters.AddWithValue("user", userId);
+            await horizon.ExecuteNonQueryAsync(cancellationToken);
         }
     }
 }

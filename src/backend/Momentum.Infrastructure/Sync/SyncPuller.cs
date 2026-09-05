@@ -16,18 +16,60 @@ public sealed class SyncPuller(SyncDbContext db) : ISyncPuller
 {
     private const int PageSize = 500;
 
-    public async Task<bool> ShouldResyncAsync(SyncCursor since, CancellationToken cancellationToken)
+    /// <summary>
+    /// IS-EMRI-o86-D2 D-DUZELTME (K-o89/5): iki horizonun MAX'ini alip TEK esige sokan onceki
+    /// mantik (o86-D) KALKTI -- iki horizonun esik semantigi FARKLIDIR, tek bir karsilastirmaya
+    /// SIKISTIRILAMAZ:
+    /// <list type="bullet">
+    /// <item>GC horizonu: bugunku gibi -- <see cref="ResyncPolicy.ShouldResync"/> (KESIN kucuktur,
+    /// <c>since &lt; gc</c>). Saf politika DEGISMEDI (DUR noktasi 1).</item>
+    /// <item>Kullanici horizonu: <c>since &lt;= userHorizon</c> (KAPSAYICI). Gerekce: horizon TAM
+    /// SINIRA yazilir (<c>pg_current_xact_id()</c>, D2) VE uyenin imleci de snapshot'tan AYNI
+    /// sinira (<c>pg_snapshot_xmin</c>) gelebilir -- ikisi ESIT cikabilir (olculdu: 753==753, o86-D
+    /// bagimsiz denetimi). Kesin-kucuktur bu esitlikte KACIRIR; kapsayici KACIRMAZ. Daveti ZATEN
+    /// gormus bir istemcinin imleci `(X, seq&gt;=1)` olur ⇒ `since &lt;= (X,0)` FALSE ⇒ gereksiz
+    /// resync YOK -- imleci tam `(X,0)` olan istemci yalniz BIR KEZ fazladan snapshot alir,
+    /// zararsiz.</item>
+    /// </list>
+    /// Sonuc ikisinin VEYA'sidir -- `g &gt; u ? g : u` karsilastirmasi ve `SyncCursor` uzerindeki
+    /// `&gt;` bagimliligi bu satirdan KALKTI.
+    /// </summary>
+    public async Task<bool> ShouldResyncAsync(Guid actorId, SyncCursor since, CancellationToken cancellationToken)
+    {
+        var gcHorizon = await ReadGcHorizonAsync(cancellationToken);
+        var gcResync = gcHorizon is { } gc && ResyncPolicy.ShouldResync(since, gc);
+
+        var userHorizon = await ReadUserHorizonAsync(actorId, cancellationToken);
+        var userResync = userHorizon is { } u && since <= u;
+
+        return gcResync || userResync;
+    }
+
+    private async Task<SyncCursor?> ReadGcHorizonAsync(CancellationToken cancellationToken)
     {
         await using var command = await db.CreateRawCommandAsync(
             "SELECT gc_horizon_xid::text, gc_horizon_seq FROM sync_gc_state WHERE id = 1", cancellationToken);
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
         if (!await reader.ReadAsync(cancellationToken) || reader.IsDBNull(0))
         {
-            return false; // no GC horizon set -> never resync
+            return null; // no GC horizon set
         }
 
-        var horizon = new SyncCursor(ulong.Parse(reader.GetString(0), CultureInfo.InvariantCulture), reader.GetInt64(1));
-        return ResyncPolicy.ShouldResync(since, horizon);
+        return new SyncCursor(ulong.Parse(reader.GetString(0), CultureInfo.InvariantCulture), reader.GetInt64(1));
+    }
+
+    private async Task<SyncCursor?> ReadUserHorizonAsync(Guid actorId, CancellationToken cancellationToken)
+    {
+        await using var command = await db.CreateRawCommandAsync(
+            "SELECT horizon_xid::text, horizon_seq FROM user_resync_horizon WHERE user_id = @actorId", cancellationToken);
+        command.Parameters.AddWithValue("actorId", actorId);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        if (!await reader.ReadAsync(cancellationToken) || reader.IsDBNull(0))
+        {
+            return null; // no join-backfill debt for this user
+        }
+
+        return new SyncCursor(ulong.Parse(reader.GetString(0), CultureInfo.InvariantCulture), reader.GetInt64(1));
     }
 
     public async Task<PullPage> PullIncrementalAsync(Guid actorId, SyncCursor since, CancellationToken cancellationToken)

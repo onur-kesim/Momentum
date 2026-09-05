@@ -80,7 +80,7 @@ public sealed class SyncCommandHandler : ICommandHandler<SyncCommand, SyncRespon
         else
         {
             var since = new SyncCursor(request.SinceCursor.Xid, request.SinceCursor.Seq);
-            if (await _puller.ShouldResyncAsync(since, cancellationToken))
+            if (await _puller.ShouldResyncAsync(command.ActorId, since, cancellationToken))
             {
                 resyncRequired = true; // flag-only: client re-requests with sinceCursor=null (named refinement)
                 nextCursor = request.SinceCursor;
