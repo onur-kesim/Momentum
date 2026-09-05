@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../ag/kullanici_arama_agi.dart';
 import '../design/metinler.dart';
 import '../design/tokens.dart';
 import '../veri/depolama_durumu.dart';
@@ -50,6 +51,21 @@ class GorevListesiEkrani extends StatefulWidget {
   // OturumYoneticisi.cikisYap ile AYNI karardadir (s2.3).
   final VoidCallback? onCikisYap;
 
+  // IS-EMRI-o86-B §C/§D: paylas akisinin `GorevDeposu`nun DISINDA kalan
+  // gereksinimleri -- kullanici arama (HTTP) ve kuyruk-satiri-okuma (§C
+  // adim 6) `SenkronDongusu`/HTTP katmanina aittir, veri katmani BUNLARI
+  // BILMEZ (F4 dikisi). K-o88/4: `uyeEkle` de BILEREK BURADA (AYRI geri
+  // cagri) -- `GorevDeposu` arayuzune EKLENMEDI (gorev_deposu.dart'taki
+  // dosya-seviyesi yoruma bkz., 13 sahte test deposunu ETKILEMEMEK icin).
+  // Hicbiri `null` ise (mevcut testler/durum vitrini) paylas DIYALOGU HICBIR
+  // SEY YAPMAZ -- onYenile/onCikisYap'in AYNI geriye-donuk-uyumlu deseni;
+  // DUGMENIN KENDISI YINE DE GORUNUR (D-D4: sahiplik istemcide bilinemez, Z9).
+  final KullaniciAramaAgi? kullaniciAramaAgi;
+  final String? actorId;
+  final Future<({String durum, String? sonHataKodu})?> Function(String opId)?
+  paylasimKuyrukSatiriniOku;
+  final Future<String> Function(String projeId, String userId)? uyeEkle;
+
   const GorevListesiEkrani({
     super.key,
     required this.depo,
@@ -57,6 +73,10 @@ class GorevListesiEkrani extends StatefulWidget {
     this.onYerelYazma,
     this.depolama,
     this.onCikisYap,
+    this.kullaniciAramaAgi,
+    this.actorId,
+    this.paylasimKuyrukSatiriniOku,
+    this.uyeEkle,
   });
 
   @override
@@ -220,6 +240,46 @@ class _GorevListesiEkraniState extends State<GorevListesiEkrani> {
     unawaited(_yerelYaz(() => widget.depo.listeSil(proje.id)));
   }
 
+  /// IS-EMRI-o86-B §C/§D: davet diyalogunu acar -- `_ListeAdiDiyalogu`nun
+  /// AYNI deseni (diyalog bir DEGER doner, YAZMA/bildirim BURADA olur), ama
+  /// diyalogun KENDISI §C'nin uc-adimli akisini (lookup->op->tur->kuyruk
+  /// okuma) ICINDE yurutur -- ara durumlar (yukleniyor/hata) diyalog ACIK
+  /// KALIRKEN gosterilmelidir, `_ListeAdiDiyalogu` gibi TEK deger donup
+  /// kapanamaz. Dort yetenek `null`sa (mevcut testler/durum vitrini) HICBIR
+  /// SEY yapmaz -- dugme YINE DE gorunur kalir (D-D4).
+  Future<void> _listePaylasDiyaloguAc(BuildContext context, Proje proje) async {
+    final aramaAgi = widget.kullaniciAramaAgi;
+    final actorId = widget.actorId;
+    final kuyrukOku = widget.paylasimKuyrukSatiriniOku;
+    final uyeEkle = widget.uyeEkle;
+    if (aramaAgi == null || actorId == null || kuyrukOku == null ||
+        uyeEkle == null) {
+      return;
+    }
+
+    final eposta = await showDialog<String>(
+      context: context,
+      builder: (_) => _ListePaylasDiyalogu(
+        projeId: proje.id,
+        actorId: actorId,
+        kullaniciAramaAgi: aramaAgi,
+        uyeEkle: uyeEkle,
+        turCalistir: widget.onYerelYazma,
+        kuyrukSatiriniOku: kuyrukOku,
+      ),
+    );
+    if (eposta == null || !context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          Metinler.listePaylasBasarili(eposta),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        ),
+      ),
+    );
+  }
+
   /// IS-EMRI-o85-A D1: `[Gelen Kutusu] + listeler`. Secim ekranin
   /// BAGLAMIDIR (D4) -- dokunus hem `_secilenListeId`yi degistirir hem
   /// Drawer'i kapatir.
@@ -265,34 +325,62 @@ class _GorevListesiEkraniState extends State<GorevListesiEkrani> {
                         Navigator.of(context).pop();
                         setState(() => _secilenListeId = proje.id);
                       },
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.edit_outlined, size: MOlcu.ikon),
-                            tooltip: Metinler.listeYenidenAdlandirDugmesi,
-                            constraints: BoxConstraints.tightFor(
-                              width: MOlcu.dokunmaHedefi,
-                              height: MOlcu.dokunmaHedefi,
-                            ),
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              Navigator.of(context).pop();
+                      // IS-EMRI-o86-B K-o88/4 (Onur kilidi, 4 Eyl -- D-D2
+                      // kirmizisi sonrasi): uc AYRI IconButton yerine TEK
+                      // PopupMenuButton -- `liste_baglam_test.dart`nin iki
+                      // testini kiran ROW GENISLIGI boylece ORTADAN kalkar
+                      // (o dosyanin KENDISI degismedi, PAZARLIKSIZ).
+                      // TUZAK olculdu: `showMenu` KENDI route'unu `onSelected`
+                      // CAGRILMADAN ONCE zaten kapatir (PopupMenuButton'in
+                      // ic mekanigi) -- bu yuzden burada TEK `Navigator.pop()`
+                      // yeterlidir (Drawer'i kapatir), ikinci bir pop YANLIS
+                      // olurdu. Kanit: paylasim_dilimi_test.dart'taki menu
+                      // testi + §F/9 canli tur.
+                      trailing: PopupMenuButton<String>(
+                        key: ValueKey('liste_menu_${proje.id}'),
+                        icon: Icon(Icons.more_vert, size: MOlcu.ikon),
+                        tooltip: Metinler.listeMenuAc,
+                        onSelected: (secim) {
+                          Navigator.of(context).pop();
+                          switch (secim) {
+                            case 'duzenle':
                               _listeYenidenAdlandirDiyaloguAc(context, proje);
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.delete_outline, size: MOlcu.ikon),
-                            tooltip: Metinler.listeSil,
-                            constraints: BoxConstraints.tightFor(
-                              width: MOlcu.dokunmaHedefi,
-                              height: MOlcu.dokunmaHedefi,
-                            ),
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              Navigator.of(context).pop();
+                            case 'paylas':
+                              // D-D4: HER LISTEDE gorunur -- sahiplik
+                              // istemcide bilinemez (Z9), red dali basarsa
+                              // dogal olarak calisir (§C/6, §F/9).
+                              _listePaylasDiyaloguAc(context, proje);
+                            case 'sil':
                               _listeSilOnayDiyaloguAc(context, proje);
-                            },
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            key: ValueKey('liste_menu_duzenle_${proje.id}'),
+                            value: 'duzenle',
+                            child: Text(
+                              Metinler.listeYenidenAdlandirDugmesi,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          PopupMenuItem(
+                            key: ValueKey('liste_menu_paylas_${proje.id}'),
+                            value: 'paylas',
+                            child: Text(
+                              Metinler.listePaylasDugmesi,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          PopupMenuItem(
+                            key: ValueKey('liste_menu_sil_${proje.id}'),
+                            value: 'sil',
+                            child: Text(
+                              Metinler.listeSil,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
                         ],
                       ),
@@ -711,6 +799,205 @@ class _ListeAdiDiyaloguState extends State<_ListeAdiDiyalogu> {
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),
+        ),
+      ],
+    );
+  }
+}
+
+/// IS-EMRI-o86-B §C PAZARLIKSIZ akis (sira dahil, adim numaralari yorumlarda):
+/// `_ListeAdiDiyalogu`dan FARKLI olarak bu diyalog TEK bir deger DONUP
+/// KAPANMAZ -- lookup/op/tur/kuyruk-okuma ARASI durumlar (yukleniyor, red,
+/// yeniden-dene) diyalog ACIK KALIRKEN gosterilir; yalniz GERCEK basari
+/// (§C/6 "satir YOK") diyalogu KAPATIR ve davet edilen e-postayi DONDURUR
+/// (parent -- `_listePaylasDiyaloguAc` -- SnackBar'i ORADA gosterir).
+class _ListePaylasDiyalogu extends StatefulWidget {
+  final String projeId;
+  final String actorId;
+  final KullaniciAramaAgi kullaniciAramaAgi;
+  final Future<String> Function(String projeId, String userId) uyeEkle;
+  final Future<void> Function()? turCalistir;
+  final Future<({String durum, String? sonHataKodu})?> Function(String opId)
+  kuyrukSatiriniOku;
+
+  const _ListePaylasDiyalogu({
+    required this.projeId,
+    required this.actorId,
+    required this.kullaniciAramaAgi,
+    required this.uyeEkle,
+    required this.turCalistir,
+    required this.kuyrukSatiriniOku,
+  });
+
+  @override
+  State<_ListePaylasDiyalogu> createState() => _ListePaylasDiyaloguState();
+}
+
+class _ListePaylasDiyaloguState extends State<_ListePaylasDiyalogu> {
+  late final TextEditingController _denetleyici;
+  bool _gonderiliyor = false;
+  String? _hataMetni;
+  Color? _hataRengi;
+
+  @override
+  void initState() {
+    super.initState();
+    _denetleyici = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _denetleyici.dispose();
+    super.dispose();
+  }
+
+  bool _epostaGecerliMi(String eposta) =>
+      eposta.isNotEmpty && eposta.contains('@');
+
+  Future<void> _davetEt() async {
+    // §C adim 1: yerel dogrulama -- AG BURADA HIC CAGRILMAZ.
+    final eposta = _denetleyici.text.trim();
+    if (!_epostaGecerliMi(eposta)) {
+      setState(() {
+        _hataMetni = Metinler.listePaylasGecersizEposta;
+        _hataRengi = MRenk.tehlike(context);
+      });
+      return;
+    }
+
+    setState(() {
+      _gonderiliyor = true;
+      _hataMetni = null;
+    });
+
+    // §C adim 2: lookup.
+    final sonuc = await widget.kullaniciAramaAgi.ara(eposta);
+    if (!mounted) return;
+    switch (sonuc) {
+      case KullaniciBulunamadi():
+        setState(() {
+          _gonderiliyor = false;
+          _hataMetni = Metinler.listePaylasKullaniciYok;
+          _hataRengi = MRenk.tehlike(context);
+        });
+        return;
+      case KullaniciAramaHatasi():
+        setState(() {
+          _gonderiliyor = false;
+          _hataMetni = Metinler.listePaylasBaglantiYok;
+          _hataRengi = MRenk.tehlike(context);
+        });
+        return;
+      case KullaniciBulundu(userId: final userId):
+        // §C adim 3: kendi kendini davet.
+        if (userId == widget.actorId) {
+          setState(() {
+            _gonderiliyor = false;
+            _hataMetni = Metinler.listePaylasKendiniDavetEdemezsin;
+            _hataRengi = MRenk.tehlike(context);
+          });
+          return;
+        }
+        await _opUretVeSonucuIsle(userId, eposta);
+    }
+  }
+
+  /// §C adim 4-6: op uretimi + itme turu + kuyruk satiri okuma -- UC dalli
+  /// karar (satir YOK/`zehirli`/`bekliyor`).
+  Future<void> _opUretVeSonucuIsle(String userId, String eposta) async {
+    // adim 4: operationId SAKLANIR.
+    final opId = await widget.uyeEkle(widget.projeId, userId);
+    if (!mounted) return;
+
+    // adim 5.
+    final tur = widget.turCalistir;
+    if (tur != null) await tur();
+    if (!mounted) return;
+
+    // adim 6: kuyruk satiri AYNI opId ile okunur.
+    final satir = await widget.kuyrukSatiriniOku(opId);
+    if (!mounted) return;
+
+    if (satir == null) {
+      // ✅ basari -- diyalog KAPANIR, e-posta parent'a doner.
+      Navigator.of(context).pop(eposta);
+      return;
+    }
+    if (satir.durum == 'zehirli') {
+      // D-C1 PAZARLIKSIZ: ham sonHataKodu METINDE GORUNUR.
+      setState(() {
+        _gonderiliyor = false;
+        _hataMetni = Metinler.listePaylasYetkiYok(satir.sonHataKodu ?? '?');
+        _hataRengi = MRenk.tehlike(context);
+      });
+      return;
+    }
+    // durum 'bekliyor'/'gonderildi' -- op kuyrukta KALIR, silinmez.
+    setState(() {
+      _gonderiliyor = false;
+      _hataMetni = Metinler.listePaylasYenidenDene;
+      _hataRengi = MRenk.uyari(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(
+        Metinler.listePaylasDugmesi,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            key: const ValueKey('liste_paylas_eposta_alani'),
+            controller: _denetleyici,
+            enabled: !_gonderiliyor,
+            autofocus: true,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(labelText: Metinler.epostaEtiketi),
+            onSubmitted: (_) => _davetEt(),
+          ),
+          if (_hataMetni != null) ...[
+            SizedBox(height: MBosluk.xs),
+            Text(
+              _hataMetni!,
+              key: const ValueKey('liste_paylas_hata_metni'),
+              style: TextStyle(color: _hataRengi),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            ),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: _gonderiliyor
+              ? null
+              : () => Navigator.of(context).pop(),
+          child: Text(
+            Metinler.iptalDugmesi,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ),
+        TextButton(
+          key: const ValueKey('liste_paylas_davet_dugmesi'),
+          onPressed: _gonderiliyor ? null : _davetEt,
+          child: _gonderiliyor
+              ? SizedBox(
+                  width: MOlcu.ikon,
+                  height: MOlcu.ikon,
+                  child: const CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(
+                  Metinler.listePaylasDavetDugmesi,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
         ),
       ],
     );

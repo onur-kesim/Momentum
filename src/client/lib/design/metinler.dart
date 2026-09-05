@@ -184,4 +184,33 @@ class Metinler {
   /// EK grubun tek FONKSIYON uyesi, F6 kilidi yalniz `const String`leri sinar.
   static String bosDurumListe(String listeAdi) =>
       '$listeAdi listesinde henüz görev yok.';
+
+  // IS-EMRI-o86-B §C/§D -- DILIM 3 "Paylaş" (davet). K-o88/3 PAZARLIKSIZ:
+  // reddedilen davet KULLANICIYA GORUNMEK ZORUNDADIR -- sessizlik yasak.
+  // K-o88/4 (D-D2 kirmizisi sonrasi Onur kilidi, 4 Eyl): uc ayri IconButton
+  // yerine TEK menu -- `listeMenuAc` menunun KENDI tooltip'i, `listePaylasDugmesi`
+  // hem madde basligi hem diyalog basligi olarak YENIDEN KULLANILIR (listeSil'in
+  // AYNI cok-rollu deseni).
+  static const String listeMenuAc = 'Liste seçenekleri';
+  static const String listePaylasDugmesi = 'Listeyi paylaş';
+  static const String listePaylasGecersizEposta =
+      'Geçerli bir e-posta adresi gir.';
+  static const String listePaylasKullaniciYok =
+      'Bu e-postayla kayıtlı kullanıcı yok.';
+  static const String listePaylasBaglantiYok =
+      'Bağlantı yok, davet gönderilemedi.';
+  static const String listePaylasKendiniDavetEdemezsin =
+      'Kendini davet edemezsin.';
+  static const String listePaylasYenidenDene = 'Gönderilemedi, yeniden dene.';
+  static const String listePaylasDavetDugmesi = 'Davet et';
+
+  /// §C adım 6 başarı: `eposta` çalışma-zamanında gelir -- `bosDurumListe`
+  /// ile AYNI desen (F6 kilidi yalnız `const String`leri sınar).
+  static String listePaylasBasarili(String eposta) =>
+      '$eposta listeye eklendi.';
+
+  /// §C adım 6 red (D-C1 PAZARLIKSIZ): ham `sonHataKodu` metne EKLENIR,
+  /// gizlenmez -- destek/denetim onu ekrandan OKUYABILSIN.
+  static String listePaylasYetkiYok(String sonHataKodu) =>
+      'Bu listeyi paylaşma yetkin yok. ($sonHataKodu)';
 }

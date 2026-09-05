@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Momentum.Api.Realtime;
 using Momentum.Application.Abstractions;
 using Momentum.Application.Abstractions.Sync;
@@ -19,60 +20,93 @@ namespace Momentum.Persistence.Tests;
 public sealed class RealtimeMembershipTests(PostgresFixture fixture)
 {
     /// <summary>
-    /// D8-v: <c>SyncHub</c> is instantiated directly (no mock library -- Hub exposes <c>Groups</c>/
-    /// <c>Context</c> as public settable properties for exactly this). IS-EMRI-o86-A §D3: membership is
-    /// now `project_members`, not outbox -- fixture arranges rows DIRECTLY. KB-C: V's membership in a
-    /// DIFFERENT scope T is REQUIRED in the fixture -- without a foreign-scope row in the table,
-    /// mutant-7 (dropping the <c>user_id</c> filter) is unobservable, since the table would otherwise
-    /// hold only U's own row. KB-B: withdrawing U's membership in S is an explicit DELETE (a test-arrange
-    /// action, not a dispatcher behavior).
+    /// IS-EMRI-o86-C §B D-B1 (md.6 "olu kod borctur"): `scope:` gruplarina baglanti aninda katilim
+    /// KALKTI -- <c>SyncHub</c> artik `IScopeMembershipSource`'a HIC ihtiyac duymuyor (constructor'dan
+    /// da kalkti). Bu test, ONCEKI sozlesmenin (bagli oldugu <c>scope:</c> grubunun uyelik degisince
+    /// yeniden hesaplanmasi) YERINE, YENI sozlesmeyi kanitlar: her baglanti, uyelikten TAMAMEN bagimsiz,
+    /// YALNIZ kendi `user:{self}` grubuna katilir -- baska hicbir grup yok.
+    /// D8-v deseni (mock kutuphanesi GEREKMEZ) korunur: <c>SyncHub</c> dogrudan instantiate edilir.
     /// </summary>
     [Fact]
-    public async Task Hub_recomputes_group_membership_on_each_connect()
+    public async Task Hub_joins_only_the_users_own_group_on_connect()
+    {
+        var u = Guid.NewGuid();
+        var groups = new RecordingGroupManager();
+        var context = new FakeHubCallerContext(Guid.NewGuid().ToString());
+        var hub = new SyncHub(new FakeCurrentUser(u)) { Groups = groups, Context = context };
+
+        await hub.OnConnectedAsync();
+
+        var actual = groups.GroupsFor(context.ConnectionId).ToHashSet(StringComparer.Ordinal);
+        actual.SetEquals(new[] { $"user:{u}" }).ShouldBeTrue($"unexpected group set: [{string.Join(", ", actual)}]");
+    }
+
+    /// <summary>
+    /// IS-EMRI-o86-C §C H9 (sinir 38'in altinci isirigi kapanisi -- PAZARLIKSIZ): B, P projesine
+    /// DAVETTEN ONCE "baglanir" (D8-v: dogrudan Hub instantiate, sadece kendi user: grubuna katilir --
+    /// yukaridaki test zaten bunu kanitliyor). SONRA A, B'yi P'ye ekler ve P'ye bir gorev op'u yazar.
+    /// Zayiflatma: gercek bir WebSocket/HubConnection GEREKMEZ -- <see cref="RecordingSignalPublisher"/>
+    /// zaten HANGI GRUBA sinyal gittigini kaydeder, ve B'nin kendi grubuna (user:B) HER ZAMAN katildigi
+    /// (yukaridaki test) AYRICA kanitlanmis oldugundan, "user:B grubuna sinyal yayinlandi" = "B sinyali
+    /// ALIR" (Reconnect_does_not_replay testi zaten ayni gruba GERCEK HubConnection'in ulastigini
+    /// kanitliyor -- iki test farkli katmanlari kapatir).
+    /// POZITIF KONTROLUN ESI (zorunlu, madde eksikse H9 bos kumeyle gecer): projede uye OLMAYAN C
+    /// icin "user:C" HICBIR ZAMAN yayinlanmaz.
+    /// Mutant: `GetMembersAsync` cagrisini connect-time uyelikle (B'nin baglandigi anki -- HENUZ uye
+    /// degil) degistir ⇒ "user:B" hic yayinlanmaz ⇒ test KIRMIZI olmali.
+    /// </summary>
+    [Fact]
+    public async Task Member_added_after_connect_receives_signal_without_reconnect_H9()
     {
         var connectionString = await TestDatabase.CreateAsync(fixture);
-        var u = Guid.NewGuid();
-        var v = Guid.NewGuid();
-        var s = Guid.NewGuid();
-        var t = Guid.NewGuid();
+        var a = Guid.NewGuid();
+        var b = Guid.NewGuid();
+        var c = Guid.NewGuid(); // uye DEGIL, hic olmayacak -- pozitif kontrolun esi.
+        var project = Guid.NewGuid();
 
-        await Db.ExecuteAsync(connectionString, "INSERT INTO project_members (project_id, user_id) VALUES (@s, @u)", ("s", s), ("u", u));
-        await Db.ExecuteAsync(connectionString, "INSERT INTO project_members (project_id, user_id) VALUES (@t, @v)", ("t", t), ("v", v));
+        await using (var app = new SyncTestApp(connectionString))
+        {
+            // A projeyi olusturur -- B henuz UYE DEGIL (B'nin "baglantisi" bu ANDAN SONRA kurulmus olur).
+            await app.SyncAsync(a, Wire.PushNoPull(a, Wire.Op(Guid.CreateVersion7(), a, project, a, 1,
+                fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P", Wire.Hlc(a, 1)) },
+                entityType: "Project")));
 
+            // A, SONRA B'yi P'ye ekler -- `uyeEkle`nin (client, IS-EMRI-o86-B §A) backend esdegeri:
+            // ayni desen, kanal YALNIZ `sets.members`.
+            await app.SyncAsync(a, Wire.PushNoPull(a, Wire.Op(Guid.CreateVersion7(), a, project, a, 2,
+                sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+                {
+                    ["members"] = new([new WireSetAdd(b.ToString(), Guid.NewGuid(), Wire.Hlc(a, 2))], null),
+                },
+                entityType: "Project")));
+
+            // P'ye bir gorev op'u yazilir (§D adim 6/7'nin sunucu karsiligi).
+            await app.SyncAsync(a, Wire.PushNoPull(a, Wire.TaskField(Guid.CreateVersion7(), a, Guid.NewGuid(), a, "title", "gorev-1")));
+        }
+
+        var publisher = new RecordingSignalPublisher();
         var services = new ServiceCollection();
-        services.AddSyncInfrastructure(connectionString);
+        services.AddSyncInfrastructure(connectionString); // IScopeMembershipSource GERCEK ScopeMembershipSource'tan gelir.
+        services.AddScoped(_ => new OutboxClaimStore(connectionString));
+        services.AddSingleton<ISignalPublisher>(publisher);
         await using var provider = services.BuildServiceProvider();
+        var dispatcher = new OutboxDispatcher(
+            provider.GetRequiredService<IServiceScopeFactory>(), TimeProvider.System,
+            new OutboxDispatcherOptions { BatchSize = 10 }, NullLogger<OutboxDispatcher>.Instance);
 
-        // --- Phase 1: U connects -> exactly {user:U, scope:S} (T must NOT leak in). ---
-        await using (var scope1 = provider.CreateAsyncScope())
+        for (var i = 0; i < 5; i++)
         {
-            var membership = scope1.ServiceProvider.GetRequiredService<IScopeMembershipSource>();
-            var groups = new RecordingGroupManager();
-            var context = new FakeHubCallerContext(Guid.NewGuid().ToString());
-            var hub = new SyncHub(new FakeCurrentUser(u), membership) { Groups = groups, Context = context };
-
-            await hub.OnConnectedAsync();
-
-            var actual = groups.GroupsFor(context.ConnectionId).ToHashSet(StringComparer.Ordinal);
-            actual.SetEquals(new[] { $"user:{u}", $"scope:{s}" }).ShouldBeTrue(
-                $"unexpected group set: [{string.Join(", ", actual)}]");
+            if (await dispatcher.PumpOnceAsync(CancellationToken.None) == 0)
+            {
+                break;
+            }
         }
 
-        // --- Phase 2: U's membership in S withdrawn (test-arrange DELETE, KB-B) -> reconnect recomputes. ---
-        await Db.ExecuteAsync(connectionString, "DELETE FROM project_members WHERE user_id = @u AND project_id = @s", ("u", u), ("s", s));
-
-        await using (var scope2 = provider.CreateAsyncScope())
-        {
-            var membership = scope2.ServiceProvider.GetRequiredService<IScopeMembershipSource>();
-            var groups = new RecordingGroupManager();
-            var context = new FakeHubCallerContext(Guid.NewGuid().ToString());
-            var hub = new SyncHub(new FakeCurrentUser(u), membership) { Groups = groups, Context = context };
-
-            await hub.OnConnectedAsync();
-
-            var actual = groups.GroupsFor(context.ConnectionId).ToHashSet(StringComparer.Ordinal);
-            actual.SetEquals(new[] { $"user:{u}" }).ShouldBeTrue($"unexpected group set: [{string.Join(", ", actual)}]");
-        }
+        var publishedGroups = publisher.Published.Select(p => p.Group).ToHashSet(StringComparer.Ordinal);
+        publishedGroups.ShouldContain($"user:{b}",
+            "H9: baglantidan SONRA davet edilen uye, YENIDEN BAGLANMADAN sinyal almali");
+        publishedGroups.ShouldNotContain($"user:{c}",
+            "pozitif kontrolun esi: projede uye OLMAYAN C, ayni op icin sinyal ALMAMALI");
     }
 
     /// <summary>
@@ -155,38 +189,9 @@ public sealed class RealtimeMembershipTests(PostgresFixture fixture)
         page.Changes.Count.ShouldBe(changeCount); // the real cursor, unaffected by the hub, returns everything
     }
 
-    /// <summary>
-    /// IS-EMRI-o86-A2 §E H2: SAHIP A, kendi projesine baglaninca `scope:{P}` grubuna KATILIR --
-    /// sahip `project_members`e YAZILMAZ (§C3), ama `project_access` GORUNUMU onu `projects.owner_id`
-    /// uzerinden zaten kapsar.
-    /// </summary>
-    [Fact]
-    public async Task Owner_joins_own_scope_group_on_connect_H2()
-    {
-        var connectionString = await TestDatabase.CreateAsync(fixture);
-        var owner = Guid.NewGuid();
-        var project = Guid.NewGuid();
-
-        await using (var app = new SyncTestApp(connectionString))
-        {
-            await app.SyncAsync(owner, Wire.PushNoPull(owner, Wire.Op(Guid.CreateVersion7(), owner, project, owner, 1,
-                fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("P", Wire.Hlc(owner, 1)) },
-                entityType: "Project")));
-        }
-
-        var services = new ServiceCollection();
-        services.AddSyncInfrastructure(connectionString);
-        await using var provider = services.BuildServiceProvider();
-
-        await using var scope = provider.CreateAsyncScope();
-        var membership = scope.ServiceProvider.GetRequiredService<IScopeMembershipSource>();
-        var groups = new RecordingGroupManager();
-        var context = new FakeHubCallerContext(Guid.NewGuid().ToString());
-        var hub = new SyncHub(new FakeCurrentUser(owner), membership) { Groups = groups, Context = context };
-
-        await hub.OnConnectedAsync();
-
-        var actual = groups.GroupsFor(context.ConnectionId).ToHashSet(StringComparer.Ordinal);
-        actual.ShouldContain($"scope:{project}", "H2: sahip project_members'e YAZILMAZ ama project_access uzerinden scope grubuna KATILMALI");
-    }
+    // IS-EMRI-o86-C §B D-B2 (gerekce, tek cumle): "Owner_joins_own_scope_group_on_connect_H2" (o86-A2
+    // H2) SILINDI -- sinadigi invaryant ("sahip baglanti aninda scope:{P} grubuna katilir") kilitle
+    // (K-o88/6, D-A1) kalkti; sahibin GetMembersAsync sonucuna project_access uzerinden dahil olmasi
+    // artik H9'un (yukarida) dolayli sonucu, ve sahip zaten kendi user: grubundan HER ZAMAN Gelen
+    // Kutusu sinyalini alir (OutboxDispatcher.GroupsFor'un owner_id kolu D-A3'te DEGISMEDI).
 }

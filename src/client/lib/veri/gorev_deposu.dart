@@ -290,6 +290,17 @@ abstract class GorevDeposu {
   Future<void> listeSil(String id);
 }
 
+// IS-EMRI-o86-B K-o88/4 (Onur kilidi, 4 Eyl -- D-D2 kirmizisi sonrasi):
+// `uyeEkle` BILEREK `GorevDeposu` ARAYUZUNE EKLENMEDI. §A'nin ilk yazimi
+// bunu arayuz uyesi olarak istiyordu, ama arayuz uyesi olmasi TUM implements
+// GorevDeposu siniflarinin (13 sahte test deposu dahil) `uyeEkle`yi
+// tanimlamasini ZORUNLU kilar -- bu da `liste_baglam_test.dart`nin
+// `_SahteDepo`sina bir satir DOKUNMAYI gerektirirdi ve Onur bunu PAZARLIKSIZ
+// yasakladi (o dosyanin git diff'i BOS kalmali). Cozum: `uyeEkle`
+// `DriftGorevDeposu`nun KENDI (arayuz DISI) metodu olarak kalir, main.dart
+// onu AYRI bir geri cagri (`GorevListesiEkrani.uyeEkle`) olarak enjekte eder
+// -- `kullaniciAramaAgi`/`paylasimKuyrukSatiriniOku` ile AYNI desen.
+
 /// GOREV-SS2 D-SS2-4 PAZARLIKSIZ: cakisma tespiti icin TEK temsil alani --
 /// hem kaybeden hem kazanan deger BU fonksiyondan gecer. v1'in MAJOR-1
 /// kusuru: tel temsili ('done'/'true') projeksiyon bool'uyla karsilastirildi,
@@ -1035,6 +1046,39 @@ class DriftGorevDeposu implements GorevDeposu {
       );
       await _kuyrugaYaz(op);
     });
+  }
+
+  /// IS-EMRI-o86-B §A (D-A1/D-A2/D-A3 PAZARLIKSIZ): davet -- `listeEkle`nin
+  /// AYNI deseni, kanal YALNIZ `sets`. `WireSetAdd.tag` uretimi ve `hlc`
+  /// atamasi etiket yolundan (~line 617-619) BIREBIR kopyalandi -- yeniden
+  /// icat EDILMEDI. D-A4: yerel projeksiyon YAZILMAZ (`Projeler`de `members`
+  /// sutunu yok, K-o88/1) -- transaction icinde TEK is `_kuyrugaYaz`.
+  /// K-o88/4: `GorevDeposu` ARAYUZUNUN DISINDA (yukaridaki dosya-seviyesi
+  /// yoruma bkz.) -- `@override` YOK, main.dart bu instance metodunu AYRI
+  /// bir geri cagri olarak tear-off eder.
+  Future<String> uyeEkle(String projeId, String userId) async {
+    final opHlc = hlc.sonrakiHlc();
+    final tag = idUret();
+    final operationId = idUret();
+
+    final op = WireOp(
+      operationId: operationId,
+      clientId: hlc.clientId,
+      entityId: projeId,
+      actorId: actorId,
+      entityType: 'Project',
+      opHlc: opHlc,
+      sets: {
+        'members': WireSetDelta(
+          adds: [WireSetAdd(el: userId, tag: tag, hlc: opHlc)],
+        ),
+      },
+    );
+
+    await _db.transaction(() async {
+      await _kuyrugaYaz(op);
+    });
+    return operationId;
   }
 
   /// D1: `govdeJson` uretim aninda donar; gonderim aninda YENIDEN URETILMEZ.

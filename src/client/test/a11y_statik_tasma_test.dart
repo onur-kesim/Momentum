@@ -15,7 +15,7 @@ library;
 //
 // GOREV-A9 [K93/spec SS5/G5] -- GENISLETME: R1 (mevcut, degismez) + R2 (YENI:
 // ellipsis tasiyan HER govde maxLines de tasir) + R4 (YENI: pozitif kontrol --
-// tarayicinin bulduğu Text( aday sayisi = 47 [taban 8 -> 12 -> 13 -> 16 -> 20 -> 25 -> 29 -> 30 -> 34 -> 47
+// tarayicinin bulduğu Text( aday sayisi = 55 [taban 8 -> 12 -> 13 -> 16 -> 20 -> 25 -> 29 -> 30 -> 34 -> 47 -> 55
 // guncellendi;
 // kanonik deger R4'un expect'indedir, bu satir ona atiftir],
 // arac kendini kanitlar). R3 (govde
@@ -178,7 +178,7 @@ void main() {
   );
 
   test(
-    'R4: pozitif kontrol -- tarayicinin buldugu Text( aday sayisi = 47 (arac kendini kanitlar)',
+    'R4: pozitif kontrol -- tarayicinin buldugu Text( aday sayisi = 55 (arac kendini kanitlar)',
     () {
       final dosyalar = _taranacakDosyalar();
       final adaylar = <String>[];
@@ -246,11 +246,23 @@ void main() {
       // Kutusu cip etiketi + liste cipi etiketi (TEK kaynak satiri, oncelik
       // ciplerinin AYNI deseni). Sayi VARSAYILMADI: `git diff | grep -c
       // 'Text('` ile OLCULDU (10 + 3 = 13).
+      // 🔴 IS-EMRI-o86-B (DILIM 3 PAYLAS) TABAN BILEREK GUNCELLENDI 47 -> 55:
+      // SEKIZ YENI Text( SATIRI, HEPSI gorev_listesi_ekrani.dart'ta.
+      // `_ListePaylasDiyalogu` diyalogu DORT (diyalog basligi, hata metni
+      // slotu, Iptal dugmesi, Davet et dugmesi) + basari SnackBar'i BIR
+      // (`ScaffoldMessenger...Text(Metinler.listePaylasBasarili(...))`) +
+      // K-o88/4'un (Onur kilidi, 4 Eyl) Drawer PopupMenuButton'u UC (madde
+      // basligi Yeniden adlandir/Paylas/Sil -- eski uc AYRI IconButton'un
+      // tooltip'leri Text( SAYILMIYORDU, PopupMenuItem'in govdesi SAYILIYOR;
+      // net degisim +3 DEGIL +8, cunku ucuncu IconButton hic COMMIT
+      // EDILMEDI -- D-D2 kirmizisi PopupMenuButton'a donusturuldu). Sayi
+      // VARSAYILMADI: `git diff -- lib/sunum lib/vitrin | grep -c '^+.*Text('`
+      // ile OLCULDU (8, 0 silindi).
       expect(
         adaylar.length,
-        47,
+        55,
         reason:
-            'Text( aday sayisi 47 DEGIL -- ya tarayici bozuldu (regex hic '
+            'Text( aday sayisi 55 DEGIL -- ya tarayici bozuldu (regex hic '
             'eslesmiyor ⇒ R1/R2 kor) ya taban degisti (yeni bir Text( eklendi/'
             'silindi). Bulunanlar:\n${adaylar.join('\n')}',
       );

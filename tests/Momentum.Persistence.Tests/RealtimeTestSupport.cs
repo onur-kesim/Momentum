@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Momentum.Application.Abstractions.Sync;
 using Momentum.Application.Features.Sync;
+using Momentum.Infrastructure;
 using Momentum.Infrastructure.Sync;
 
 namespace Momentum.Persistence.Tests;
@@ -105,7 +106,13 @@ public static class DispatcherHarness
         string connectionString, ISignalPublisher publisher, OutboxDispatcherOptions options, TimeProvider timeProvider)
     {
         var services = new ServiceCollection();
-        services.AddScoped(_ => new OutboxClaimStore(connectionString));
+        // IS-EMRI-o86-C K-o88/8/9: GERCEK production DI grafigi -- AddSyncInfrastructure zaten
+        // OutboxClaimStore + IScopeMembershipSource (ve SyncDbContext'i, ScopeMembershipSource'in
+        // bagimliligi) AYNI connectionString ile kaydeder (K-o88/9 sart 3: TEK kaynak, ikinci bir
+        // literal/baglanti dizesi YOK). OutboxDispatcher'in kendisi burada AddHostedService
+        // EDILMEZ (Program.cs'de ayrica kayitli, K-o88/9 sart 2 ile OLCULDU) -- bu harness onu hep
+        // manuel `PumpOnceAsync` ile tek tek kosturur, iki kez calismasi soz konusu degil.
+        services.AddSyncInfrastructure(connectionString);
         services.AddSingleton(publisher); // TService inferred as ISignalPublisher (the parameter's static type)
         var provider = services.BuildServiceProvider();
         return new OutboxDispatcher(provider.GetRequiredService<IServiceScopeFactory>(), timeProvider, options, NullLogger<OutboxDispatcher>.Instance);

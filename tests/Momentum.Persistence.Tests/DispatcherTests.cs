@@ -267,22 +267,36 @@ public sealed class DispatcherTests(PostgresFixture fixture)
     }
 
     /// <summary>
-    /// D7/C7 sinyal ayağı (ADR K2-C7 -- sinyal ayağı ONLY, pull ayağı bu dilimde yok). An entity moving
-    /// from scope A to scope B must signal BOTH <c>scope:{A}</c> (2b1's H11 already proves the column is
-    /// written) AND <c>scope:{B}</c>, or the old-scope collaborator would never see the "left" signal.
+    /// D7/C7 signal leg (ADR K2-C7 -- signal leg ONLY, no pull leg in this slice). IS-EMRI-o86-C D-B2
+    /// (SECOND and LAST exception to the "don't touch a test that catches a real regression" rule):
+    /// the ORIGINAL version of this test used ONE actor (<c>client</c>) as the owner of BOTH projects,
+    /// so the "old scope" and "new scope" audiences were the SAME person -- after §A removed the
+    /// <c>scope:</c> group (D-A1 PAZARLIKSIZ), every path collapsed onto the single <c>user:{client}</c>
+    /// envelope (D3's <c>maxByGroup</c> reduction) and the test could no longer distinguish "old_scope
+    /// column present" from "old_scope column removed" (mutant-6 would go undetected either way) --
+    /// it was testing the GROUP-NAME STRING, never the AUDIENCE. Rewritten with a THIRD identity
+    /// (<c>v</c>, a real <c>project_access</c> member of A ONLY, added via the SAME wire op shape
+    /// IS-EMRI-o86-B §A's client <c>uyeEkle</c> produces) so the old-scope audience and the new-scope
+    /// audience are genuinely different people again. An entity moving from scope A to scope B must
+    /// still signal BOTH the A-audience (the "it left" signal, reachable only via <c>OldScopeId</c>)
+    /// and the B-audience (the "it arrived" signal, via <c>ScopeId</c>).
     /// </summary>
     [Fact]
     public async Task Scope_transition_dispatches_to_both_old_and_new_scope_groups()
     {
         var connectionString = await TestDatabase.CreateAsync(fixture);
-        var client = Guid.NewGuid();
+        var client = Guid.NewGuid(); // Task actor + sahibi HEM projectA HEM projectB'nin.
+        var v = Guid.NewGuid();      // projectA'nin UYESI, projectB'de DEGIL -- "eski kitle" (client'tan FARKLI kimlik).
+        var x = Guid.NewGuid();      // hicbir projede degil -- NEGATIF ES.
         var entity = Guid.NewGuid();
         var projectA = Guid.NewGuid();
         var projectB = Guid.NewGuid();
 
         // IS-EMRI-o86-A §E: bir Task'in HEDEF scope'u sahip/uye gerektirir (varlik yeni DEGILSE) --
-        // client'in ikisinin de GERCEK sahibi olmasi icin once Project'ler yaratilir (kendi dispatch
-        // turunda drenilir, asagidaki "tek satir" sayimlarini KIRLETMEZ).
+        // client'in ikisinin de GERCEK sahibi olmasi icin once Project'ler yaratilir, SONRA V
+        // projectA'ya GERCEK bir wire op ile UYE eklenir (IS-EMRI-o86-B §A `uyeEkle`nin AYNI deseni:
+        // kanal YALNIZ `sets.members`) -- hepsi kendi dispatch turunda drenilir, asagidaki "tek satir"
+        // sayimlarini KIRLETMEZ.
         await using (var app = new SyncTestApp(connectionString))
         {
             await app.SyncAsync(client, Wire.PushNoPull(client, Wire.Op(Guid.CreateVersion7(), client, projectA, client, 1,
@@ -291,11 +305,17 @@ public sealed class DispatcherTests(PostgresFixture fixture)
             await app.SyncAsync(client, Wire.PushNoPull(client, Wire.Op(Guid.CreateVersion7(), client, projectB, client, 1,
                 fields: new Dictionary<string, WireFieldWrite>(StringComparer.Ordinal) { ["name"] = new("B", Wire.Hlc(client, 1)) },
                 entityType: "Project")));
+            await app.SyncAsync(client, Wire.PushNoPull(client, Wire.Op(Guid.CreateVersion7(), client, projectA, client, 2,
+                sets: new Dictionary<string, WireSetDelta>(StringComparer.Ordinal)
+                {
+                    ["members"] = new([new WireSetAdd(v.ToString(), Guid.NewGuid(), Wire.Hlc(client, 2))], null),
+                },
+                entityType: "Project")));
         }
 
         var priorPublisher = new RecordingSignalPublisher();
         var priorDispatcher = DispatcherHarness.Create(connectionString, priorPublisher, new OutboxDispatcherOptions { BatchSize = 10 }, TimeProvider.System);
-        (await priorDispatcher.PumpOnceAsync(CancellationToken.None)).ShouldBe(2);
+        (await priorDispatcher.PumpOnceAsync(CancellationToken.None)).ShouldBe(3);
 
         await using (var app = new SyncTestApp(connectionString))
         {
@@ -304,10 +324,8 @@ public sealed class DispatcherTests(PostgresFixture fixture)
         }
 
         // Drain + close row1 (the entity's CREATION into scope A) BEFORE the transition. Otherwise
-        // "scope:A" would already be in the published set as row1's OWN new-scope publish, and removing
-        // ONLY the old-scope yield (mutant-6) would go unnoticed -- the group name is identical whether
-        // it arrived via the new-scope or the old-scope path, so the two must not be allowed to overlap
-        // in the observed publisher.
+        // the new-scope publish from row1's OWN creation would already put V/client's envelopes in the
+        // observed set, and removing ONLY the old-scope yield (mutant-6) would go unnoticed.
         var setupPublisher = new RecordingSignalPublisher();
         var setupDispatcher = DispatcherHarness.Create(connectionString, setupPublisher, new OutboxDispatcherOptions { BatchSize = 10 }, TimeProvider.System);
         (await setupDispatcher.PumpOnceAsync(CancellationToken.None)).ShouldBe(1);
@@ -323,9 +341,12 @@ public sealed class DispatcherTests(PostgresFixture fixture)
         (await dispatcher.PumpOnceAsync(CancellationToken.None)).ShouldBe(1);
 
         var groups = publisher.Published.Select(p => p.Group).ToHashSet(StringComparer.Ordinal);
-        groups.ShouldContain($"scope:{projectA}"); // reachable ONLY via the old-scope yield at this point
-        groups.ShouldContain($"scope:{projectB}");
-        groups.ShouldContain($"user:{client}");
+        groups.ShouldContain($"user:{v}",
+            "eski kitle (V, SADECE projectA uyesi): gecisin 'gitti' bilgisini almali -- YALNIZ OldScopeId kolundan ulasilabilir");
+        groups.ShouldContain($"user:{client}",
+            "yeni kitle (client, projectB'nin sahibi): gecisin 'geldi' bilgisini almali");
+        groups.ShouldNotContain($"user:{x}",
+            "negatif es: hicbir projede olmayan X sinyal ALMAMALI");
     }
 
     private static async Task<List<Guid>> LockTenRowsAsync(NpgsqlConnection connection, NpgsqlTransaction transaction)

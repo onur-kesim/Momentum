@@ -6,7 +6,10 @@ plugins {
 
 android {
     namespace = "com.momentum.client"
-    compileSdk = flutter.compileSdkVersion
+    // §F canli tur hazirligi: flutter.compileSdkVersion (36) flutter_secure_storage'in
+    // istedigi SDK 37'nin ALTINDA kaldi -- ORTAM sorunu, IS-EMRI-o86-B'nin degisikligiyle
+    // ILGISIZ (baseline'da da AYNI hata, git stash ile olculdu). Flutter'in KENDI onerisi.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

@@ -141,6 +141,16 @@ class SenkronDongusu {
     });
   }
 
+  /// IS-EMRI-o86-B §C adim 6: bir op'un kuyruk SATIRINI dogrudan `opId` ile
+  /// okur -- caGiran `turCalistir()`i BEKLEDIKTEN SONRA cagirir; satir
+  /// YOK/`zehirli`/`bekliyor` uc dalli diyalog kararini besler (Z7/Z8'in
+  /// kapsadigi `Project` op'u icin BASKA gorunurluk yolu yoktur).
+  Future<SenkronKuyruguRow?> kuyrukSatiriniOku(String opId) {
+    return (_db.select(
+      _db.senkronKuyrugu,
+    )..where((t) => t.opId.equals(opId))).getSingleOrNull();
+  }
+
   /// D8/2: uçuş işareti olan (`gonderildi`) TÜM satırları `bekliyor`e
   /// döndürür. Uygulama açılışında AYRICA (tur beklemeden) çağrılmalıdır --
   /// `turCalistir()` zaten her turun başında bunu yapar.

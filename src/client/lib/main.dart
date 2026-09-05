@@ -6,7 +6,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'ag/gercek_zamanli_sinyal.dart';
 import 'ag/http_auth_agi.dart';
+import 'ag/http_kullanici_arama_agi.dart';
 import 'ag/http_senkron_agi.dart';
+import 'ag/kullanici_arama_agi.dart';
 import 'ag/signalr_json_sinyal.dart';
 import 'design/tema.dart';
 import 'sunum/giris_ekrani.dart';
@@ -175,6 +177,18 @@ class _KimlikKapisiState extends State<_KimlikKapisi> {
           // karar SADECE farkli kullaniciyla giriste devreye girer
           // (ayarlariHazirla ezme karsilastirmasi bir sonraki girişte kosar).
           onCikisYap: () => unawaited(widget.oturumYoneticisi.cikisYap()),
+          // IS-EMRI-o86-B §C: paylas akisinin GEREKSINIMLERI -- F4 dikisi
+          // geregi ham Drift satiri (`SenkronKuyruguRow`) UI KATMANINA
+          // GECMEZ, burada kucuk bir kayda (record) UYARLANIR.
+          kullaniciAramaAgi: kurulum.kullaniciAramaAgi,
+          actorId: kurulum.actorId,
+          uyeEkle: kurulum.uyeEkle,
+          paylasimKuyrukSatiriniOku: (opId) async {
+            final satir = await kurulum.dongu.kuyrukSatiriniOku(opId);
+            return satir == null
+                ? null
+                : (durum: satir.durum, sonHataKodu: satir.sonHataKodu);
+          },
         );
       },
     );
@@ -241,11 +255,21 @@ class _UretimKurulumu {
   // GOREV-W2 T5: dikisin (Veritabani.onResult) yazdigi, ekranin dinledigi
   // TEK bildirim.
   final DepolamaBildirimi depolamaBildirimi;
+  // IS-EMRI-o86-B §C: paylas akisinin GEREKSINIMLERI. K-o88/4: `uyeEkle`
+  // `depo`nun (GorevDeposu, arayuz) DISINDA AYRI tasinir -- `DriftGorevDeposu`
+  // somut instance'inin tear-off'udur (gorev_deposu.dart'taki dosya-seviyesi
+  // yoruma bkz.).
+  final KullaniciAramaAgi kullaniciAramaAgi;
+  final String actorId;
+  final Future<String> Function(String projeId, String userId) uyeEkle;
   const _UretimKurulumu(
     this.depo,
     this.dongu,
     this.sinyal,
     this.depolamaBildirimi,
+    this.kullaniciAramaAgi,
+    this.actorId,
+    this.uyeEkle,
   );
 }
 
@@ -312,5 +336,23 @@ Future<_UretimKurulumu> _uretimKurulumOlustur(
   sinyal.olaylar.listen((_) => unawaited(dongu.cekmeTuruCalistir()));
   unawaited(sinyal.baslat());
 
-  return _UretimKurulumu(depo, dongu, sinyal, depolamaBildirimi);
+  // IS-EMRI-o86-B §B (D-B1): jeton isleme HttpSenkronAgi ile AYNI deseni --
+  // `_senkronSunucuUrl`den YENIDEN turetilir, ikinci bir derleme-zamani ortam
+  // okumasi EKLENMEZ.
+  final kullaniciAramaAgi = HttpKullaniciAramaAgi(
+    lookupUcNoktasi: Uri.parse('$_senkronSunucuUrl/v1/users/lookup'),
+    actorId: ayarlar.devUserId,
+    erisimJetonuAl: oturumYoneticisi.gecerliErisimJetonuAl,
+    jetonuYenile: oturumYoneticisi.yenile,
+  );
+
+  return _UretimKurulumu(
+    depo,
+    dongu,
+    sinyal,
+    depolamaBildirimi,
+    kullaniciAramaAgi,
+    ayarlar.devUserId,
+    depo.uyeEkle,
+  );
 }
