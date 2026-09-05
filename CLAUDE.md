@@ -28,18 +28,17 @@ orkestrasyon · hafıza yapar, **kod yazmaz**.
 - [x] **Hesap aç, giriş yap;** kendi görevlerini gör, başkasınınkini görme — *19 Ağu*
 - [x] Görevleri **listelere** ayır, görevi listeye taşı — *20 Ağu*
 - [ ] **İki kullanıcı bir listeyi paylaşır;** birinin yazdığı ötekinin ekranında belirir — *4-6 Eyl*
-- [ ] Göreve **tekrar** ver; tamamlayınca sonraki örnek doğar — *7-9 Eyl · SIRADAKİ KESİLECEK*
 
 *Bu listede yasak: spec/ADR/kapı/mutant/borç. Madde eklemek §5'e kesme yazmadan olmaz.*
 
 ## 3. SIRADAKİ İŞ (tek dikey dilim)
 
-**DİLİM 3 — İŞBİRLİĞİ** (4-6 Eyl, taç mücevher). Sunucu ayağı `o86-A` yazıldı, **bağımsız
-denetimde DÜŞTÜ**: iki bulgu + eldeki enjeksiyon deliği **tek sınıf** — yetki/görünürlük kararı
-op'un KENDİ beyanına bakıyor, varlığın mevcut bağlamına değil. Düzeltme **`IS-EMRI-o86-A2`**
-(MOD: KRİTİK; üçünü birden kapatır, `project_access` görünümü). Sonra `o86-B` (istemci + realtime).
+**DİLİM 3 — İŞBİRLİĞİ** (4-6 Eyl, taç mücevher). Sunucu ayağı + istemci davet akışı + realtime
+yayın-anı üyelik KABUL ve PUSH. Son kusur — **katılım-sonrası geçmiş gelmiyor** —
+**`IS-EMRI-o86-D2` ile KAPANDI** (kullanıcı-başına resync horizonu +
+kapsayıcı eşik; bağımsız denetim KABUL etti, **commit YOK**). Kalan: **§F vitrin adım 3-9**.
 🔴 **ADR/spec YAZILMAZ** (İŞLEYİŞ md.4): kimliği bir kez **altı kâğıt kapı turu öldürdü, 30 gün**
-(ÖDEV §6.1). Hatırlatıcı 4 Eyl'de kesildi; sıradaki kesme **tekrar** [Onur kilidi].
+(ÖDEV §6.1). Hatırlatıcı 4 Eyl, **tekrar** 5 Eyl kesildi; kesme sırası TÜKENDİ.
 
 ## 4. ORTAM MAYINLARI (yalnız ÖLÇÜLMÜŞ)
 
@@ -73,6 +72,8 @@ op'un KENDİ beyanına bakıyor, varlığın mevcut bağlamına değil. Düzeltm
   kutu 2 Eyl'e uzadı [Onur kilidi]. `v1.0.1` bunlar kesikken çıktı; yeni teslim `v1.1.0`.
 - **[4 Eyl KESİLDİ] Hatırlatıcı** (bildirim): kutu 2 Eyl'de doldu, İŞLEYİŞ md.1 gereği madde
   kesildi [Onur kilidi, 4 Eyl]. Kesme sırası kilitliydi: hatırlatıcı → tekrar.
+- **[5 Eyl KESİLDİ] Tekrar eden görev:** kutuda tek dilim kaldı, İŞLEYİŞ md.1 gereği süre
+  uzatılmadı [Onur kilidi, K-o88/7 — kesme sırasının SON adımı]. README'ye de yazıldı.
 - **[o85 KESİLDİ] Proje/liste klasörü** (üst kap): yeni entityType + materyalizasyon + registry
   dokunuşu demekti [Onur kilidi, 19 Ağu]. Üründe "Liste" denen kap kodda/telde **`Project`**'tir.
 - **Windows masaüstü hedefi yok** [Onur, 16 Ağu]: `src/client/` yalnız `android`/`ios`/`web` taşır;

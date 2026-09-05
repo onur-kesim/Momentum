@@ -44,7 +44,12 @@ etikettir (sunucu Ordinal karşılaştırır). Ayrıştırma satırın tamamın�
 gösterilmez**, metin alanda kalır — sessiz kayıp yoktur, geri bildirim de yoktur
 ([Beyan edilmiş sınırlar](#beyan-edilmiş-sınırlar)).
 
-Yukarıdakilerin tamamı canlıdır (`CLAUDE.md` §2 bitti listesi **10/10**); kesilenler
+**Hesap açılır ve giriş yapılır:** `POST /v1/auth/register` · `/login` · `/refresh` · `/logout`
+(JWT bearer, HS256; `users` + `refresh_tokens` tabloları). Kimlik **her ortamda JWT'den** okunur;
+geçerli jeton yoksa uç **401** döner — deny-by-default. `Development`'ta `X-Momentum-Dev-User`
+başlığı **ikincil** ölçüm yolu olarak durur. Herkes yalnız kendi görevlerini görür.
+
+Yukarıdakilerin tamamı canlıdır (`CLAUDE.md` §2 bitti listesi **12/13**); kesilenler
 [Kapsam dışı](#kapsam-dışı--teslim-beyanı) bölümündedir.
 
 ---
@@ -426,31 +431,29 @@ karar arşivi, borç · kimlik · kapı · ortam defterleri ve oturum araçları
 
 ## Kapsam dışı — teslim beyanı
 
-Bu üç madde **eksik değil, karardır**; gerekçeleriyle birlikte burada durur.
+Bu iki madde **eksik değil, karardır**; gerekçeleriyle birlikte burada durur.
 
-### 1. Kimlik doğrulama KAPSAM DIŞIDIR
+> 🟢 **[19 Ağu 2026 DEĞİŞTİ — eski beyan burada duruyordu] Kimlik doğrulama artık kapsam
+> İÇİNDEDİR.** Bu bölüm bir süre *"gerçek kimlik doğrulama yoktur ve bilerek yazılmamıştır"*
+> diyordu; **o cümle artık yanlıştır** ve 5 Eyl 2026'da ölçülerek düzeltilmiştir. Depoda `users` +
+> `refresh_tokens` tabloları, parola özeti, JWT bearer (HS256) ve `POST /v1/auth/register` ·
+> `/login` · `/refresh` · `/logout` uçları vardır. `ICurrentUser` **her ortamda önce JWT'den**
+> okur (`JwtCurrentUser`); eski `NullCurrentUser` **artık kayıtlı değildir** — deny-by-default
+> onun yerine JWT yolunda korunur (geçerli jeton yoksa `null` ⇒ **401**). `Development`'ta
+> `X-Momentum-Dev-User` başlığı **ikincil** yol olarak kalır (`CompositeCurrentUser`).
+> `Jwt:Secret` her ortamda **zorunludur**: eksikse uygulama sessizce herkesi 401'e düşürmek
+> yerine **açılışta patlar**. Korunan ayrım sürüyor: **`UserId` ⟂ `ClientId`** — kimlik
+> kullanıcıya, senkron kimliği cihaza aittir. Kimlik başlığı altında kapsam dışı kalanlar:
+> **parola sıfırlama · e-posta doğrulama · OAuth · 2FA · RBAC** (`CLAUDE.md` §5).
 
-Bu depoda gerçek kimlik doğrulama (JWT/OIDC, kullanıcı modeli, giriş ekranı) **yoktur ve bilerek
-yazılmamıştır.** Ödevin odağı senkron mimarisi ve ölçüm disiplinidir.
-
-Yerine duran şey bir **ölçüm iskelesidir** (`K61`): `Development` profilinde `X-Momentum-Dev-User`
-başlığı `UserId`'yi taşır; başlık yok ya da bozuksa uç **401** döner, **sessiz varsayılan yoktur**.
-🔴 **Üretim profilinde `NullCurrentUser` çalışır — deny-by-default.** Yani uygulama
-`ASPNETCORE_ENVIRONMENT=Production` ile ayağa kalkar, port dinler, ama **hiçbir istek yetkilenmez**:
-üretimde **kullanılamaz**, bu **tasarım gereğidir** ve bir **mutant** bunu kanıtlar.
-
-Korunan ayrım: **`UserId` ⟂ `ClientId`** — kimlik kullanıcıya, senkron kimliği cihaza aittir; ikisi
-hiçbir yerde birbirinin yerine geçmez. Gerçek kimlik eklendiğinde değişmesi gereken tek yer
-`ICurrentUser` uygulamasıdır.
-
-### 2. `GET /v1/task-lists` istemcide tüketilmiyor
+### 1. `GET /v1/task-lists` istemcide tüketilmiyor
 
 Uç vardır ve çalışır; **istemcide karşılığı yoktur.** Bu, `slice-3a/D4`'ün ölçülmüş kararıdır:
 bu dilimde **`Task` ↔ `TaskList` bağı UYDURULMADI** (`F6`). Bağ olmayınca listelerin arayüzde
 yapacağı bir iş de yoktur. `by-id` karşılığının olmaması da aynı kararın parçasıdır —
 **asimetri bilinçlidir**, yarım kalmış bir uç değildir.
 
-### 3. Açık borçlar — sayı gizlenmiyor
+### 2. Açık borçlar — sayı gizlenmiyor
 
 `arsiv/BORCLAR.md` **14 Ağu 2026'da dondurulduğunda 108 işaretli satır** taşıyordu; **60'ı `B-…` kimlikli kalem**:
 **24 🔴 · 33 🟡 · 3 🟢 (kapanmış)**. En kalabalık aileler `B-O71` (12) · `B-O62` (9) · `B-O63` (6) ·
@@ -478,6 +481,10 @@ Bu liste **kısaltılmadı, yumuşatılmadı ve teslimden önce temizlenmedi.** 
 - 🔴 **[4 Eyl 2026 KESİLDİ] Hatırlatıcı / bildirim.** Takvim kutusu 2 Eyl'de doldu; `CLAUDE.md`
   İŞLEYİŞ md.1 gereği süre uzatılmadı, **madde kesildi** (kesme sırası 18 Ağu'da kilitliydi:
   hatırlatıcı → tekrar). `CLAUDE.md` §5'e de yazıldı.
+- 🔴 **[5 Eyl 2026 KESİLDİ] Tekrar eden görev** (tamamlanınca sonraki örneğin doğması). Takvim
+  kutusunda 9 Eyl'e tek dilim (işbirliği) kaldı; `CLAUDE.md` İŞLEYİŞ md.1 gereği süre uzatılmadı,
+  **madde kesildi** — 18 Ağu'da kilitlenen kesme sırasının **son** adımıdır (hatırlatıcı → tekrar)
+  ve sıra bununla tükenmiştir. `CLAUDE.md` §5'e de yazıldı.
 - **iOS yalnız CI'da derlenir** — geliştirme makinesinde macOS yok.
 - **Windows masaüstü hedefi yok.**
 - **Gerçek zamanlı sinyal web'de kapalı.** Dev-kimlik kalkanı bir HTTP başlığı istiyor, tarayıcı ise

@@ -222,6 +222,8 @@ token'ı süresi dolduğunda kuyruktaki yazımların kaybolmaması mimari zorunl
    kaldırır ⇒ **§2'nin "kesinlikle çalışan uygulama; önce uygulamaya bakılacak" ölçütüne doğrudan hizmet.**
    **CI/CD'nin kendisi (GitHub Actions) 11-12 Ağu'da kalır** — bu madde AÇIK; `KON` testleri o güne kadar
    **yerelde** koşulur ve KANIT'a yazılır (ADR 0003 §3.2(7)'de adlandırılmış sapma olarak yazılıdır).
+   **KAPANDI [ölçüldü, 5 Eyl 2026]:** üç iş akışı canlı — `ci` · `paket` · `pages`. Son yeşil koşum
+   `ci #81` ve `paket #15`, ikisi de `c3dfe14` (sha'lar run kayıtlarının KENDİ sayfalarından okundu).
 5. **Auth'un ürün-içi görünürlüğü** — §6.1 ince kimlik dilimini kilitledi, ama çok-kullanıcılı
    *paylaşım* (liste/proje davet akışı) gerçek zamanlı işbirliği diliminde tasarlanacak; bugün
    kapsamı belirsiz.

@@ -1,6 +1,6 @@
 # DURUM.md — Momentum
 
-**BİTTİ: 12/14 · kutu 9 Eyl · dilim 3/5 sunucu ayağı KABUL+PUSH · HEAD `12dc0a0`. AŞAMA: `o86-B` (istemci).** Teslim biçimi paketlenmiş build (docker imajı + APK); yeni teslim `v1.1.0`.
+**BİTTİ: 12/13 · kutu 9 Eyl · dilim 3/5 o86-D2 KABUL (commit YOK) · HEAD `c3dfe14`. AŞAMA: §F vitrin.** Teslim: paketlenmiş build (docker imajı + APK), `v1.1.0`.
 
 > Açılış ≤3 komut: ① `git --no-optional-locks log --oneline -1` + `status --porcelain -- src`
 > ② bu dosya ③ CI durumu — **cihaz Chrome'undan** (bulut tarayıcısı kanıt değil). `arsiv/` AÇILMAZ.
@@ -23,11 +23,11 @@ doğrulanır, liste satırı yanıltır (o81: `pages #8` = o78 kodu ⇒ canlı d
 **Kilitler [Onur, 20 Ağu]:** üyelik = `Project.members` OrSet → `project_members` · davet e-posta
 ile · rol kademesi YOK · sahip OrSet'e YAZILMAZ; erişim = **`project_access`** (sahip ∪ üye).
 
-**Kapı beyanı (cihaz Chrome, 4 Eyl):** `ci #79`·`paket #14`·`pages #15` — üçü de **`12dc0a0`**
-ve yeşil; `pages` elle tetiklendi, sha'sı **run kaydından** okundu (liste satırından DEĞİL).
-Dört commit push'lu. İki denetim turu **beş** bulgu çıkardı (hepsi sınır 38'in sınıfı), beşi de
-kapandı; kapı proza değil **doğruluk tablosu** (15 satır, 3 mutant). Canlı tur **14/14** ·
-regresyon **6/6** ve **8/8** · `verify` EXIT 0 / **175** test · kanıt `KANIT/o86A*`.
+**Kapı beyanı (cihaz Chrome, 5 Eyl):** `ci #81`·`paket #15` = **`c3dfe14`** yeşil (run
+kayıtlarından). 🔴 `pages #15` = **`12dc0a0`**: canlı demo HEAD DEĞİL, üç commit geride —
+vitrinden sonra tetiklenir. Sunucu ayağı iki denetim turu + beş
+bulguyla kapandı (`KANIT/o86A*`); istemci+realtime push'lu. **o86-D2 KABUL** (kapsayıcı eşik;
+M4 iki kapıyı öldürdü · 3×6/6) — **commit YOK**. Kalan: §F vitrin 3-9; **8-9 KANITSIZ**.
 
 **DİLİM 2 — LİSTE BİTTİ** (20 Ağu; kapı beyanları `arsiv/DURUM-arsiv-o85.md`). **Kilitler [Onur,
 19 Ağu]:** Liste = sunucudaki **`Project`** · klasör KESİLDİ · `listPos`/`order` kanalı AÇILMADI ·
@@ -75,16 +75,14 @@ regresyon **6/6** ve **8/8** · `verify` EXIT 0 / **175** test · kanıt `KANIT/
 29. 🔴 **[o81] `DEV_USER_ID` iki tarafta AYNI olmalı:** `docker-compose.yml:31` web istemcisini
     `deadbeef-0000-4000-8000-000000000001` ile derler; APK define'sız derlenirse **rastgele**
     kullanıcı üretir ⇒ emülatör ile tarayıcı birbirini GÖRMEZ. `SENKRON_SUNUCU_URL` = `main.dart:25`.
-32. **[o85-A] `projeId`/`fields:projectId` ÇAKIŞMA TESPİTİNE GİRMEZ** — `priority`/`dueAt` ile aynı
-    sınıf: `kanonikDize` çağrılmaz, `cakismaKayitlari`'na yazılmaz; LWW sessizce kazanır/kaybeder.
-33. 🔴 **[o85-A ÖLÇÜLDÜ] Kanal-adı asimetrisi UYUYOR:** fractional alanlar (`pos`/`listPos`/
-    `boardPos`) snapshot'ta **`scalars[]`** (`fields:$ad`), artımlıda **`order` haritası**
-    (`order:$ad`) gelir — AYNI alan, İKİ `alan` dizgesi ⇒ `UzakAlanDurumu` PK'sinde iki satır.
-    Bugün etkisiz; kanal açılınca o84'le AYNI SINIF sessiz-kayıp riski — **İLK ÖLÇÜLECEK yer**.
+32. 🔴 **[o85-A ÖLÇÜLDÜ] Alan-kanalı sessiz kayıp, iki yüzü:** (a) `projeId`/`fields:projectId`
+    ÇAKIŞMA TESPİTİNE GİRMEZ (`priority`/`dueAt` sınıfı: `kanonikDize` çağrılmaz, LWW sessizce
+    kazanır). (b) fractional alanlar (`pos`/`listPos`/`boardPos`) snapshot'ta `fields:$ad`,
+    artımlıda `order:$ad` ⇒ `UzakAlanDurumu` PK'sinde İKİ satır; bugün etkisiz, kanal açılınca
+    o84 SINIFI — **İLK ÖLÇÜLECEK yer**.
 34. **[o85-A · o86-A] Dilim 2-3'ün canlı ölçümü PROTOKOL SEVİYESİNDEDİR** (`/v1/sync` HTTP betiği);
     **Flutter UI canlı koşturulmadı**, ekran widget testleriyle ölçüldü (o83-G ile aynı sınır).
-36. **[İŞLEYİŞ md.4] Builder beyanı örneklemesi üç dilim üst üste TUTTU** (o85-A2 bayt-özdeşlik ·
-    o86-A verify/EXPLAIN · o86-A3 test sayısı) — hiçbir dilim %100 doğrulamaya DÖNMEDİ.
+36. **[§5] o88 örneklemesi: iki beyan doğrulandı, İKİSİ DE TUTTU; %100'e DÖNÜLMEDİ.**
 37. 🔴 **[o86] `outbox.owner_id` = YAZAN; `projects.owner_id` = PROJE SAHİBİ.** Erişim kümesi
     `project_access` görünümüdür, ham `project_members` sormak yasak (mimari testi). Snapshot varlık
     listesi outbox GEÇMİŞİNDEN değil GÜNCEL `tasks`/`projects`ten okunur.
@@ -92,6 +90,9 @@ regresyon **6/6** ve **8/8** · `verify` EXIT 0 / **175** test · kanıt `KANIT/
     scope · `isNewEntity` koşulsuz KABUL · tahmin edilen `projectId` · `owner_id`in sonsuz
     görünürlüğü · scope'suz görevde sahipliğin sorulmaması. KAYNAK ve HEDEF scope'un ikisi,
     kapsamsızda `tasks.owner_id` sorulur. "A pull" TAZE snapshot'la ölçülürse YALAN söyler.
+    **6. üye [o86-C] bağlantı-anı · 7. üye [o86-D] imleç-anı: kalıp bir ANIN fotoğrafı.**
 39. **[o86-A3 BEYAN] `tasks.owner_id` ON CONFLICT'ta güncellenmez** (ilk yazan sabit) ⇒ üyenin
     projede yarattığı görevi sahip koparırsa görev **üyenin** kutusuna düşer ve sahip artık ona
     yazamaz. Sahiplik devri op'u YOK (README'de).
+40. 🔴 **[o89 ÖLÇÜLDÜ] `ResyncRequired` ÖLÜ DEĞİL:** `SyncCommandHandler.cs:85` üretimde `true`
+    yazar; `ShouldResyncAsync` YALNIZ GC horizonuna bakar (NULL ⇒ hep false). İstemci dalı testli.
