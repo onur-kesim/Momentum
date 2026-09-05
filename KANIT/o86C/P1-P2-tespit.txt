@@ -1,0 +1,9 @@
+AYIRT EDICI OLCUM (Onur, 5 Eyl) -- B2 kimligiyle POST /v1/sync, since disinda HER SEY sabit:
+P1 (sinceCursor=null, snapshot yolu) -> Proje X + gorev-1 + iki uye TAM doner (pozitif kontrol GECTI).
+P2 (sinceCursor={xid:1703,seq:414}, uygulamanin GERCEKTEN gonderdigi cursor) -> changes:[] + snapshot:null, HICBIR SEY donmuyor.
+
+TESPIT: Kusur istemcide DEGIL, sunucuda -- PullIncrementalAsync'in "(commit_xid, server_seq) > (sinceXid, sinceSeq)"
+filtresi B2'nin cursor'inin (414, kendi davet-edilme satiri) GERISINDE kalan hicbir satiri (411-413, Proje X'in
+kendisi dahil) asla geri doldurmuyor -- B2 kayit anindaki (davetten ONCE, since=null) snapshot'ta bos donup
+cursor'unu "o anki horizon"a sabitledigi icin, davet SONRASI incremental pull SADECE kendi ekleniş satirini
+gorur, ekleniş ONCESI hicbir gecmisi GERIYE DONUK getirmez. o86-D SUNUCU-only, src/client DEGISMEZ.
