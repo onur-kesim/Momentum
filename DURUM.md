@@ -1,6 +1,6 @@
 # DURUM.md — Momentum
 
-**BİTTİ: 13/13 · kutu 9 Eyl · DİLİM 3 BİTTİ (§F 9/9) · HEAD `10a4fb2`. AŞAMA: teslim paketi v1.1.0.** Teslim: paketlenmiş build (docker imajı + APK), `v1.1.0`.
+**BİTTİ: 13/13 · kutu 9 Eyl · DİLİM 3 BİTTİ (§F 9/9) · HEAD `03690c2`. AŞAMA: teslim paketi `v1.1.0` (docker imajı + APK) — belgeler yazıldı, APK yeniden derlenip etiket atılacak.**
 
 > Açılış ≤3 komut: ① `git --no-optional-locks log --oneline -1` + `status --porcelain -- src`
 > ② bu dosya ③ CI durumu — **cihaz Chrome'undan** (bulut tarayıcısı kanıt değil). `arsiv/` AÇILMAZ.
@@ -23,11 +23,13 @@ doğrulanır, liste satırı yanıltır (o81: `pages #8` = o78 kodu ⇒ canlı d
 **Kilitler [Onur, 20 Ağu]:** üyelik = `Project.members` OrSet → `project_members` · davet e-posta
 ile · rol kademesi YOK · sahip OrSet'e YAZILMAZ; erişim = **`project_access`** (sahip ∪ üye).
 
-**Kapı beyanı (cihaz Chrome, 5 Eyl):** `ci #82`·`paket #16` = **`4359fa8`** yeşil (run
-kayıtlarından). 🔴 `pages #15` = **`12dc0a0`**: canlı demo HEAD DEĞİL, vitrinden sonra tetiklenir.
-**o86-D2 PUSH'LU · o86-E KABUL (commit YOK).** 🟢 **§F CANLI TAM (6 Eyl, `KANIT/o86F`): 9/9** —
-davet→üye ekranı **≤10 sn, ikinci tetik YOK** · üye davetten önceki görevi görüyor · üye→sahip
-≤12 sn · davetsiz hesabın snapshot'ı BOŞ · üye paylaşamıyor (RejectedForbidden).
+**Kapı beyanı (6 Eyl, run kayıtlarından):** `ci #84`·`paket #17`·`pages #16` üçü de **`03690c2`**
+yeşil. 🔴 **Yeni commit bunları bayatlatır, TETİKLER ASİMETRİKTİR:** `ci` her push'ta; `paket`
+yalnız `Dockerfile`/`.dockerignore`/`docker-compose.yml`/`src/**`/`global.json`/`paket.yml`
+değişince; `pages` yalnız `workflow_dispatch`. Yalnız-belge commit'inde ikisi de **elle tetiklenir**
+— üçü aynı sha'da yeşil olmadan etiket atılmaz.
+🟢 **§F CANLI TAM (6 Eyl, `KANIT/o86F`): 9/9** — davet→üye ekranı **≤10 sn, ikinci tetik YOK** ·
+üye davetten önceki görevi görüyor · üye→sahip ≤12 sn · davetsiz snapshot BOŞ · üye paylaşamıyor.
 
 **DİLİM 2 — LİSTE BİTTİ** (20 Ağu; kapı beyanları `arsiv/DURUM-arsiv-o85.md`). **Kilitler [Onur,
 19 Ağu]:** Liste = sunucudaki **`Project`** · klasör KESİLDİ · `listPos`/`order` kanalı AÇILMADI ·
@@ -39,9 +41,6 @@ davet→üye ekranı **≤10 sn, ikinci tetik YOK** · üye davetten önceki gö
    PowerShell 5.1'de `&&` yok, `;` yaz.
 2. **Canlı ölçümde tıklama tuzağı:** hover'sız sentetik tıklama çalışmaz, hover'lı bile bazen İKİ
    kez gerekir; diyalogdaki `İptal` tetiklenmez, modalı **Escape** kapatır.
-3. **Kapı bütçesi ihlalde** ⇒ yeni kapı DOSYASI açılmaz (widget/birim testleri orana girmez).
-   **[o81] Kalan TEK açık bulgu:** arm64 kırılması manifestle gösterildi, **gerçek arm64'te
-   KOŞULMADI** — donanım yok.
 6. **Pages demosunda backend yok** ⇒ satır kuyrukta kalır, rozet **"↑ Gönderiliyor"**da asılı
    durur. Senkron ayağı Pages'te ASLA ölçülemez, **pakette ölçülür**. Eşitlenmiş satır rozet
    GÖSTERMEZ (`senkronize => null`).
@@ -72,17 +71,18 @@ davet→üye ekranı **≤10 sn, ikinci tetik YOK** · üye davetten önceki gö
 28. **[o78 KİLİT — Onur, 16 Ağu] Ekleme süzgeçleri SIFIRLAR** (arama + etiket çipi). Sıfırlama
     SENKRON ve yalnız `onEkle` ateşlenince. 🔴 **[o85] AKTİF LİSTE BUNA DAHİL DEĞİL** — liste
     süzgeç değil **BAĞLAM**tır, sıfırlanmaz; `test/liste_baglam_test.dart` ısırıyor.
-29. 🔴 **[o81] `DEV_USER_ID` iki tarafta AYNI olmalı:** `docker-compose.yml:31` web istemcisini
-    `deadbeef-0000-4000-8000-000000000001` ile derler; APK define'sız derlenirse **rastgele**
-    kullanıcı üretir ⇒ emülatör ile tarayıcı birbirini GÖRMEZ. `SENKRON_SUNUCU_URL` = `main.dart:25`.
+29. 🔴 **[o81 → o91 ÇÜRÜTÜLDÜ] `DEV_USER_ID` ÖLÜ** — kimlik JWT'de. `Dockerfile:100` define'ı web
+    derlemesine geçse de `main.dart.js`'te `deadbeef` **0 kez** (pozitif kontrol: `localhost:5298`
+    **4 kez**). `SENKRON_SUNUCU_URL` = `main.dart:25`.
 32. 🔴 **[o85-A ÖLÇÜLDÜ] Alan-kanalı sessiz kayıp, iki yüzü:** (a) `projeId`/`fields:projectId`
     ÇAKIŞMA TESPİTİNE GİRMEZ (`priority`/`dueAt` sınıfı: `kanonikDize` çağrılmaz, LWW sessizce
     kazanır). (b) fractional alanlar (`pos`/`listPos`/`boardPos`) snapshot'ta `fields:$ad`,
     artımlıda `order:$ad` ⇒ `UzakAlanDurumu` PK'sinde İKİ satır; bugün etkisiz, kanal açılınca
     o84 SINIFI — **İLK ÖLÇÜLECEK yer**.
-34. **[o85-A · o86-A] Dilim 2-3'ün canlı ölçümü PROTOKOL SEVİYESİNDEDİR** (`/v1/sync` HTTP betiği);
-    **Flutter UI canlı koşturulmadı**, ekran widget testleriyle ölçüldü (o83-G ile aynı sınır).
-36. **[§5] o88 örneklemesi: iki beyan doğrulandı, İKİSİ DE TUTTU; %100'e DÖNÜLMEDİ.**
+34. 🔴 **[o91] SOĞUK `docker compose up --build` bu makinede Docker motorunu düşürüyor** (`rpc
+    error: … EOF`, 218 sn; koşarken `gh`/Chrome da açılmıyor) ⇒ soğuk süre YEREL ÖLÇÜLEMEZ,
+    referans `paket` run'ının adım damgasıdır (**149 sn**). Sıcak koşum 443,6 sn EXIT 0.
+36. **[§5] Örnekleme: o88'de iki, o91'de iki beyan — DÖRDÜ DE TUTTU. %100'e DÖNÜLMEDİ.**
 37. 🔴 **[o86] `outbox.owner_id` = YAZAN; `projects.owner_id` = PROJE SAHİBİ.** Erişim kümesi
     `project_access` görünümüdür, ham `project_members` sormak yasak (mimari testi). Snapshot varlık
     listesi outbox GEÇMİŞİNDEN değil GÜNCEL `tasks`/`projects`ten okunur.

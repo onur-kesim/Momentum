@@ -301,14 +301,16 @@ mutantla ölçülü) · erişilebilirlik duyurularının gerçek ekran okuyucuyl
 
 ## Teslim paketi
 
-📦 **Hazır paket: [Releases → `v1.0.1`](https://github.com/tuzakavcisi1-cloud/Momentum/releases/latest)** (Latest)
-— derlenmiş Android APK (`momentum-v1.0.1-emulator.apk`, **59.953.218 bayt**), sha256'sı ve
-imza/kimlik uyarılarıyla birlikte yayında; derlendiği commit `a332b25`. Aşağıdaki bölüm, paketi
+📦 **Hazır paket: [Releases → `v1.1.0`](https://github.com/tuzakavcisi1-cloud/Momentum/releases/latest)** (Latest)
+— derlenmiş Android APK (`momentum-v1.1.0-emulator.apk`, **60.953.726 bayt**), sha256'sı ve
+imza uyarısıyla birlikte yayında; derlendiği commit `03690c2`. Aşağıdaki bölüm, paketi
 **kendiniz derlemek** istediğinizde geçerlidir.
 
-> `v1.0.0` arşiv olarak durur ve **dokunulmamıştır** — kendi kaynağıyla tutarlıdır. Ama orada
-> uygulamanın görünen adı hâlâ `client`tır ve çalışma imajı yüzen `aspnet:10.0` etiketindedir;
-> `v1.0.1` tam olarak bunları kapatır. **Değerlendirici `v1.0.1`'i indirmelidir.**
+> `v1.0.1` ve `v1.0.0` arşiv olarak durur ve **dokunulmamıştır**. `v1.1.0` üç dilim ekler —
+> **kimlik** (hesap aç, giriş yap) · **listeler** · **işbirliği** (iki kullanıcı bir listeyi
+> paylaşır) — ve `v1.0.1` APK'sının sürüm damgası kusurunu kapatır: o dosya içeride
+> `versionName 1.0.0` / `versionCode 1` taşıyordu (ölçüldü: `aapt dump badging`), yani v1.0.0
+> üstüne kurulumu yükseltme sayılmıyordu. **Değerlendirici `v1.1.0`'ı indirmelidir.**
 
 Paket iki parçadır: **çalışan sistem** (docker imajı — API + web istemcisi) ve **Android APK**.
 
@@ -318,28 +320,31 @@ kullanır. **Yerel bir Windows masaüstü `.exe`'si yoktur** — Flutter'ın Win
 depoya hiç eklenmedi (`src/client/` altında yalnız `android`, `ios`, `web` vardır; ölçüldü).
 Kapsam kararıdır, aşağıda [Beyan edilmiş sınırlar](#beyan-edilmiş-sınırlar) bölümünde de yazılıdır.
 
-### Paylaşılan kimlik — atlanırsa vitrin çıkmaz
+### Kimlik — hesap açılır, giriş yapılır
 
-İstemci kimliği (`devUserId`) **kurulum başına rastgele** üretilir. İki istemcinin birbirini
-görmesi için ikisi de **aynı** `DEV_USER_ID` ile derlenmelidir; `docker-compose.yml` bu yüzden
-sabit bir demo kimliği verir. **APK ve Windows derlemesinde aynı değeri verin**, yoksa telefon
-ile tarayıcı iki ayrı kullanıcı olur ve senkron/çakışma vitrini görünmez.
+🔴 **`v1.0.1`'in "paylaşılan `DEV_USER_ID`" talimatı bu sürümde GEÇERSİZDİR.** Kimlik dilimiyle
+birlikte yetki **JWT**'den gelir: `POST /v1/auth/register` ile hesap açılır, `/login` ile girilir.
+İki istemcinin birbirini görmesi için paylaşılan bir derleme sabiti **gerekmez** — her istemci
+kendi hesabıyla girer, paylaşım listeye **e-posta ile davet** üzerinden olur.
 
-```
-DEV_USER_ID = deadbeef-0000-4000-8000-000000000001
-```
+Ölçüldü (6 Eyl 2026, paketlenmiş yığın ayaktayken — `KANIT/o86F`): `DEV_USER_ID` define'ı
+**VERİLMEDEN** derlenen tek bir APK, iki ayrı cihazda iki **ayrı** hesapla (`a@` ve `b@`) sorunsuz
+çalıştı. Üçüncü bir hesap `POST /v1/auth/register` ile açıldı (**201**) ve `Authorization: Bearer`
+ile çektiği snapshot **`[]`** döndü — yetkilendirme jetondan geliyor, sabit kimlikten değil.
 
-> `DEV_USER_ID` mevcut kimlikten farklıysa ilk açılışta yerel görevler **ve** senkron kuyruğu
-> aynı transaction'da silinir (bilinçli: eski kullanıcının bekleyen op'ları yeni kimlikle
-> sunucuya itilmesin). GUID biçiminde olmayan bir değer **gürültülü hata** verir.
+> `docker-compose.yml` hâlâ bir `DEV_USER_ID` derleme argümanı taşır; **geriye dönük uyumluluk
+> içindir, vitrin için zorunlu değildir.** Değeri mevcut kimlikten farklıysa ilk açılışta yerel
+> görevler **ve** senkron kuyruğu aynı transaction'da silinir (bilinçli: eski kullanıcının
+> bekleyen op'ları yeni kimlikle sunucuya itilmesin); GUID biçiminde olmayan bir değer
+> **gürültülü hata** verir. `X-Momentum-Dev-User` başlığı da yalnız `Development` profilinde,
+> **ikincil** ölçüm yolu olarak durur.
 
 ### Android APK
 
 ```bash
 cd src/client
 flutter build apk --release \
-  --dart-define=SENKRON_SUNUCU_URL=http://<makinenin-LAN-IPsi>:5298 \
-  --dart-define=DEV_USER_ID=deadbeef-0000-4000-8000-000000000001
+  --dart-define=SENKRON_SUNUCU_URL=http://<makinenin-LAN-IPsi>:5298
 # çıktı: build/app/outputs/flutter-apk/app-release.apk
 ```
 

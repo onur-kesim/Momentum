@@ -1,0 +1,40 @@
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  Momentum.Domain -> C:\dev\Momentum\src\backend\Momentum.Domain\bin\Debug\net10.0\Momentum.Domain.dll
+  Momentum.Application -> C:\dev\Momentum\src\backend\Momentum.Application\bin\Debug\net10.0\Momentum.Application.dll
+  Momentum.Infrastructure -> C:\dev\Momentum\src\backend\Momentum.Infrastructure\bin\Debug\net10.0\Momentum.Infrastructure.dll
+  Momentum.Api -> C:\dev\Momentum\src\backend\Momentum.Api\bin\Debug\net10.0\Momentum.Api.dll
+  Momentum.Persistence.Tests -> C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll
+C:\dev\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net10.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+  Başarısız Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.D9_outbox_owner_id_VE_actor_id_ikisi_de_artik_dogrulanan_aktorden_yazilir [290 ms]
+  Hata İletisi:
+   System.InvalidOperationException : MOMENTUM_KANIT_DIZIN ortam degiskeni ayarli degil -- KANIT sessizce atlanamaz.
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.D9_outbox_owner_id_VE_actor_id_ikisi_de_artik_dogrulanan_aktorden_yazilir() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 62
+   at Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.D9_outbox_owner_id_VE_actor_id_ikisi_de_artik_dogrulanan_aktorden_yazilir() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\D9OwnerIdVisibilityTests.cs:line 73
+--- End of stack trace from previous location ---
+  Başarısız Momentum.Persistence.Tests.DispatcherTests.Cursor_correctness_is_unaffected_by_concurrent_dispatch_single_owner [1 s]
+  Hata İletisi:
+   Shouldly.ShouldAssertException : seen[i]
+    should contain (case insensitive comparison)
+""v0""
+    but was actually
+"{"sets": null, "opHlc": {"wallMs": 1700000000000, "counter": 0, "clientId": "d3293b3f-ae02-426d-9b3e..."
+  Yığın İzleme:
+     at Momentum.Persistence.Tests.DispatcherTests.Cursor_correctness_is_unaffected_by_concurrent_dispatch_single_owner() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\DispatcherTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Momentum.Persistence.Tests.DispatcherTests.Cursor_correctness_is_unaffected_by_concurrent_dispatch_single_owner() in C:\dev\Momentum\tests\Momentum.Persistence.Tests\DispatcherTests.cs:line 196
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+Sonuç Dosyası: C:\dev\Momentum\KANIT\o83D\trx\kosum-1.trx
+
+Başarısız! - Başarısız:     2, Başarılı:    67, Atlanan:     0, Toplam:    69, Süre: 1 m 13 s - Momentum.Persistence.Tests.dll (net10.0)
