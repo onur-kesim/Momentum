@@ -105,17 +105,18 @@ mutantla** kanıtlandı (`KANIT/o71/16-pages-demo/01-mutant-kosumlari.txt`).
 
 ## Depo haritası — nereden başlamalı
 
-🔴 **Bu depo alışılmadık bir bileşim taşır ve bu bilinçlidir.** İzlenen dosyaların **%74'ü**
-(1.355 / 1.821) ürün kodu değil, **ölçüm kanıtıdır**. Ne aradığınıza göre:
+🔴 **Bu depo alışılmadık bir bileşim taşır ve bu bilinçlidir.** İzlenen dosyaların **%75'i**
+(1.622 / 2.170) ürün kodu değil, **ölçüm kanıtıdır**. Ne aradığınıza göre:
 
 | ne arıyorsanız | nereye bakın |
 |---|---|
 | **Ürün kodu** | `src/backend/` (.NET, 4 katman) · `src/client/lib/` (Flutter) |
-| **Testler** | `tests/` (backend, **127** test) · `src/client/test/` (istemci, **708** test) |
+| **Testler** | `tests/` (backend, **177** test) · `src/client/test/` (istemci, **767** test) — 6 Eyl 2026'da koşuldu |
 | **Mimari kararlar** | [`docs/ADR/`](docs/ADR/) |
 | **Kapsam otoritesi** | [`docs/ODEV.md`](docs/ODEV.md) — neyin istendiği; kesilenler [Kapsam dışı](#kapsam-dışı--teslim-beyanı) |
 | **Ölçüm araçları** | `araclar/` — CI'nın koştuğu `verify.ps1` + bağımlılık/yayın araçları; oturum kapıları `arsiv/araclar/` altına alındı (14 Ağu 2026) |
-| **Ham ölçüm kanıtları** | `KANIT/` — **1.355 izlenen dosya, 16,3 MiB** (`311b6d0`'da sayıldı, 17 Ağu 2026) |
+| **Ham ölçüm kanıtları** | `KANIT/` — **1.622 izlenen dosya, 27,9 MiB** (`daa435d`'de sayıldı, 6 Eyl 2026) |
+| **Dış inceleme brifingi** | [`docs/BRIFING.md`](docs/BRIFING.md) — kodu inceleyecek yazılımcı **buradan başlasın** |
 | **Esaslar ve durum** | `CLAUDE.md` (tek talimat dosyası) · `DURUM.md` (canlı durum) · süreç tarihçesi `arsiv/` |
 
 **`KANIT/` nedir:** her kabul hükmünün, her düşmüş denetimin ve her mutant koşumunun **ham
@@ -524,6 +525,9 @@ Bu liste **kısaltılmadı, yumuşatılmadı ve teslimden önce temizlenmedi.** 
 ---
 
 ## Lisans ve kimlik
+
+Bu depodaki kod **MIT** lisanslıdır — kökte `LICENSE`, © 2026 Onur Kesim
+[Onur kilidi, 6 Eyl 2026].
 
 Bağımlılık eklenirken **lisans + CVE** denetimi zorunludur (`araclar/pub-lisans-kapisi.py`,
 `araclar/pub-cve-kapisi.py`, `NuGetAudit`). Sırlar repoya girmez; build artefaktları `.gitignore`'dadır.
