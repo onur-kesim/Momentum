@@ -56,7 +56,7 @@ taşır — bu da APK'nın kendisinden `aapt dump badging` ile okundu (§2 tablo
 ## 1. Tek komutla çalıştır
 
 ```
-git clone https://github.com/tuzakavcisi1-cloud/Momentum.git
+git clone https://github.com/onur-kesim/Momentum.git
 cd Momentum
 docker compose up --build
 ```
@@ -79,7 +79,7 @@ belleği yetmedi. Aynı komut sıcak önbellekle **443,6 sn**'de EXIT 0 ile bitt
 
 Sağlık ucu: `GET /health/ready` → **200** (paketlenmiş yığında ölçüldü).
 
-Hiçbir şey kurmadan bakmak isterseniz: https://tuzakavcisi1-cloud.github.io/Momentum/ — aynı istemci,
+Hiçbir şey kurmadan bakmak isterseniz: https://onur-kesim.github.io/Momentum/ — aynı istemci,
 ama **backend yoktur**: veriler yalnız tarayıcıda kalır ve yazılan satır kuyrukta *"↑ Gönderiliyor"*da
 asılı durur. Senkron, çakışma ve paylaşım vitrini **yalnız** yukarıdaki docker paketinde görülür.
 Ölçüldü (6 Eyl 2026): canlı demoda **`crossOriginIsolated === false`** — pakettekinin (`true`)

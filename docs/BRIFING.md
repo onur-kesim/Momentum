@@ -183,7 +183,7 @@ koşucusunda ilk derleme **149 sn** sürüyor ama belleği dolu bir dizüstünde
 derleme ortasında düşebiliyor (geliştirme makinesinde bir kez ölçüldü). **5298 portu boş olmalı.**
 
 ```
-git clone https://github.com/tuzakavcisi1-cloud/Momentum.git
+git clone https://github.com/onur-kesim/Momentum.git
 cd Momentum
 docker compose up --build
 ```
@@ -192,6 +192,6 @@ Sonra `http://localhost:5298`. Sıra otomatiktir: postgres → migrator (şemay�
 (web istemcisini de aynı kökenden servis eder). Hazır Android APK'sı `v1.1.0` release'inde
 (emülatör için `10.0.2.2` hedefiyle derlendi; gerçek telefonda kendi LAN IP'nizle yeniden derleyin).
 
-Hiçbir şey kurmadan bakmak isterseniz: <https://tuzakavcisi1-cloud.github.io/Momentum/> —
+Hiçbir şey kurmadan bakmak isterseniz: <https://onur-kesim.github.io/Momentum/> —
 aynı istemci ama **backend yok**, veriler yalnız tarayıcıda kalır ve senkron/paylaşım vitrini
 görünmez. Vitrin yalnız docker paketinde çalışır.

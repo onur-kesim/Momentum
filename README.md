@@ -73,7 +73,7 @@ Ayrıntı: `KANIT/SS2/13-KABUL-HUKMU-COWORK-kriter8-UCTAN-UCA.md` §3.
 
 ### Canlı demo (yalnız istemci)
 
-**https://tuzakavcisi1-cloud.github.io/Momentum/** — GitHub Pages; `.github/workflows/pages.yml`
+**https://onur-kesim.github.io/Momentum/** — GitHub Pages; `.github/workflows/pages.yml`
 ile dağıtılır (elle tetiklenir, `workflow_dispatch`).
 
 Ekleyin · başlığı düzenleyin · tamamlayın · sayfayı yenileyin: **veri durur.**
@@ -302,7 +302,7 @@ mutantla ölçülü) · erişilebilirlik duyurularının gerçek ekran okuyucuyl
 
 ## Teslim paketi
 
-📦 **Hazır paket: [Releases → `v1.1.0`](https://github.com/tuzakavcisi1-cloud/Momentum/releases/latest)** (Latest)
+📦 **Hazır paket: [Releases → `v1.1.0`](https://github.com/onur-kesim/Momentum/releases/latest)** (Latest)
 — derlenmiş Android APK (`momentum-v1.1.0-emulator.apk`, **60.953.726 bayt**), sha256'sı ve
 imza uyarısıyla birlikte yayında; `v1.1.0` etiketinin `src/` ağacından derlendi. Aşağıdaki bölüm, paketi
 **kendiniz derlemek** istediğinizde geçerlidir.
