@@ -23,11 +23,11 @@ doğrulanır, liste satırı yanıltır (o81: `pages #8` = o78 kodu ⇒ canlı d
 **Kilitler [Onur, 20 Ağu]:** üyelik = `Project.members` OrSet → `project_members` · davet e-posta
 ile · rol kademesi YOK · sahip OrSet'e YAZILMAZ; erişim = **`project_access`** (sahip ∪ üye).
 
-**Kapı beyanı (cihaz Chrome, 5 Eyl):** `ci #81`·`paket #15` = **`c3dfe14`** yeşil (run
-kayıtlarından). 🔴 `pages #15` = **`12dc0a0`**: canlı demo HEAD DEĞİL, üç commit geride —
-vitrinden sonra tetiklenir. Sunucu ayağı iki denetim turu + beş
-bulguyla kapandı (`KANIT/o86A*`); istemci+realtime push'lu. **o86-D2 KABUL** (kapsayıcı eşik;
-M4 iki kapıyı öldürdü · 3×6/6) — **commit YOK**. Kalan: §F vitrin 3-9; **8-9 KANITSIZ**.
+**Kapı beyanı (cihaz Chrome, 5 Eyl):** `ci #82`·`paket #16` = **`4359fa8`** yeşil (run
+kayıtlarından). 🔴 `pages #15` = **`12dc0a0`**: canlı demo HEAD DEĞİL, geride — vitrinden
+sonra tetiklenir. Sunucu ayağı iki denetim turu + beş bulguyla kapandı (`KANIT/o86A*`).
+**o86-D2 KABUL ve PUSH** (kapsayıcı eşik; M4 iki kapıyı öldürdü · 3×6/6).
+Kalan: §F vitrin 3-9; **8-9 KANITSIZ**.
 
 **DİLİM 2 — LİSTE BİTTİ** (20 Ağu; kapı beyanları `arsiv/DURUM-arsiv-o85.md`). **Kilitler [Onur,
 19 Ağu]:** Liste = sunucudaki **`Project`** · klasör KESİLDİ · `listPos`/`order` kanalı AÇILMADI ·
