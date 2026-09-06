@@ -1,6 +1,6 @@
 # DURUM.md — Momentum
 
-**BİTTİ: 13/13 · kutu 9 Eyl · DİLİM 3 BİTTİ (§F 9/9). AŞAMA: teslim paketi `v1.1.0` (docker imajı + APK) — belgeler yazıldı, APK bayt bayt aynı çıktı; kalan: push + üç kapı + etiket.**
+**BİTTİ: 13/13 · kutu 9 Eyl · DİLİM 3 BİTTİ (§F 9/9) · `v1.1.0` TESLİM EDİLDİ (6 Eyl), release yayında ve `latest`.**
 
 > Açılış ≤3 komut: ① `git --no-optional-locks log --oneline -1` + `status --porcelain -- src`
 > ② bu dosya ③ CI durumu — **cihaz Chrome'undan** (bulut tarayıcısı kanıt değil). `arsiv/` AÇILMAZ.
@@ -23,11 +23,12 @@ doğrulanır, liste satırı yanıltır (o81: `pages #8` = o78 kodu ⇒ canlı d
 **Kilitler [Onur, 20 Ağu]:** üyelik = `Project.members` OrSet → `project_members` · davet e-posta
 ile · rol kademesi YOK · sahip OrSet'e YAZILMAZ; erişim = **`project_access`** (sahip ∪ üye).
 
-**Kapı beyanı (6 Eyl, run kayıtlarından):** `ci #84`·`paket #17`·`pages #16` üçü de **`03690c2`**
-yeşil. 🔴 **Yeni commit bunları bayatlatır, TETİKLER ASİMETRİKTİR:** `ci` her push'ta; `paket`
-yalnız `Dockerfile`/`.dockerignore`/`docker-compose.yml`/`src/**`/`global.json`/`paket.yml`
-değişince; `pages` yalnız `workflow_dispatch`. Yalnız-belge commit'inde ikisi de **elle tetiklenir**
-— üçü aynı sha'da yeşil olmadan etiket atılmaz.
+**Kapı beyanı (6 Eyl, run kayıtlarından):** `ci #85`·`paket #18`·`pages #17` üçü de **`22fa0b2`**
+(= `v1.1.0` etiketi) yeşil; yayınlanan APK indirilip sha256 + `aapt` ile doğrulandı.
+🔴 **Yeni commit bunları bayatlatır, TETİKLER ASİMETRİKTİR:** `ci` her push'ta; `paket` yalnız
+`Dockerfile`/`.dockerignore`/`docker-compose.yml`/`src/**`/`global.json`/`paket.yml` değişince;
+`pages` yalnız `workflow_dispatch`. Yalnız-belge commit'inde ikisi de **elle tetiklenir** — üçü
+aynı sha'da yeşil olmadan etiket atılmaz.
 🟢 **§F CANLI TAM (6 Eyl, `KANIT/o86F`): 9/9** — davet→üye ekranı **≤10 sn, ikinci tetik YOK** ·
 üye davetten önceki görevi görüyor · üye→sahip ≤12 sn · davetsiz snapshot BOŞ · üye paylaşamıyor.
 

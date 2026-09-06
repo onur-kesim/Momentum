@@ -33,10 +33,10 @@ orkestrasyon · hafıza yapar, **kod yazmaz**.
 
 ## 3. SIRADAKİ İŞ (tek dikey dilim)
 
-🟢 **DİLİM 3 — İŞBİRLİĞİ BİTTİ (6 Eyl).** §F vitrini gerçek telefon + emülatör + JWT'li üçüncü
-hesapla **9/9** koştu (`KANIT/o86F`); son iki kusur `IS-EMRI-o86-D2` (sunucu: katılım-sonrası
-geçmiş) ve `IS-EMRI-o86-E` (istemci: resync turu boş yanıtta duruyordu) ile kapandı.
-**SIRADAKİ İŞ: teslim paketi `v1.1.0`** — adımlar `SURUM-NOTU-v1.1.0.md` §H1-H4.
+🟢 **TESLİM EDİLDİ — `v1.1.0`, 6 Eyl 2026.** DİLİM 3 (işbirliği) §F vitrininde **9/9**
+(`KANIT/o86F`). Release yayında ve `latest`; etiket **`22fa0b2`**, üç kapı (`ci #85` · `paket #18` ·
+`pages #17`) **aynı sha'da yeşil**; yayınlanan APK indirilip **sha256 + `aapt dump badging`** ile
+doğrulandı (`1.1.0`/`2`). **AÇIK DİLİM YOK.**
 🔴 **ADR/spec YAZILMAZ** (İŞLEYİŞ md.4): kimliği bir kez **altı kâğıt kapı turu öldürdü, 30 gün**
 (ÖDEV §6.1). Hatırlatıcı 4 Eyl, **tekrar** 5 Eyl kesildi; kesme sırası TÜKENDİ.
 
