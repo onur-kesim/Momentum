@@ -44,6 +44,24 @@ Map<String, Object?> _degisiklikGirdisi(String entityId, int xid) => {
   },
 };
 
+/// IS-EMRI-o86-E G7: `WireSnapshotEntity` bicimi (Task, tek `title` scalar'i)
+/// -- `snapshotUygula`nin GERCEKTEN calistigini (yerel `gorevler` satiri
+/// DOGDU) dogrulamak icin yeterli minimal govde.
+Map<String, Object?> _snapshotGorevGirdisi(String entityId, String title) => {
+  'entityType': 'Task',
+  'entityId': entityId,
+  'scalars': [
+    {
+      'field': 'title',
+      'value': title,
+      'hlc': {'wallMs': 1, 'counter': 0, 'clientId': 'c1'},
+      'winOperationId': 'op-snap-$entityId',
+    },
+  ],
+  'sets': [],
+  'groups': [],
+};
+
 void main() {
   late Directory gecici;
 
@@ -303,6 +321,80 @@ void main() {
     expect(ayarlar.nextCursorJson, isNull, reason: 'sahipsiz (imlecSahibi==null) imlec guvenilmez, silinir');
     await yeniDb.close();
   });
+
+  // ================= IS-EMRI-o86-E: G7/G8/G9 =================
+
+  test(
+    'G7 (PAZARLIKSIZ): resyncRequired true (bos govde) -- AYNI dongu cagrisinda IKINCI istek '
+    'sinceCursor TASIMAZ, ve donen snapshot UYGULANIR (varlik yerel depoda gorunur)',
+    () async {
+      final k = await kurulumYap();
+      const entityId = 'e-g7-snap';
+      final agi = SahteSenkronAgi(
+        davranis: (govde, cagriNo) async {
+          if (cagriNo == 1) {
+            return SenkronBasarili(jsonEncode({
+              'serverHlc': null, 'nextCursor': {'xid': 999, 'seq': 0}, 'hasMore': false,
+              'resyncRequired': true, 'applied': [], 'changes': [], 'snapshot': [],
+            }));
+          }
+          return SenkronBasarili(jsonEncode({
+            'serverHlc': null, 'nextCursor': {'xid': 1000, 'seq': 0}, 'hasMore': false,
+            'resyncRequired': false, 'applied': [], 'changes': [],
+            'snapshot': [_snapshotGorevGirdisi(entityId, 'Proje X gorevi')],
+          }));
+        },
+      );
+      final dongu = donguOlustur(k, agi, baslangicCursorJson: '{"xid":1,"seq":0}');
+
+      await dongu.cekmeTuruCalistir();
+
+      expect(agi.alinanIstekler, hasLength(2), reason: 'resync bayragi AYNI dongu cagrisinda ikinci bir istegi tetiklemeli');
+      expect(agi.alinanIstekler[0]['sinceCursor'], {'xid': 1, 'seq': 0}, reason: 'ilk istek ESKI imleci tasir');
+      expect(agi.alinanIstekler[1]['sinceCursor'], isNull, reason: 'imlec resyncRequired dalinda silindi -- ikinci istek sinceCursor TASIMAMALI');
+
+      final gorev = await (k.db.select(k.db.gorevler)..where((t) => t.id.equals(entityId))).getSingleOrNull();
+      expect(gorev, isNotNull, reason: 'ikinci istegin donen snapshotu GERCEKTEN uygulanmali (varlik yerel depoda gorunur)');
+      expect(gorev!.baslik, 'Proje X gorevi');
+      await k.db.close();
+    },
+  );
+
+  test(
+    'G8 (NEGATIF): resyncRequired false + bos sayfa -- dongu ESKISI GIBI durur (D7/2 korunur, '
+    'bu satir olmadan G7 sahte gecerdi)',
+    () async {
+      final k = await kurulumYap();
+      final agi = SahteSenkronAgi(
+        davranis: (govde, cagriNo) async => SenkronBasarili(jsonEncode({
+          'serverHlc': null, 'nextCursor': {'xid': 1, 'seq': 0}, 'hasMore': true,
+          'resyncRequired': false, 'applied': [], 'changes': [], 'snapshot': [],
+        })),
+      );
+      final dongu = donguOlustur(k, agi);
+      await dongu.cekmeTuruCalistir();
+      expect(agi.alinanIstekler, hasLength(1), reason: 'resyncRequired:false + bos sayfa -- ikinci istek GITMEMELI');
+      await k.db.close();
+    },
+  );
+
+  test(
+    'G9 (SONSUZ DONGU KORUMASI): sahte ag HER yanitta resyncRequired true donerse dongu DURUR '
+    '(zincir EN FAZLA BIR KEZ, kosum sayisi mekanik olarak sinanir)',
+    () async {
+      final k = await kurulumYap();
+      final agi = SahteSenkronAgi(
+        davranis: (govde, cagriNo) async => SenkronBasarili(jsonEncode({
+          'serverHlc': null, 'nextCursor': {'xid': 999 + cagriNo, 'seq': 0}, 'hasMore': false,
+          'resyncRequired': true, 'applied': [], 'changes': [], 'snapshot': [],
+        })),
+      );
+      final dongu = donguOlustur(k, agi, baslangicCursorJson: '{"xid":1,"seq":0}');
+      await dongu.cekmeTuruCalistir();
+      expect(agi.alinanIstekler, hasLength(2), reason: 'resync HER yanitta true donse bile zincir EN FAZLA bir kez uzamali (toplam: ilk istek + TEK zincirlenen istek)');
+      await k.db.close();
+    },
+  );
 
   // ================= D8 =================
 

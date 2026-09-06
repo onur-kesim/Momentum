@@ -204,6 +204,12 @@ class SenkronDongusu {
     // henuz bir boşaltma devami da GEREKMIYORSA hicbir istek atmadan doner
     // (mevcut/eski davranis: kuyruk bos ise sifir istek).
     var devamGerekli = !kuyrugaBak;
+    // IS-EMRI-o86-E SONSUZ DONGU KORUMASI PAZARLIKSIZ: resync bir TUR icinde
+    // EN FAZLA BIR KEZ zincirlenir -- sunucu ART ARDA resyncRequired:true
+    // donse bile (beklenmeyen/bozuk durum), bu tur ikinci bir resync-tetikli
+    // ek istek ATMAZ (D7/2'nin `_bosaltmaTavani`si BASKA bir senaryoyu --
+    // hasMore zincirini -- sinirlar, resync zincirini AYRICA sinirlamaz).
+    var resyncZincirlendiMi = false;
 
     while (true) {
       final secilenler = kuyrugaBak
@@ -229,7 +235,12 @@ class SenkronDongusu {
             // GOREV-A11 D-A11-2/3: basarili itme -- retry cizelgesi SIFIRLANIR.
             _itmeYenidenDeneme.sifirla();
           }
-          devamGerekli = await _basariliYanitIsle(govdeJson, secilenler);
+          final sonucBilgisi = await _basariliYanitIsle(govdeJson, secilenler);
+          devamGerekli = sonucBilgisi.devamGerekli;
+          if (sonucBilgisi.resyncTetiklendi) {
+            if (resyncZincirlendiMi) return; // SONSUZ DONGU KORUMASI: resync ZATEN bir kez zincirlendi.
+            resyncZincirlendiMi = true;
+          }
           if (devamGerekli) {
             bosaltmaSayaci++;
             if (bosaltmaSayaci >= _bosaltmaTavani) return; // [KIRMIZI] tavan -- sonsuz donguye girmez.
@@ -284,9 +295,14 @@ class SenkronDongusu {
   /// `UzakDegisiklikUygulayici`'ya uygular; sayfa uygulaması VE imleç
   /// yazımı TEK `_db.transaction()` içindedir, imleç EN SON yazılır (bir
   /// sayfa ATOMİKTİR -- yarım sayfa senaryosunda tüm işlem geri sarılır).
-  /// Döner: D7/2 boşaltma döngüsünün DEVAM etmesi mi gerekiyor
-  /// (`hasMore == true` VE bu sayfa boş DEĞİLDİ).
-  Future<bool> _basariliYanitIsle(
+  /// Döner: `devamGerekli` -- D7/2 boşaltma döngüsünün DEVAM etmesi mi
+  /// gerekiyor (`hasMore == true` VE bu sayfa boş DEĞİLDİ) VEYA
+  /// `resyncRequired` (IS-EMRI-o86-E §2) -- imleç zaten SİLİNDİ (aşağıda),
+  /// bir sonraki istek `sinceCursor`suz (snapshot) gitmeli, bu YÜZDEN devam
+  /// GEREKİR; `resyncTetiklendi` -- çağıranın (SONSUZ DÖNGÜ KORUMASI için)
+  /// bu turda resync'in ZATEN bir kez zincirlenip zincirlenmediğini
+  /// izleyebilmesi için ayrıca taşınır.
+  Future<({bool devamGerekli, bool resyncTetiklendi})> _basariliYanitIsle(
     String govdeJson,
     List<SenkronKuyruguRow> gonderilenler,
   ) async {
@@ -343,8 +359,17 @@ class SenkronDongusu {
       await _ayarlarDeposu.nextCursorKalicilastir(_mevcutCursorJson, devUserId: _devUserId);
     });
 
-    // D7/2: boş sayfa hasMore'a BAKILMAKSIZIN döngüyü durdurur.
-    return hasMore && (changes.isNotEmpty || snapshot.isNotEmpty);
+    // D7/2: boş sayfa hasMore'a BAKILMAKSIZIN döngüyü durdurur -- AMA
+    // IS-EMRI-o86-E §2: resyncRequired bu kuraldan MUAF'tır. `resyncRequired`
+    // (bayrak-only: `changes:[]`, `snapshot:null`) D7/2'nin "boş sayfa"
+    // taniminA UYAR ve önceki davranışta döngüyü durdururdu -- ama imleç
+    // yukarıda ZATEN silindi, bir sonraki istek sinceCursor'suz (snapshot)
+    // gitmesi GEREKİR; aksi halde bu tur biter ve o istek bir SONRAKİ dış
+    // tetiğe kadar hiç atılmaz (§F adım 6'nın canlı kusuru, KANIT/o86F).
+    return (
+      devamGerekli: resyncRequired || (hasMore && (changes.isNotEmpty || snapshot.isNotEmpty)),
+      resyncTetiklendi: resyncRequired,
+    );
   }
 
   /// D5: op bazında sonuç işleme + `cakisma` kilidi.
