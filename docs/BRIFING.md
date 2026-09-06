@@ -148,9 +148,39 @@ burada her düzeltme ölçülüp bir kapıya bağlanıyor.
 | 6 | `docs/ADR/` | kararların gerekçesi |
 | 7 | `KANIT/o86F` · `KANIT/o84` | son canlı vitrin · sessiz veri kaybının kök neden raporu |
 
+### Kod haritası — platformlar AYRI kod tabanı DEĞİL
+
+Android, iOS ve Web **tek bir Dart kod tabanını** paylaşır; platform klasörleri yalnızca ince
+kabuklardır. Ölçüm (`git ls-files`, 6 Eyl 2026):
+
+| Yer | Ne | Ölçü |
+|---|---|---|
+| `src/client/lib/` | **paylaşılan** Flutter/Dart ürün kodu — üç platformun tamamı buradan çıkar | 42 dosya · **12.904 satır** |
+| `src/client/android/` | Android kabuğu (Gradle, manifest, ikon) | 20 dosya · 290 satır |
+| `src/client/ios/` | iOS kabuğu (Xcode projesi) — **hiçbir cihazda koşmadı**, yalnız CI'da derlenir | 40 dosya · 1.342 satır |
+| `src/client/web/` | Web kabuğu: `index.html` + `manifest.json` = **73 satır** el yazısı. Yanındaki `drift_worker.js` (Drift üretiyor) ve `sqlite3.wasm` (ikili) satır olarak sayılmaz | 9 dosya |
+| `src/backend/` | .NET, dört katman: Domain **1.504** · Application **1.121** · Infrastructure **6.374** · Api **990** satır | 133 dosya · **9.989 satır** |
+| `src/client/test/` + `tests/` | testler | 121 dosya · **24.572 satır** |
+
+**Test satırı ürün satırından fazladır: 24.572 / 22.893.** Bilinçlidir.
+
+*(Not: `Infrastructure` ve `tests` ikisi de tam 6.374 satır çıktı — kopyala-yapıştır değil,
+iki kez ayrı ayrı ölçüldü, rastlantı.)*
+
 ---
 
 ## 8 · ÇALIŞTIRMAK İSTERSENİZ
+
+**İncelemek için gerekmiyor — depo yeter.** Ayrı bir kurulum paketi yoktur ve gerekmez: bu depoda
+model ağırlığı, veri kümesi ya da sanal ortam taşınmaz; `.gitignore` yalnızca derleme çıktısını,
+sırları ve editör çöpünü dışlar. `.env` bile oluşturmanıza gerek yok — `docker-compose.yml`
+parola/kullanıcı için varsayılan taşır.
+
+🔴 **Fiilen çalıştıracaksanız üç şey gerekiyor:** (1) **Docker Desktop** kurulu olmalı,
+(2) **ilk derlemede internet** gerekir — Flutter SDK'sı, apt ve NuGet/pub paketleri o sırada iner
+(kurulduktan sonra uygulama offline çalışır), (3) makinede rahat **~8 GB RAM** — temiz bir CI
+koşucusunda ilk derleme **149 sn** sürüyor ama belleği dolu bir dizüstünde Docker'ın Linux motoru
+derleme ortasında düşebiliyor (geliştirme makinesinde bir kez ölçüldü). **5298 portu boş olmalı.**
 
 ```
 git clone https://github.com/tuzakavcisi1-cloud/Momentum.git
