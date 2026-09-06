@@ -27,16 +27,16 @@ orkestrasyon · hafıza yapar, **kod yazmaz**.
 - [x] Depo klonlanır, README'deki komutla testler **yeşil** koşar
 - [x] **Hesap aç, giriş yap;** kendi görevlerini gör, başkasınınkini görme — *19 Ağu*
 - [x] Görevleri **listelere** ayır, görevi listeye taşı — *20 Ağu*
-- [ ] **İki kullanıcı bir listeyi paylaşır;** birinin yazdığı ötekinin ekranında belirir — *4-6 Eyl*
+- [x] **İki kullanıcı bir listeyi paylaşır;** birinin yazdığı ötekinin ekranında belirir — *6 Eyl*
 
 *Bu listede yasak: spec/ADR/kapı/mutant/borç. Madde eklemek §5'e kesme yazmadan olmaz.*
 
 ## 3. SIRADAKİ İŞ (tek dikey dilim)
 
-**DİLİM 3 — İŞBİRLİĞİ** (4-6 Eyl, taç mücevher). Sunucu ayağı + istemci davet akışı + realtime
-yayın-anı üyelik KABUL ve PUSH. Son kusur — **katılım-sonrası geçmiş gelmiyor** —
-**`IS-EMRI-o86-D2` ile KAPANDI** (kullanıcı-başına resync horizonu +
-kapsayıcı eşik; bağımsız denetim KABUL etti, **commit YOK**). Kalan: **§F vitrin adım 3-9**.
+🟢 **DİLİM 3 — İŞBİRLİĞİ BİTTİ (6 Eyl).** §F vitrini gerçek telefon + emülatör + JWT'li üçüncü
+hesapla **9/9** koştu (`KANIT/o86F`); son iki kusur `IS-EMRI-o86-D2` (sunucu: katılım-sonrası
+geçmiş) ve `IS-EMRI-o86-E` (istemci: resync turu boş yanıtta duruyordu) ile kapandı.
+**SIRADAKİ İŞ: teslim paketi `v1.1.0`** — adımlar `SURUM-NOTU-v1.1.0.md` §H1-H4.
 🔴 **ADR/spec YAZILMAZ** (İŞLEYİŞ md.4): kimliği bir kez **altı kâğıt kapı turu öldürdü, 30 gün**
 (ÖDEV §6.1). Hatırlatıcı 4 Eyl, **tekrar** 5 Eyl kesildi; kesme sırası TÜKENDİ.
 

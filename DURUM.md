@@ -1,6 +1,6 @@
 # DURUM.md — Momentum
 
-**BİTTİ: 12/13 · kutu 9 Eyl · dilim 3/5 o86-D2 KABUL (commit YOK) · HEAD `c3dfe14`. AŞAMA: §F vitrin.** Teslim: paketlenmiş build (docker imajı + APK), `v1.1.0`.
+**BİTTİ: 13/13 · kutu 9 Eyl · DİLİM 3 BİTTİ (§F 9/9) · HEAD `10a4fb2`. AŞAMA: teslim paketi v1.1.0.** Teslim: paketlenmiş build (docker imajı + APK), `v1.1.0`.
 
 > Açılış ≤3 komut: ① `git --no-optional-locks log --oneline -1` + `status --porcelain -- src`
 > ② bu dosya ③ CI durumu — **cihaz Chrome'undan** (bulut tarayıcısı kanıt değil). `arsiv/` AÇILMAZ.
@@ -18,16 +18,16 @@ doğrulanır, liste satırı yanıltır (o81: `pages #8` = o78 kodu ⇒ canlı d
 🔴 **Pozitif kontrol:** boş liste her iddiayı geçirir — her "görünüyor" iddiasının yanına bir
 "görünmemeli" iddiası konur.
 
-## DİLİM 3 — İŞBİRLİĞİ (sunucu ayağı KABUL EDİLDİ ve PUSH'LANDI)
+## DİLİM 3 — İŞBİRLİĞİ
 
 **Kilitler [Onur, 20 Ağu]:** üyelik = `Project.members` OrSet → `project_members` · davet e-posta
 ile · rol kademesi YOK · sahip OrSet'e YAZILMAZ; erişim = **`project_access`** (sahip ∪ üye).
 
 **Kapı beyanı (cihaz Chrome, 5 Eyl):** `ci #82`·`paket #16` = **`4359fa8`** yeşil (run
-kayıtlarından). 🔴 `pages #15` = **`12dc0a0`**: canlı demo HEAD DEĞİL, geride — vitrinden
-sonra tetiklenir. Sunucu ayağı iki denetim turu + beş bulguyla kapandı (`KANIT/o86A*`).
-**o86-D2 KABUL ve PUSH** (kapsayıcı eşik; M4 iki kapıyı öldürdü · 3×6/6).
-Kalan: §F vitrin 3-9; **8-9 KANITSIZ**.
+kayıtlarından). 🔴 `pages #15` = **`12dc0a0`**: canlı demo HEAD DEĞİL, vitrinden sonra tetiklenir.
+**o86-D2 PUSH'LU · o86-E KABUL (commit YOK).** 🟢 **§F CANLI TAM (6 Eyl, `KANIT/o86F`): 9/9** —
+davet→üye ekranı **≤10 sn, ikinci tetik YOK** · üye davetten önceki görevi görüyor · üye→sahip
+≤12 sn · davetsiz hesabın snapshot'ı BOŞ · üye paylaşamıyor (RejectedForbidden).
 
 **DİLİM 2 — LİSTE BİTTİ** (20 Ağu; kapı beyanları `arsiv/DURUM-arsiv-o85.md`). **Kilitler [Onur,
 19 Ağu]:** Liste = sunucudaki **`Project`** · klasör KESİLDİ · `listPos`/`order` kanalı AÇILMADI ·
