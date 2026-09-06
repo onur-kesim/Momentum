@@ -24,10 +24,14 @@ x-momentum-imaj: &momentum-imaj
       # portu degistirirsen BU DEGERI DE degistir, yoksa tarayicidaki istemci
       # API'yi bulamaz (Dockerfile'da beyan edilmis sinir 2).
       SENKRON_SUNUCU_URL: http://localhost:5298
-      # SABIT DEMO KIMLIGI. Bos birakilsa her kurulum rastgele bir kullanici
-      # uretirdi ve paketteki web istemcisi ile APK birbirini GOREMEZDI -- iki
-      # istemcili senkron/cakisma vitrini paketin ANA GOSTERISI oldugu icin bu
-      # deger sabittir. APK/Windows derlemesinde de AYNI degeri verin.
+      # GERIYE DONUK UYUMLULUK: kimlik dilimi ONCESI paylasim SART'ti (bos
+      # birakilirsa rastgele kullanici uretilir, web istemcisi ile APK birbirini
+      # GOREMEZDI). Kimlik dilimi SONRASI (6 Eyl) yetkilendirme JWT'den gelir,
+      # paylasim davetle olur -- bu define artik ZORUNLU DEGIL. Yalniz WEB
+      # istemcisi derlemesine girer (Dockerfile: `flutter build web`); APK/
+      # Windows derlerken verilmesi GEREKMEZ. Mekanizma SILINMEDI (build arg
+      # dev_user_id_define_test.dart + ayarlari_hazirla_test.dart G19 tarafindan
+      # pinlenmis) -- silmek yeniden olcum ister, bu turun kapsami disinda.
       DEV_USER_ID: deadbeef-0000-4000-8000-000000000001
   image: momentum:yerel
 
