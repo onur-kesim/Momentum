@@ -1,6 +1,6 @@
 # DURUM.md — Momentum
 
-**BİTTİ: 13/13 · kutu 9 Eyl · DİLİM 3 BİTTİ (§F 9/9) · HEAD `03690c2`. AŞAMA: teslim paketi `v1.1.0` (docker imajı + APK) — belgeler yazıldı, APK yeniden derlenip etiket atılacak.**
+**BİTTİ: 13/13 · kutu 9 Eyl · DİLİM 3 BİTTİ (§F 9/9). AŞAMA: teslim paketi `v1.1.0` (docker imajı + APK) — belgeler yazıldı, APK bayt bayt aynı çıktı; kalan: push + üç kapı + etiket.**
 
 > Açılış ≤3 komut: ① `git --no-optional-locks log --oneline -1` + `status --porcelain -- src`
 > ② bu dosya ③ CI durumu — **cihaz Chrome'undan** (bulut tarayıcısı kanıt değil). `arsiv/` AÇILMAZ.

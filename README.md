@@ -303,7 +303,7 @@ mutantla ölçülü) · erişilebilirlik duyurularının gerçek ekran okuyucuyl
 
 📦 **Hazır paket: [Releases → `v1.1.0`](https://github.com/tuzakavcisi1-cloud/Momentum/releases/latest)** (Latest)
 — derlenmiş Android APK (`momentum-v1.1.0-emulator.apk`, **60.953.726 bayt**), sha256'sı ve
-imza uyarısıyla birlikte yayında; derlendiği commit `03690c2`. Aşağıdaki bölüm, paketi
+imza uyarısıyla birlikte yayında; `v1.1.0` etiketinin `src/` ağacından derlendi. Aşağıdaki bölüm, paketi
 **kendiniz derlemek** istediğinizde geçerlidir.
 
 > `v1.0.1` ve `v1.0.0` arşiv olarak durur ve **dokunulmamıştır**. `v1.1.0` üç dilim ekler —

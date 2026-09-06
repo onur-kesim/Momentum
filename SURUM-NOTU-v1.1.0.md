@@ -95,7 +95,13 @@ asılı durur. Senkron, çakışma ve paylaşım vitrini **yalnız** yukarıdaki
 | ABI | `arm64-v8a` · `armeabi-v7a` · `x86_64` (tek fat APK, `aapt` ile teyit) |
 | Uygulama adı | `Momentum` |
 | Derleme hedefi | `SENKRON_SUNUCU_URL=http://10.0.2.2:5298` |
-| Derlendiği commit | `03690c2` — çalışma ağacı `src` altında temizdi |
+| Uygulama kimliği | `com.momentum.client` · `minSdk 24` · `targetSdk 36` |
+| Derlendiği ağaç | Etiketlenen commit'in `src/`'si — derleme anında `git status --porcelain -- src` **boştu** |
+
+🟢 **APK bu ağaçta yeniden derlendi ve BAYT BAYT AYNI çıktı.** `03690c2`'de üretilen dosya ile
+teslim commit'inin ağacında yeniden derlenen dosyanın sha256'ları **birebir aynı**
+(`57c668b0…20fb6cf`, 60.953.726 bayt). Aradaki commit'ler yalnız belge değiştirdiği için ürün biti
+değişmiyor; yani yukarıdaki sha256, etiketlenen kaynağın ürünüdür.
 
 🔴 **Derleme hedefi VARSAYILMADI, APK'nın içinden ölçüldü:** üç ABI'nin `libapp.so`'sunda
 `http://10.0.2.2:5298` dizesi dörder kez geçiyor, `http://localhost:5298` **hiç geçmiyor**.
@@ -134,7 +140,8 @@ flutter build apk --release --dart-define=SENKRON_SUNUCU_URL=http://<backend-LAN
 🔴 **APK debug anahtarıyla imzalıdır.** `android/app/build.gradle.kts` içinde Flutter'ın varsayılan
 `signingConfig = signingConfigs.getByName("debug")` satırı duruyor; üretim imza zinciri kurulmadı.
 Kurulumda "bilinmeyen kaynak" onayı isteyecektir. Gözden kaçma değil, **yazılı kapsam kararıdır**.
-`[ÖLÇÜLECEK: imza bloğu bu pakette de yeniden sökülür]`
+İmza bloğu bu pakette de söküldü (`apksigner verify --print-certs`): tek imzacı,
+**`C=US, O=Android, CN=Android Debug`**, sertifika SHA-256 `ee35229e…0d47b45`.
 
 ## 3. Ne ölçüldü
 
@@ -143,12 +150,12 @@ Kurulumda "bilinmeyen kaynak" onayı isteyecektir. Gözden kaçma değil, **yaz�
 - Backend testleri: **177** başarılı / **0** başarısız / **0** atlanan (mimari 6 · SyncCore 44 ·
   Api 22 · kalıcılık 105); `verify` zinciri EXIT **0** (240,7 sn) — `build -warnaserror`
   **0 uyarı, 0 hata** · CVE kapısı **0 zafiyetli paket**
-- CI kapıları: `[ÖLÇÜLECEK — teslim commit'i push'landıktan SONRA ÜÇÜ BİRDEN]`
-  🔴 Kural: **`ci` · `paket` · `pages` aynı sha'da yeşil olmadan release YAYINLANMAZ.** Sha'lar
-  run kayıtlarının KENDİ sayfasından okunur (liste satırından DEĞİL — o81 dersi). `pages` yalnız
-  `workflow_dispatch` ile koşar ⇒ **her yeni commit'ten sonra elle tetiklenmesi gerekir.**
-  *(Ara ölçüm, 6 Eyl 2026 ~12:00: `ci #84` · `paket #17` · `pages #16` — üçü de `03690c2`'de
-  yeşildi. Teslim commit'i bunun üstüne bindiği için satır yeniden ölçülecek.)*
+- CI kapıları: **`ci` · `paket` · `pages` — üçü de etiketlenen commit'te yeşil.** Ölçülmüş sha'lar
+  **release sayfasının gövdesindedir**; bu dosya kendi commit'inin sha'sını içeremeyeceği için
+  sayılar orada durur, burada kural durur.
+  🔴 Kural: üçü **aynı sha'da** yeşil olmadan release YAYINLANMAZ; sha'lar run kayıtlarının
+  KENDİ sayfasından okunur (liste satırından DEĞİL — o81 dersi). `pages` yalnız
+  `workflow_dispatch` ile koşar ⇒ **her yeni commit'ten sonra elle tetiklenir.**
 - **`crossOriginIsolated === true`**, `SharedArrayBuffer` kullanılabilir — paketlenmiş web
   istemcisinde tarayıcıdan ölçüldü (6 Eyl 2026). İzolasyon başlıkları belgeye iniyor:
   `Cross-Origin-Opener-Policy: same-origin` · `Cross-Origin-Embedder-Policy: require-corp` ·
