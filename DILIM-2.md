@@ -55,7 +55,7 @@ open(yol, encoding="utf-8"))` kullanır; `kod_sagligi_mutanti.py`'nin B kolu
   `defaults` `src/client`'tır), önce kapı sonra mutant koşar, `continue-on-error`
   yok.
 
-## 4. Kapı beyanı (bu oturumda ölçüldü, commit `103306e`'den sonraki HEAD'de)
+## 4. Kapı beyanı (bu oturumda ölçüldü, `7aada32`'nin ustune yazilan agacta -- yani bu belgenin bulundugu commit'te; o sha bu dosyanin icine yazilamaz (oz-basvuru))
 
 1. `python araclar/kod_sagligi.py --kapi` → **exit 0**; metin raporu birebir:
    *"162 dosya tarandi ... toplam 16238 satir, 5 ihlal (esik=400 satir)"*, SONUÇ
@@ -73,13 +73,61 @@ open(yol, encoding="utf-8"))` kullanır; `kod_sagligi_mutanti.py`'nin B kolu
    kadar **ÖLÇÜLEMEDİ** sayılmalı; kağıt beyan değil, ilk gerçek koşumun run
    kaydı doğrulanmalıdır.
 
+## 4-EK. Bagimsiz denetim (ureten degil, 8 Eyl 2026)
+
+Kapi beyani KAGITTAN degil, CANLI CIKTIDAN dogrulandi -- komutlar denetci
+tarafindan yeniden kosuldu, builder'in raporu okunmadi:
+
+| olculen | sonuc |
+|---|---|
+| `kod_sagligi.py --kapi` | exit **0**, "162 dosya ... 16238 satir, 5 ihlal", YESIL |
+| rapor kipi (`--kapi` yok) | exit **0** -- olcum kipi kapiya donusmuyor |
+| `kod_sagligi_mutanti.py` | exit **0**, 4/4 `[TUTTU]` |
+| `continue-on-error` | ci.yml'de **0 eslesme** |
+| taban dosyasi | 5 dosya, esik 400, sayilar bagimsiz olcumle **birebir** tutuyor |
+
+**BULGU 1 -- 3. KIRMIZI KURAL MUTANTSIZDI.** Kapinin uc kirmizi kurali var;
+mutantin dort kolu yalnizca 1. ve 2. kurali atesliyor (A/B yeni ihlal, C taban
+yok, pozitif kontrol yesil). **Kural 3 (cirCir: tabandaki dosya esigin altina
+inerse / kaybolursa) kodda vardi ama ISIRDIGI HIC GOSTERILMEMISTI.** Denetci
+kum havuzunda elle atesledi -- **6/6 kol tuttu**:
+
+- 3a taban 500 -> dosya 300 satir  -> KIRMIZI, iz `TABAN GERI ADIM` 🟢
+- 3b tabandaki dosya kayboldu      -> KIRMIZI, iz `TABAN DOSYASI KAYIP` 🟢
+- 3c kontrol: 500 -> 450 (hala esik ustu) -> YESIL (kural asiri tetiklemiyor) 🟢
+- 4  bilinen sinir: taban dosyasi 500 -> 900 BUYUDU -> YESIL (kirmizi YAKMAZ) 🟢
+- 5  sinir: tam 400 satir -> ihlal DEGIL (kural `>400`) 🟢
+- 6  sinir: 401 satir -> ihlal 🟢
+
+Kural 3 **davranissal olarak dogrulandi**, ama dogrulama denetcinin gecici
+betigindeydi; **CI'da kosmuyor**. Elle bir kez ispatlanmis kural, projenin
+kendi doktrinine gore surekli ispatlanmis sayilmaz. **ACIK IS:** mutanta D ve E
+kollari (3a, 3b) eklenir; eklenene kadar kapinin ucte biri mekanik ispatsizdir.
+
+**BULGU 2 -- KIRIK KAPI ANKRAJI (duzeltildi).** §4 basligi olcumu
+`103306e`'ye capaliyordu. O commit gercek ve main'de, ama **6 Eyl tarihli,
+konusu docker-compose `DEV_USER_ID` yorumu** ve HEAD'den 10 commit geride --
+o agacta `kod_sagligi.py` HENUZ YOK. Beyani oradan uretmeye calisan bos agac
+bulurdu. Ankraj ebeveyn commit'e (`7aada32`) tasindi; oz-basvuru ozyinelemesine
+girmeden dogru agaci gosteriyor.
+
+**BILINEN VE KABUL EDILMIS SINIR (ustu kapanmasin diye yaziliyor):** taban
+kumesindeki bir dosyanin BUYUMESI kirmizi yakmaz -- `gorev_deposu.dart` 1135'ten
+5000'e ciksa kapi yesil kalir, rapor yalnizca `+N satir` yazar. Bu, is emrinin
+bilincli tercihiydi (cirCir yeni ihlali ve geri adimi tutar, buyumeyi tutmaz).
+Karsi tedbir gerekiyorsa ayri kilit ister.
+
+**NE OLCULMEDI:** CI'nin gercek kosumundaki log kaniti (push oncesi
+olculemez, bkz. §4 madde 4) · karmasiklik ekseni (§1) · 5 uzun dosyanin ICI --
+uzunluklarinin hakli olup olmadigi okunmadi, yalniz sayildi.
+
 ## 5. M-3'ün ilk koşumu: belge/kod oranı
 
 Kod satırı (python sayımıyla): `kod_sagligi.py` 253 + `kod_sagligi_mutanti.py`
 196 + `kod_sagligi_taban.json` 13 + `ci.yml` eklenen 19 satır = **481**.
-Bu belgenin kendisi **89** satır (python sayımıyla, aynı yöntem).
+Bu belgenin kendisi **137** satır (python sayımıyla, aynı yöntem — §4-EK bağımsız denetim bölümü dâhil).
 
-**Oran = 89 / 481 ≈ 0,19 ≤ 1,0.** Geçti.
+**Oran = 137 / 481 ≈ 0,28 ≤ 1,0.** Geçti.
 
 ## 6. Sonuç
 
