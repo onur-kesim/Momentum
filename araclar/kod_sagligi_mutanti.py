@@ -1,22 +1,35 @@
 # -*- coding: utf-8 -*-
 """M-2 -- kod_sagligi.py'nin kapiyi GERCEKTEN isirdigini kanitlar.
 
-Dort kol, HER BIRI kendi gecici sahte git deposunu kurar (kum havuzu
+Alti kol, HER BIRI kendi gecici sahte git deposunu kurar (kum havuzu
 PAYLASILMAZ -- bir kolun dosyasi baskasini etkilemez):
 
   POZITIF KONTROL -- hepsi esigin altinda -> kapi YESIL (exit 0). Bu kol
     olmadan asagidaki mutantlarin kirmizisi "kapi olcuyor" demek DEGILDIR --
     yalniz "her zaman kirmizi yakiyor" da olabilirdi.
-  MUTANT A -- taban DISINDA 401 satirlik (hepsi dolu) yeni dosya -> KIRMIZI.
+  MUTANT A -- taban DISINDA 401 satirlik (hepsi dolu) yeni dosya -> KIRMIZI
+    (kural 1: tabanda olmayan ihlal).
   MUTANT B -- taban DISINDA 401 satirlik dosya, 200'u BOS SATIR -> yine
-    KIRMIZI. PowerShell `Measure-Object -Line` boslugu SAYMAZ ve bunu 201
-    sanip kacirirdi (8 Eyl'de gercek olculmus kusur) -- bu kol o siniftan
-    bir mutanti YAKALADIGINI kanitlar.
+    KIRMIZI (kural 1). PowerShell `Measure-Object -Line` boslugu SAYMAZ ve
+    bunu 201 sanip kacirirdi (8 Eyl'de gercek olculmus kusur) -- bu kol o
+    siniftan bir mutanti YAKALADIGINI kanitlar.
   MUTANT C -- taban dosyasi (kod_sagligi_taban.json) YOK -> exit kodu 2
     (OLCULEMEDI), 0 DEGIL. "Kirmizi yakmiyor" ile "olcemedim" karistirilamaz.
+  MUTANT D -- taban bir dosyayi 500 satir bilir, agacta dosya 300 satirdir
+    -> KIRMIZI, iz "TABAN GERI ADIM" (kural 3, cirCir -- once bagimsiz
+    denetimin gecici kum havuzunda elle atesledigi ayak, simdi mekanik).
+  MUTANT E -- taban bir dosyayi 500 satir bilir, dosya agacta HIC YOK
+    -> KIRMIZI, iz "TABAN DOSYASI KAYIP" (kural 3'un ikinci dali).
 
-Cikis kodu: 0 -- dordu de kehanetini tuttu. 1 -- en az biri sapti (detay
-stdout'ta, hangi kol/ne beklenip ne bulundugu ile).
+Ayrica IKI asiri-tetikleme kontrolu (kol SAYILMAZ, ama ayni yalitim
+gerekcesiyle her biri kendi havuzunu kurar -- kural 3'un GEREKENDEN FAZLA
+atesLENMEDIGINI kanitlar):
+  taban 500 / dosya 450 (hala esik ustu)   -> YESIL beklenir.
+  taban 500 / dosya 900 (BUYUDU, esik ustu) -> YESIL beklenir (bilinen sinir --
+    tabandaki dosyanin buyumesi kirmizi YAKMAZ, bu is emrinin kararidir).
+
+Cikis kodu: 0 -- alti kolun altisi VE iki ek ayak da kehanetini tuttu. 1 --
+en az biri sapti (detay stdout'ta, hangi kol/ne beklenip ne bulundugu ile).
 """
 import json
 import os
@@ -159,11 +172,104 @@ def kol_mutant_c():
         shutil.rmtree(kok, ignore_errors=True)
 
 
+def kol_mutant_d():
+    """Bagimsiz denetimin 3a ayagi (elle atesLENMISTI) -- simdi mekanik."""
+    kok = gecici_depo_kur("d")
+    try:
+        dosya_yaz_ve_ekle(kok, "lib/kuculdu.dart", dolu_satirlar(300))
+        taban_yolu = taban_yaz(kok, {"lib/kuculdu.dart": 500})
+        kod, govde, out, err = kod_sagligi_calistir(kok, taban_yolu, ["--kapi"])
+        beklenen = (
+            kod == 1
+            and govde is not None
+            and govde.get("sonuc") == "KIRMIZI"
+            and any(
+                "TABAN GERI ADIM" in k and "lib/kuculdu.dart" in k
+                for k in govde.get("kirmizilar", [])
+            )
+        )
+        detay = f"exit={kod} sonuc={govde.get('sonuc') if govde else None} kirmizilar={govde.get('kirmizilar') if govde else None}"
+        return beklenen, detay, out, err
+    finally:
+        shutil.rmtree(kok, ignore_errors=True)
+
+
+def kol_mutant_e():
+    """Bagimsiz denetimin 3b ayagi (elle atesLENMISTI) -- simdi mekanik."""
+    kok = gecici_depo_kur("e")
+    try:
+        # Repo BOS kalmasin diye baska, esiksiz bir dosya -- asil olay taban'in
+        # bildigi "lib/kayip.dart"in agaca HIC eklenmemis olmasi.
+        dosya_yaz_ve_ekle(kok, "lib/var-olan.dart", dolu_satirlar(50))
+        taban_yolu = taban_yaz(kok, {"lib/kayip.dart": 500})
+        kod, govde, out, err = kod_sagligi_calistir(kok, taban_yolu, ["--kapi"])
+        beklenen = (
+            kod == 1
+            and govde is not None
+            and govde.get("sonuc") == "KIRMIZI"
+            and any(
+                "TABAN DOSYASI KAYIP" in k and "lib/kayip.dart" in k
+                for k in govde.get("kirmizilar", [])
+            )
+        )
+        detay = f"exit={kod} sonuc={govde.get('sonuc') if govde else None} kirmizilar={govde.get('kirmizilar') if govde else None}"
+        return beklenen, detay, out, err
+    finally:
+        shutil.rmtree(kok, ignore_errors=True)
+
+
+def ek_asiri_tetikleme_kontrolleri():
+    """Kol SAYILMAZ (§ust) -- iki ayak, ikisi de YESIL beklenir: kural 3
+    hala-esik-ustu kucculmede VE buyumede atesLENMEMELI. Her ayak KENDI
+    havuzunu kurar -- ayni havuzda ardisik taban.json degistirmek onceki
+    ayaktan kalan dosyayi yeni taban icin "tabanda yok" gosterip yanlis
+    kirmizi uretiyordu (olculdu, bu yuzden AYRILDI)."""
+    sonuclar = []
+
+    # Ayak 1: taban 500 -> 450, HALA esigin (400) ustunde -- kirmizi YAKMAMALI.
+    kok1 = gecici_depo_kur("asiri-tetik-1")
+    try:
+        dosya_yaz_ve_ekle(kok1, "lib/hala-ustunde.dart", dolu_satirlar(450))
+        taban1 = taban_yaz(kok1, {"lib/hala-ustunde.dart": 500})
+        kod1, govde1, out1, err1 = kod_sagligi_calistir(kok1, taban1, ["--kapi"])
+        ayak1_ok = kod1 == 0 and govde1 is not None and govde1.get("sonuc") == "YESIL"
+        sonuclar.append((
+            "AYAK 1 (taban 500 -> dosya 450, hala esik ustu -> YESIL beklenir)",
+            ayak1_ok,
+            f"exit={kod1} sonuc={govde1.get('sonuc') if govde1 else None} kirmizilar={govde1.get('kirmizilar') if govde1 else None}",
+            out1,
+            err1,
+        ))
+    finally:
+        shutil.rmtree(kok1, ignore_errors=True)
+
+    # Ayak 2: taban 500 -> 900, BUYUDU -- bilinen sinir, kirmizi YAKMAMALI.
+    kok2 = gecici_depo_kur("asiri-tetik-2")
+    try:
+        dosya_yaz_ve_ekle(kok2, "lib/buyudu.dart", dolu_satirlar(900))
+        taban2 = taban_yaz(kok2, {"lib/buyudu.dart": 500})
+        kod2, govde2, out2, err2 = kod_sagligi_calistir(kok2, taban2, ["--kapi"])
+        ayak2_ok = kod2 == 0 and govde2 is not None and govde2.get("sonuc") == "YESIL"
+        sonuclar.append((
+            "AYAK 2 (taban 500 -> dosya 900, buyudu -- bilinen sinir -> YESIL beklenir)",
+            ayak2_ok,
+            f"exit={kod2} sonuc={govde2.get('sonuc') if govde2 else None} kirmizilar={govde2.get('kirmizilar') if govde2 else None}",
+            out2,
+            err2,
+        ))
+    finally:
+        shutil.rmtree(kok2, ignore_errors=True)
+
+    return sonuclar
+
+
 KOLLAR = [
     ("POZITIF KONTROL (hepsi esik alti -> YESIL)", kol_pozitif_kontrol),
     ("MUTANT A (401 dolu satir, tabanda yok -> KIRMIZI)", kol_mutant_a),
     ("MUTANT B (401 satir, 200 bos -- Measure-Object korlugu -> KIRMIZI)", kol_mutant_b),
     ("MUTANT C (taban dosyasi yok -> exit 2)", kol_mutant_c),
+    ("MUTANT D (taban 500 / dosya 300 -> TABAN GERI ADIM)", kol_mutant_d),
+    ("MUTANT E (taban 500 / dosya YOK -> TABAN DOSYASI KAYIP)", kol_mutant_e),
 ]
 
 
@@ -185,10 +291,27 @@ def main(argv):
                 print("  --- kod_sagligi.py stderr ---")
                 print("  " + err.replace("\n", "\n  "))
 
+    try:
+        ek_sonuclar = ek_asiri_tetikleme_kontrolleri()
+    except Exception as exc:
+        ek_sonuclar = [(f"EK AYAKLAR PATLADI: {exc!r}", False, "", "", "")]
+
+    for isim, tuttu, detay, out, err in ek_sonuclar:
+        durum = "TUTTU" if tuttu else "SAPTI"
+        print(f"[{durum}] {isim} -- {detay}")
+        if not tuttu:
+            hepsi_tuttu = False
+            if out:
+                print("  --- kod_sagligi.py stdout ---")
+                print("  " + out.replace("\n", "\n  "))
+            if err:
+                print("  --- kod_sagligi.py stderr ---")
+                print("  " + err.replace("\n", "\n  "))
+
     if hepsi_tuttu:
-        print("SONUC: dort kolun dordu de kehanetini tuttu.")
+        print(f"SONUC: {len(KOLLAR)} kolun {len(KOLLAR)}'si VE 2 ek asiri-tetikleme ayagi kehanetini tuttu.")
         return 0
-    print("SONUC: en az bir kol sapti -- kapi kor OLABILIR, yukariya bak.")
+    print("SONUC: en az bir kol/ayak sapti -- kapi kor OLABILIR, yukariya bak.")
     return 1
 
 
