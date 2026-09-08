@@ -28,7 +28,7 @@ kapı `package:analyzer` + Roslyn üzerine **KENDİ aracımız** olur (CI'da sı
 yok, tavan yok, tekrarlayan maliyet yok); DCM'in ücretsiz kademesi **BİR KEZ**
 yerelde çapraz tanık olarak koşulur, kanıtı `KANIT/`e yazılır. Bu **bir
 SONRAKİ dilimdir**, bu dilimde yazılmaz. Süslü parantez sayan bir sezgisel
-yazıp adına "karmaşıklık kapısı" demek, `ADR_CC_OLÇÜTÜ.md`'nin kapattığı
+yazıp adına "karmaşıklık kapısı" demek, `hafiza-kur/faz0/ADR_CC_OLCUTU.md`'nin (BAŞKA proje — bu depoda yok, yalnız ilke olarak anılıyor) kapattığı
 kusuru (ölçüt kabul edilmeden yazılan kural) geri getirir — dış tanık artık
 VAR, ama henüz SEÇİLİP KOŞULMADI.
 
@@ -127,7 +127,7 @@ betigindeydi; **CI'da kosmuyordu**. Elle bir kez ispatlanmis kural, projenin
 kendi doktrinine gore surekli ispatlanmis sayilmaz. **ACIK IS KAPANDI (8 Eyl,
 ayni oturum):** `kod_sagligi_mutanti.py`'ye Mutant D (3a: taban geri adim) ve
 Mutant E (3b: taban dosyasi kayip) kollari + 2 asiri-tetikleme ayagi (3c, 4)
-eklendi -- artik 6 kolun 6'si de mekanik, CI'da kosuyor
+eklendi -- artik 6 kolun 6'si de mekanik. YEREL kosumda dogrulandi; CI'daki ilk kosumu bu commit push edilene kadar OLCULMEDI (CI'da kosan son surum c6ce425'ti, logunda 'dort kolun dordu' yaziyor)
 (`python araclar/kod_sagligi_mutanti.py` -> exit 0). Kor-mutant ozdenetimiyle
 de dogrulandi: kural 3 kod icinde gecici kapatilinca D ve E dogru sekilde
 `[SAPTI]` dedi (exit 1), sonra dosya yedekten geri alinip 6/6 tekrar `TUTTU`
