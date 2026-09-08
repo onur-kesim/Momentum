@@ -63,8 +63,9 @@ doğrulandı (`1.1.0`/`2`). **AÇIK DİLİM YOK.**
    edilir; kalıcı silme Onur'da.
 9. **Bulut ≠ cihaz:** Cowork UTC koşar ⇒ tarih `TZ='Europe/Istanbul' date` ile ölçülür; **CI
    `istemci` işi de `TZ: Europe/Istanbul`** [o77]. Bulut tarayıcısı canlı kanıt DEĞİLDİR.
-10. **Kapı bütçesi (İŞLEYİŞ md.3):** `araclar/` ÷ `src/` satır oranı ≤ %10; `src/**/test/` girmez.
-    Yeni kapı dosyası açılmaz.
+10. **Kapı bütçesi (İŞLEYİŞ md.3):** `araclar/` ÷ **el yazımı** `src/` ≤ %10 (üretilen/vendor
+    `.g.dart` `.wasm` `.lock` paydaya girmez — ham `src/` %71 üretilmişti, kapı kördü).
+    **8 Eyl: 2867/18435 = %15,6 🔴** ⇒ yeni kapı yazılmaz.
 
 ## 5. KAPSAM DIŞI (kesilenler — README'ye de yazılır)
 
