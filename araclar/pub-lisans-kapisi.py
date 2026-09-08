@@ -76,7 +76,7 @@ BEYAN_EDILMIS_SINIR = (
     "tespiti kusursuz degildir. Bu bir disiplin kapisidir, hukuki guvence degildir."
 )
 
-# T5/Z11'in pinledigi vendored ikililer -- kaynagi araclar/web-varlik.sha256'dir.
+# T5/Z11'in pinledigi vendored ikililer -- kaynagi arsiv/araclar/web-varlik.sha256'dir.
 VENDORED = [
     ("drift_worker.js", "simolus3/drift (tag drift-2.34.0)", "MIT"),
     ("sqlite3.wasm (sarmalayici)", "simolus3/sqlite3.dart (tag sqlite3-3.5.0)", "MIT"),

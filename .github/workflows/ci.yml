@@ -73,3 +73,50 @@ jobs:
       # rapor + kirmizi karari), sonra kapinin kendisini isirdigini kanitlar.
       - run: python araclar/kod_sagligi.py --kapi
       - run: python araclar/kod_sagligi_mutanti.py
+
+  # o93 [Onur, 9 Eyl 2026]: CVE/lisans kapilari BAGLANDI. AYRI is, AYRI ad,
+  # AYNI tetik -- ci.yml'de yeni bir job tetik asimetrisi YARATMAZ (etiket
+  # zamani kapi beyani hala ci/paket/pages ucludur); ayri bir .yml dosyasi
+  # dorduncu asimetrik tetik dogururdu (o81 tuzagi). ustteki defaults.run
+  # src/client'tir; git ls-files ve araclar/ kokten kosmasi icin
+  # working-directory: . backend/kod-sagligi isindeki gibi ELLE verildi.
+  bagimlilik:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # github.event.before'a erisim icin
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 1) ALTIN KUME -- her kosumda, AGA CIKMAZ. Kapi once kendini kanitlar.
+      - run: python araclar/pub-cve-kapisi.py --altin-kume
+      - run: python araclar/pub-lisans-kapisi.py --altin-kume
+
+      # 2) Gercek tarama gerekli mi? BELIRSIZLIKTE TARAR, ATLAMAZ -- onceki
+      # sha yok/erisilemez/pubspec degisti ise tara, susmaya degil.
+      - id: kapsam
+        env:
+          ONCEKI: ${{ github.event.before }}
+        run: |
+          if [ -z "$ONCEKI" ] || [ "$ONCEKI" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$ONCEKI^{commit}" 2>/dev/null; then
+            echo "tara=1" >> "$GITHUB_OUTPUT"
+            echo "GEREKCE: onceki sha yok/erisilmez -- TARANIR"
+          elif git diff --name-only "$ONCEKI" "$GITHUB_SHA" -- src/client/pubspec.lock src/client/pubspec.yaml | grep -q .; then
+            echo "tara=1" >> "$GITHUB_OUTPUT"
+            echo "GEREKCE: pubspec degisti -- TARANIR"
+          else
+            echo "tara=0" >> "$GITHUB_OUTPUT"
+            echo "GEREKCE: pubspec degismedi -- ATLANIR"
+          fi
+
+      # 3) GERCEK TARAMA -- URUN UCU: fixture degil, depodaki pubspec.lock.
+      - if: steps.kapsam.outputs.tara == '1'
+        run: python araclar/pub-cve-kapisi.py src/client/pubspec.lock
+      - if: steps.kapsam.outputs.tara == '1'
+        run: python araclar/pub-lisans-kapisi.py src/client/pubspec.lock

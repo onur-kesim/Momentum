@@ -537,4 +537,6 @@ Bu depodaki kod **MIT** lisanslıdır — kökte `LICENSE`, © 2026 Onur Kesim
 [Onur kilidi, 6 Eyl 2026].
 
 Bağımlılık eklenirken **lisans + CVE** denetimi zorunludur (`araclar/pub-lisans-kapisi.py`,
-`araclar/pub-cve-kapisi.py`, `NuGetAudit`). Sırlar repoya girmez; build artefaktları `.gitignore`'dadır.
+`araclar/pub-cve-kapisi.py`, `NuGetAudit`) — ikisi `ci` iş akışının `bagimlilik` işinde koşar:
+altın küme (kendi öz-kanıtı) **her koşumda**, gerçek tarama **yalnız `pubspec` değişince**.
+Sırlar repoya girmez; build artefaktları `.gitignore`'dadır.

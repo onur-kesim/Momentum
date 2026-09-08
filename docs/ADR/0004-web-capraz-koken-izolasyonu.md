@@ -178,3 +178,11 @@ gstatic/flutter-canvaskit → **1** · `flutter.js` gstatic → **1** (toplam **
 🔴 **Bu gövde KİLİTLİ DEĞİLDİR.** `K127`: kilit öncesi **bağımsız** denetim koşar ve kilit
 **Onur'dan** gelir (`K40`). Bu belge hiçbir şıkkı **kendi seçmez** ve yürürlükteki hiçbir kilidin
 metnini **yeniden yazmaz**.
+
+---
+
+> **ERRATA — 9 Eyl 2026 [o93].** `araclar/yayin-kapisi.py` ve `araclar/web-yayina-al.py`
+> `arsiv/araclar/` altına alındı (kapı bütçesi budaması, İŞLEYİŞ md.3). §1, §2, §6 ve §8'deki
+> `araclar/...` yolları **o günkü** hâli belgeler. §6 tablosundaki bayt/satır/sha pinleri
+> taşımadan **önceki** dosyalara aittir; dosya içerikleri **değişmedi**, yalnız yerleri değişti.
+> Bu ADR'nin kararı yürürlüktedir.
