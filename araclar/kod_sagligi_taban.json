@@ -1,0 +1,13 @@
+{
+  "olculdu": "2026-09-08",
+  "commit": "7aada32",
+  "kapsam": "urun-kodu-testler-haric",
+  "esik_satir": 400,
+  "dosyalar": {
+    "src/client/lib/veri/gorev_deposu.dart": 1135,
+    "src/client/lib/sunum/gorev_listesi_ekrani.dart": 1005,
+    "src/client/lib/senkron/uzak_degisiklik_uygulayici.dart": 887,
+    "src/client/lib/sunum/gorev_satiri.dart": 823,
+    "src/client/lib/veri/senkron_dongusu.dart": 549
+  }
+}

@@ -54,3 +54,22 @@ jobs:
           global-json-file: global.json
       - run: ./araclar/verify.ps1
         shell: pwsh
+
+  # M-2 [Onur, 8 Eyl 2026]: satir ekseni -- karmasiklik ekseni AYRI bir dilim
+  # (dis tanik yok, bkz. araclar/kod_sagligi.py basligi). defaults.run
+  # ustteki src/client'i miras alir; git ls-files YANLIS KOKTEN kosmasin diye
+  # backend isindeki gibi working-directory: . ELLE verildi.
+  kod-sagligi:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # Mutant kosmadan kapi yururluge girmez: adim once kapiyi (162/5
+      # rapor + kirmizi karari), sonra kapinin kendisini isirdigini kanitlar.
+      - run: python araclar/kod_sagligi.py --kapi
+      - run: python araclar/kod_sagligi_mutanti.py
