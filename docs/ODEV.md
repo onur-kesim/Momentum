@@ -6,6 +6,16 @@
 > **Kapsam otoritesi budur** — hafızadaki türev cümleler değil. Çelişkide bu dosya geçerlidir.
 > Onur hatırladıkça güncellenir; her güncelleme tarihli olarak eklenir.
 
+> **⛔ ERRATA — K12-b / K13-a YÜRÜRLÜKTEN KALKTI [7 Eyl 2026, ölçümle doğrulandı]**
+> Bu dosya **kapsam otoritesi olmaya devam eder.** Ancak içinde geçen iki *süreç kuralı*
+> global anayasa §0 ile **feshedilmiştir** ve bu dosyadaki "yürürlükte" ifadeleri geçersizdir:
+> · **K12-b** ("kalite>hız"ın süreç-kanıtı yorumu — §67, §71, §152, §171)
+> · **K13-a** ("tur sayısı sınırlanmaz / öngörülemez" — §134, §140, §167)
+> Öncelik: MUTLAK SINIRLAR > global anayasa > Cowork talimatı > proje esasları > bu dosya.
+> Yürürlükteki karşılıkları: teslim doğrulaması **anayasa §5**'tedir (tek bağımsız tur, canlı
+> çıktıya bakılır, iç kâğıt denetlenmez); tur sayısı ise `proje-radari` ile **ölçülür** —
+> öngörülemez değil, ölçülebilirdir.
+
 ---
 
 ## 1. Sözlü brief — Onur'un aktarımı (20 Tem 2026)
