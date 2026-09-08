@@ -1,5 +1,0 @@
-[00:50:17] ① docker start momentum-postgres
-[00:50:17]   exit=0 out='momentum-postgres' err=''
-[00:50:17] YOKLAMA basladi: momentum-postgres healthy (aralik=2s, tavan=30 deneme)
-[00:50:17]   [deneme 1/30, 0.2sn] 'healthy'
-[00:50:17] YOKLAMA GECTI: momentum-postgres healthy (0.2 sn'de)

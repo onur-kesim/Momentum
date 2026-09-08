@@ -1,1 +1,0 @@
-kCakismaGovdesiMaxSatir=16, deneme sirasi 3(kirmizi 9)->5(kirmizi 9)->10(kirmizi 5)->16(TUMU YESIL). Izgara: g16_metin_kaybi_kapisi_test.dart G16/A1, olcek 1.0/1.5/2.0 x genislik 320/360/411, formul (g-3*MBosluk.m)/2.

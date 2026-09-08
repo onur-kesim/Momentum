@@ -1,6 +1,0 @@
-[00:50:52] §4 adim ④ -- backend KAPATILIYOR
-[00:50:52]   kayitli PID=22052 -- taskkill /PID /T /F
-[00:50:53]   taskkill -> exit=0 out='SUCCESS: The process with PID 7900 (child process of PID 22052) has been terminated.\nSUCCESS: The process with PID 22052 (child process of PID 1968) has been terminated.' err=''
-[00:50:53] YOKLAMA basladi: netstat :5298 -- LISTENING satiri YOK (aralik=2s, tavan=20 deneme)
-[00:50:53]   [deneme 1/20, 0.0sn] ('  TCP    127.0.0.1:5298         127.0.0.1:60659        TIME_WAIT       0\n  TCP    127.0.0.1:60653        127.0.0.1:5298         TIME_WAIT       0\n', [])
-[00:50:53] YOKLAMA GECTI: netstat :5298 -- LISTENING satiri YOK (0.0 sn'de)

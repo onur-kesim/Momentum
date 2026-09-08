@@ -1,4 +1,0 @@
-[23:38:55] ② backend baslatiliyor -- AYRI surecte, env Python subprocess.Popen(env=) ile
-[23:38:55]   baglanti dizesi (docker inspect ile TEYIT EDILDI): Host=localhost;Port=5432;Database=momentum;Username=momentum;Password=momentum_dev
-[23:38:55]   cwd=C:\dev\Momentum\src\backend\Momentum.Api
-[23:38:55]   baslatildi -- PID=700, log=C:\dev\Momentum\KANIT\SS2\T8-uctan-uca\09-backend-log.txt, pid dosyasi=C:\dev\Momentum\KANIT\SS2\T8-uctan-uca\_backend.pid

@@ -1,3 +1,0 @@
-﻿=== G18/d -- usesCleartextTraffic (1 eslesme BEKLENIR) [DUZELTILMIS KOMUT: /s wildcard gerektirir] ===
-android\app\src\main\AndroidManifest.xml:        android:usesCleartextTraffic="true">
-EXIT=0

@@ -1,7 +1,0 @@
-00:41 +499: C:/dev/Momentum/src/client/test/yerel_yazma_itme_tetikleyicisi_test.dart: K112/a -- gorev ekleme ITME turunu tetikler
-00:41 +500: C:/dev/Momentum/src/client/test/yerel_yazma_itme_tetikleyicisi_test.dart: K112/b -- SIRA: once YAZMA, sonra itme
-00:42 +501: C:/dev/Momentum/src/client/test/yerel_yazma_itme_tetikleyicisi_test.dart: K112/c -- YANLIS-POZITIF: onYerelYazma null ise cokmez
-00:42 +502: C:/dev/Momentum/src/client/test/yerel_yazma_itme_tetikleyicisi_test.dart: K112/d -- BOS metin ne yazar ne tetikler
-00:42 +503: All tests passed!
-Analyzing client...                                             
-No issues found! (ran in 5.1s)

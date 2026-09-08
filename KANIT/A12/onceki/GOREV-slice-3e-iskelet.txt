@@ -1,9 +1,0 @@
-==========================================================================
-SPEC KAPI KAPSAMA -- GOREV_CLAUDE_CODE/GOREV-slice-3e-iskelet.md
-==========================================================================
-[S0] BICIM: '## 5.' veya '## 6.' bolumu bulunamadi
---------------------------------------------------------------------------
-BEYAN EDILMIS SINIR: bu betik mutantin GERCEKTEN ISIRDIGINI olcmez;
-esdeger-mutant tespiti calisan kod ister. Yalnizca KAPSAMA olculur.
-==========================================================================
-EXIT=3

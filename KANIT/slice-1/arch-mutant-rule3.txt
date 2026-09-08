@@ -1,9 +1,0 @@
-==== D10 KANIT: Arch Rule-3 MUTANT (Domain -> Microsoft.AspNetCore) ====
-Tarih: 2026-07-18
-Mutant: Domain.csproj'a FrameworkReference Microsoft.AspNetCore.App + ZzMutant.cs (IResult alani) eklendi.
-Not: NetArchTest TIP-bagimliligina bakar; salt proje-referansi yetmez -> gercek tip kullanildi.
-Beklenen: Rule3 testi FAIL. Ciktisi:
------------------------------------------------------------------
-Toplam 1 test dosyası belirtilen desenle eşleşti.
-    Architecture rule violated. Failing types: Momentum.Domain.ZzMutant
-Başarısız! - Başarısız:     1, Başarılı:     0, Atlanan:     0, Toplam:     1, Süre: 888 ms - Momentum.ArchitectureTests.dll (net9.0)

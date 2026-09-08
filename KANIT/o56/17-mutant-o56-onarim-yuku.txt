@@ -1,8 +1,0 @@
-HEDEF   : araclar/ss2-kapisi.py  15658 b  sha8=AC744C65
-MUTANT  : _blok_yorumsuz() devre disi (onarim geri alindi)
-EXIT    : 1  (0 ise ONARIM YUK TASIMIYOR = ESDEGER MUTANT)
-  [KALDI] 13) BLOK yorum /* ... */ icinde distinct'siz .count( -- SUSMALI [o56 onarimi]
-  [KALDI] 14) BLOK yorumda schemaVersion => 5, GERCEK kod => 4 -- KIRMIZI [o56: KOR KAPIYDI]
-  HUKUM: 12/14 GECTI -- ARAC KULLANILAMAZ
-GERI AL : 15658 b  sha8=AC744C65  ==> BAYT-OZDES
-HUKUM   : ISIRDI -- onarim yuk tasiyor (13 ve 14 dustu)

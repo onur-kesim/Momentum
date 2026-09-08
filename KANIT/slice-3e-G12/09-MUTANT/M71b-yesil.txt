@@ -1,3 +1,0 @@
-TABAN (K81 sonrasi, mutantsiz):
-EXIT 0 -- BULGU YOK: Y1-Y4 hepsi TEMIZ.
-altin kume: 15/15 vaka GECTI, EXIT 0.

@@ -1,5 +1,0 @@
-HAZIR: 2 satir bulundu (>= 2 beklenen)
-  [1] MOMENTUM-G6-KANIT chosenImplementation=WasmStorageImplementation.sharedIndexedDb missingFeatures={MissingBrowserFeature.dedicatedWorkersInSharedWorkers, MissingBrowserFeature.sharedArrayBuffers}
-  *** DIKKAT: missingFeatures BOS DEGIL -- {MissingBrowserFeature.dedicatedWorkersInSharedWorkers, MissingBrowserFeature.sharedArrayBuffers} (G37/c: bu ACIKCA yazilmalidir)
-  [2] MOMENTUM-G6-KANIT chosenImplementation=WasmStorageImplementation.sharedIndexedDb missingFeatures={MissingBrowserFeature.dedicatedWorkersInSharedWorkers, MissingBrowserFeature.sharedArrayBuffers}
-  *** DIKKAT: missingFeatures BOS DEGIL -- {MissingBrowserFeature.dedicatedWorkersInSharedWorkers, MissingBrowserFeature.sharedArrayBuffers} (G37/c: bu ACIKCA yazilmalidir)

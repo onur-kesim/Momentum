@@ -1,3 +1,0 @@
-KOL A (kelepce YOK) : ['Passed', 'Passed', 'Passed', 'Passed', 'Passed'] -> 5/5 GECTI
-ham liste: ['Passed', 'Passed', 'Passed', 'Passed', 'Passed']
-dosya ozdes(kosum sonrasi=taban): True

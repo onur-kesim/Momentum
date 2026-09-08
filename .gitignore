@@ -114,3 +114,9 @@ KANIT/**/_ozet*.py
 KANIT/**/_gitignore_olc.py
 
 .claude/
+
+# --- M-1 (8 Eyl 2026): ham kanit agaca girmez; kosumda yeniden uretilenler susturulur ---
+KANIT/slice-3c/02-G2/*.json
+KANIT/slice-3d/07-G7-backend-zorlama/*.txt
+KANIT/**/*.trx
+KANIT/**/*.log

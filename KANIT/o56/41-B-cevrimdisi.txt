@@ -1,4 +1,0 @@
-  svc wifi disable -> (0, '')
-  svc data disable -> (0, '')
-  PROB emulator-5554 -> 10.0.2.2:5298  ham=[(1, 'nc: connect: Network is unreachable'), (1, 'nc: connect: Network is unreachable'), (1, 'nc: connect: Network is unreachable')]  ==> ULASILAMIYOR
-HUKUM: YESIL -- CEVRIMDISI (olculdu, bayrakla degil)

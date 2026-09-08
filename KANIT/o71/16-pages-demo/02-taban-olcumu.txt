@@ -1,5 +1,0 @@
-git --no-optional-locks ls-files --cached --others --exclude-standard GOREV_CLAUDE_CODE | Measure-Object -Line -> 32
-git --no-optional-locks ls-files --cached --others --exclude-standard docs/ADR | Measure-Object -Line -> 6
-git --no-optional-locks ls-files --cached --others --exclude-standard araclar | Measure-Object -Line -> 41
-
-Not: 41, --cached --others --exclude-standard kapsamıdır; DURUM.md §6'nın 31'i farklı bir sayımdır.

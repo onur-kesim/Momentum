@@ -1,4 +1,0 @@
-  File "<string>", line 1
-    import io,sys;sys.stdout.reconfigure(encoding='utf-8',errors='replace');[print('===',f);[print('   ',x) for x in io.open('KANIT/o56/'+f,encoding='utf-8',errors='replace').read().splitlines() if x.startswith(('[SARI','[KIRMIZI','HUKUM','BULGU YOK','  bulgu yok','  [SARI','  [KIRMIZI','  canli    DURUM'))]] for f in ['19-sayi-tazeligi-SON.txt','19b-tavan-SON.txt','19c-tekkopya-SON.txt']
-                                                                                           ^
-SyntaxError: invalid syntax

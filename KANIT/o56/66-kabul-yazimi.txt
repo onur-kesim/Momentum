@@ -1,2 +1,0 @@
-PROJE_HAFIZA.md : 998192 b -> 1000653 b (+2461)
-DURUM.md        : 30423 b -> 30329 b (-94)  pay 2439 b

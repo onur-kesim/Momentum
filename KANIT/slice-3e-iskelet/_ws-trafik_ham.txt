@@ -1,9 +1,0 @@
-07-29 15:08:19.133 I/flutter ( 6045): [sinyal] el sikisma basarili -- SinyalBaglandi yayinlaniyor
-07-29 15:13:10.594 I/flutter ( 6045): [sinyal] Changed alindi -- SinyalDegisiklik yayinlaniyor
-07-29 15:16:15.269 I/flutter ( 6045): [sinyal] baglanti koptu: kanal kapandi (onDone)
-07-29 15:16:16.429 I/flutter ( 6045): [sinyal] baglanti koptu: baglanma denemesi basarisiz: ClientException with SocketException: Connection failed (OS Error: Network is unreachable, errno = 101), address = 10.0.2.2, port = 5298, uri=http://10.0.2.2:5298/hubs/sync/negotiate?negotiateVersion=1
-07-29 15:16:18.495 I/flutter ( 6045): [sinyal] baglanti koptu: baglanma denemesi basarisiz: ClientException with SocketException: Connection failed (OS Error: Network is unreachable, errno = 101), address = 10.0.2.2, port = 5298, uri=http://10.0.2.2:5298/hubs/sync/negotiate?negotiateVersion=1
-07-29 15:16:21.731 I/flutter ( 6045): [sinyal] baglanti koptu: baglanma denemesi basarisiz: ClientException with SocketException: Connection failed (OS Error: Network is unreachable, errno = 101), address = 10.0.2.2, port = 5298, uri=http://10.0.2.2:5298/hubs/sync/negotiate?negotiateVersion=1
-07-29 15:16:30.341 I/flutter ( 6045): [sinyal] baglanti koptu: baglanma denemesi basarisiz: ClientException with SocketException: Connection failed (OS Error: Network is unreachable, errno = 101), address = 10.0.2.2, port = 5298, uri=http://10.0.2.2:5298/hubs/sync/negotiate?negotiateVersion=1
-07-29 15:16:46.743 I/flutter ( 6045): [sinyal] baglanti koptu: baglanma denemesi basarisiz: ClientException with SocketException: Connection failed (OS Error: Network is unreachable, errno = 101), address = 10.0.2.2, port = 5298, uri=http://10.0.2.2:5298/hubs/sync/negotiate?negotiateVersion=1
-07-29 15:17:16.390 I/flutter ( 6045): [sinyal] el sikisma basarili -- SinyalBaglandi yayinlaniyor

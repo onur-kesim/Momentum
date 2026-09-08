@@ -1,8 +1,0 @@
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-Date: Wed, 29 Jul 2026 15:13:10 GMT
-Server: Kestrel
-Transfer-Encoding: chunked
-X-Correlation-Id: 89321640-0f4d-43b8-9c82-a7d887e510d7
-api-supported-versions: 1.0
-

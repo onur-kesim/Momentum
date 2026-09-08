@@ -1,6 +1,0 @@
-﻿artefakt: C:\dev\Momentum\src\client\lib\main.dart
-SHA256 hash of C:\dev\Momentum\src\client\lib\main.dart:
-22460e2398da475cff98e6bedc24dc7e80ddb980dd44fb3a62baae29b096aa0a
-CertUtil: -hashfile command completed successfully.
-EXIT=0
-degistirilme zamani: 2026-08-01T22:46:46.7890989+03:00

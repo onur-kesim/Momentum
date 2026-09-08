@@ -1,5 +1,0 @@
-T1 -- yalniz-cekme yuruyen iskelet
-istek govdesi: {"clientId":"019fa84d-0614-7b8d-ba74-749481d08dc5","clientHlc":null,"sinceCursor":null,"ops":[]}
-durum kodu: 200
-ham yanit:
-{"serverHlc":{"wallMs":1700000000000,"counter":0,"clientId":"019fa84d-0614-7b8d-ba74-749481d08dc5"},"nextCursor":{"xid":1080,"seq":0},"hasMore":false,"resyncRequired":false,"applied":[],"changes":[],"snapshot":[{"entityType":"Task","entityId":"019fa84d-0620-77b5-8d66-297d6f6919eb","scalars":[{"field":"title","value":"T1 tohum gorevi","hlc":{"wallMs":1700000000000,"counter":0,"clientId":"019fa84d-0614-7b8d-ba74-749481d08dc5"},"winOperationId":"019fa84d-0620-76f6-94b3-02d244ec7802"}],"sets":[],"groups":[]}]}

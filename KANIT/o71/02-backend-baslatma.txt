@@ -1,2 +1,0 @@
-[00:50:17] ② backend baslatiliyor -- AYRI surecte, Python subprocess.Popen(env=)
-[00:50:17]   baslatildi -- PID=22052, log=C:\dev\Momentum\KANIT\o71\09-backend-log.txt

@@ -1,5 +1,0 @@
-﻿=== G18/a (geri alma sonrasi) -- debug manifest networkSecurityConfig (VAR olmali) ===
-    package="com.momentum.client"
-EXIT=0
-        android:networkSecurityConfig="@xml/network_security_config" >
-EXIT=0

@@ -1,3 +1,0 @@
-[23:41:04] YOKLAMA basladi: emulator boot_completed=1 (devam, flutter.bat zaman asimina ragmen surec canli) (aralik=5s, tavan=48 deneme)
-[23:41:07]   [deneme 1/48, 3.0sn] ('emulator-5554', 'tuzak_api34')
-[23:41:07] YOKLAMA GECTI: emulator boot_completed=1 (devam, flutter.bat zaman asimina ragmen surec canli) (3.0 sn'de)

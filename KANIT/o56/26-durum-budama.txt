@@ -1,4 +1,0 @@
-PROJE_HAFIZA.md : 993255 b -> 996155 b (+2900)
-DURUM.md        : 31489 b -> 30423 b (-1066)  pay 2345 b
-BORCLAR.md      : 31437 b -> 32352 b (+915)  pay 416 b
-ARSIVLENEN SATIR: 3

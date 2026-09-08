@@ -1,7 +1,0 @@
-'Back'
-'Çakışma var'
-'Tamamlanma durumu\nBenimki\nTamamlandı\nOnlarınki\nAçık'
-'Benimkini tut'
-'Benimkini tut'
-'Onlarınkini al'
-'Onlarınkini al'

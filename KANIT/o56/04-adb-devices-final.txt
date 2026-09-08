@@ -1,5 +1,0 @@
-== adb devices -l (nihai, iki cihazda da uygulama calisirken) ==
-List of devices attached
-fba69c15               device product:flourite_tr model:2510ERA8BG device:flourite transport_id:2
-emulator-5554          device product:sdk_gphone64_x86_64 model:sdk_gphone64_x86_64 device:emu64xa transport_id:3
-

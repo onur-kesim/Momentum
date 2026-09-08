@@ -1,5 +1,0 @@
-EXIT=0
-
-00:00 +0: loading C:/dev/Momentum/src/client/test/g14_dikey_donus_kapisi_test.dart
-00:00 +0: IS-EMRI-o72 -- silme ikonu `sabitler` KALDIRACI (M-o72-2, M77b-sinifi) 370dp + 1.0x + gonderilmemis + onSil VAR ⇒ DIKEY (kaldirac, D4 urun yolu)
-00:00 +1: All tests passed!

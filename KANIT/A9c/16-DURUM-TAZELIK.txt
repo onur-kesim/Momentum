@@ -1,9 +1,0 @@
-﻿=== KRITER 16 -- DURUM.md SURUM ve IDDIA TAZELIGI ===
---- ayak 1: findstr /C:"1.2.0" DURUM.md (EXIT 1 BEKLENIR) ---
-EXIT=1
---- ayak 2: findstr /C:"1.3.0" DURUM.md (EXIT 0 BEKLENIR) ---
-| **İstemci (Flutter)** | 🟢 **slice-3b→3e + R9/R10 + A7/A8/A9 BİTTİ — senkron ÇİFT YÖNLÜ + gerçek zamanlı sinyal.** Drift çevrimdışı CRUD · itme kuyruğu · çekme (`UzakAlanDurumu` v4 + yerel LWW + `hasMore` + snapshot/artımlı) · rozet **kuyruktan türetiliyor** · SignalR-JSON sinyali (web'de `kIsWeb` ile KAPALI). Kapılar **spec-yereldir** (K108; envanter `GOREV_CLAUDE_CODE/`'da ÖLÇÜLÜR) + `design-token-kapisi.py` + `iddia-kapisi.py` **1.3.0**. Ölçülen mutantlar: **`M1`–`M108`** (dilim dilim) + A9b'nin **14** kanıtı; `M119` ISIRIYOR (vaka 27, `A9c/D8`). Son koşumlar **Cowork'ün kendisi** (K26): `flutter test` **481/481** (A10 ile 476→481) · `analyze --fatal-infos` **0** · **release APK derlendi** (bu depoda ilk kez, K106). 🔴 A‑7 `DESIGN.md`'de kapanmadı (K46). Tur tur anlatım **arşivde** (K73). |
-| `iddia-kapisi.py` **1.3.0** [A9c] | saf çekirdek (`kanit_topla`/`denetle`); kanıt eşlemesi **yalnız HAM dosya adından** (`I2`/`I3`), dairesel-kanıt filtresi ad-içi arar, envanter reddi (`LISTE_ESIGI=8`, iki yönlü pinli, `D8` ile **gerçekten** yük taşıyor); `I1` **satır-sha keyli, dosya-kapsamlı** muafiyet alabiliyor (`iddia-muafiyet.json`) | **27/27** |
-EXIT=0
---- ayak 3: findstr /C:"M119 ISIRMIYOR" DURUM.md (EXIT 1 BEKLENIR) ---
-EXIT=1

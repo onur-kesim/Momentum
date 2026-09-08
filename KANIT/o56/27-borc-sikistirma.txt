@@ -1,2 +1,0 @@
-PROJE_HAFIZA.md : 996155 b -> 998192 b (+2037)
-BORCLAR.md      : 32352 b -> 31923 b (-429)  pay 845 b

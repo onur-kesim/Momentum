@@ -1,5 +1,0 @@
-[00:17:54] ADIM 4 -- 60 saniyelik sessizlik olcumu basliyor (B cevrimdisi, kuyrukta 1 op)
-[00:17:54]   60sn ONCESI log boyutu: 10125 bayt
-[00:18:54]   60sn SONRASI log boyutu: 10125 bayt (fark=0)
-[00:18:54]   yeni satirlar:
-(YOK -- tam sessizlik)

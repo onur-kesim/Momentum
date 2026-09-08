@@ -1,7 +1,0 @@
-==== KANIT: araclar/verify.ps1 tam zincir (slice-2b1, Docker acik) ====
-Tarih: 2026-07-19
-1) build -warnaserror : 0 Uyari / 0 Hata
-2) test               : ArchitectureTests 4 + Api.Tests 9 + SyncCore 26 + Persistence 21 = 60
-                        slice-1: 13 | slice-2a: 26 | slice-2b1: 21 (H7b/H8x3/H12/H10/H11x4/round-trip x5/rollback/uuidv7/schema/model/endpoint x3)
-3) CVE gate           : 0 zafiyet (EF/Npgsql/FluentValidation/Testcontainers dahil)
-Sonuc: == VERIFY PASSED ==  SCRIPT_EXIT_CODE=0

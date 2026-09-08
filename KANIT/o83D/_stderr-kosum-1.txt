@@ -1,2 +1,0 @@
-[xUnit.net 00:00:42.72]     Momentum.Persistence.Tests.D9OwnerIdVisibilityTests.D9_outbox_owner_id_VE_actor_id_ikisi_de_artik_dogrulanan_aktorden_yazilir [FAIL]
-[xUnit.net 00:00:46.99]     Momentum.Persistence.Tests.DispatcherTests.Cursor_correctness_is_unaffected_by_concurrent_dispatch_single_owner [FAIL]

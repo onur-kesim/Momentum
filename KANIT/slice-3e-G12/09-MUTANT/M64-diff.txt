@@ -1,9 +1,0 @@
-M64 -- signalr_json_sinyal.dart -- el sikisma dalindaki "continue"yu kaldir (yanit mesaj gibi islensin)
-Hedef ayak: A8 (el sikisma yaniti MESAJ olarak islenmez -- "taninmayan" logu DUSMEMELI)
-
---- once ---
-            if (!elSikismaTamam.isCompleted) elSikismaTamam.complete();
-            continue; // bu parca el sikisma yanitiydi, mesaj DEGIL.
-
---- sonra ---
-            if (!elSikismaTamam.isCompleted) elSikismaTamam.complete();

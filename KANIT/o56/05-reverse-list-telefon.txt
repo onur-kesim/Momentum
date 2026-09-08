@@ -1,7 +1,0 @@
-== adb -s fba69c15 reverse tcp:5298 tcp:5298 ==
-5298
-== adb -s fba69c15 reverse --list ==
-UsbFfs tcp:5298 tcp:5298
-
-== adb -s emulator-5554 reverse --list (KONTROL: BOS OLMALI, reverse KURULMADI) ==
-

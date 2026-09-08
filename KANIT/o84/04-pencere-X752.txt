@@ -1,8 +1,0 @@
-
-=== ADAY PENCERE  B=100 · xid 90..599 · 510 satir ===
-  xid araligi: 90..599 (510 satir) · en buyuk xid 599 < X=752 mi: EVET
-  URUN   (ORDER BY commit_xid, server_seq)      tur=2 teslim=500  KAYIP=10   sira_dogru=False
-  DUZELT (ORDER BY o.commit_xid, o.server_seq)  tur=2 teslim=510  KAYIP=0    sira_dogru=True
-
-=== EMRIN ILK KURALI (oncesi=100, sonrasi=499, B=10^k) ===
-  B=1000 gerekiyordu -> B+499=1499 < X=752 SAGLANMIYOR -> pencere YOK (Claude Code hakli)

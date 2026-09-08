@@ -1,8 +1,0 @@
-==============================================================================
-HAFIZA DIZINI v1.1.0 — .\PROJE_HAFIZA.md
-  indekslenen checkpoint: 161 · dosya: 998192 bayt
-  DEGISIKLIK YOK -- dizin zaten guncel.
-  BEYAN EDILMIS SINIR: yalniz BASLIKLAR indekslenir; govde metni ARANMAZ
-  (tam metin icin grep/ripgrep). Satir no'lari dosyaya ELLE satir eklenirse
-  bayatlar -- araci yeniden kos.
-==============================================================================

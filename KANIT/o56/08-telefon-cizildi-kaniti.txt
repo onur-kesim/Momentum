@@ -1,6 +1,0 @@
-== telefon fba69c15: am start ciktisi ==
-Starting: Intent { cmp=com.momentum.client/.MainActivity }
-== telefon fba69c15: uiautomator dump (K86 -- 'dumped to' gorunene kadar yoklandi) ==
-UI hierchary dumped to: /sdcard/window_dump_a.xml
-== telefon fba69c15: dumpsys topResumedActivity ==
-    topResumedActivity=ActivityRecord{16638285 u0 com.momentum.client/.MainActivity t26}

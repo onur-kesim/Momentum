@@ -1,6 +1,0 @@
-==== KANIT: health readiness gate (ready->503, live->200) ====
-Tarih: 2026-07-18
-Sahte 'ready' etiketli Unhealthy check kaydedilince /health/ready 503, /health/live 200 kalir.
------------------------------------------------------------------
-Toplam 1 test dosyası belirtilen desenle eşleşti.
-Başarılı!  - Başarısız:     0, Başarılı:     2, Atlanan:     0, Toplam:     2, Süre: 305 ms - Momentum.Api.Tests.dll (net9.0)

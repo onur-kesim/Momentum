@@ -1,3 +1,0 @@
-[00:23:27] ADIM 6 -- B cevrimici yapiliyor
-[00:23:28]   svc wifi enable -> exit=0 out='' err=''
-[00:23:28]   svc data enable -> exit=0 out='' err=''

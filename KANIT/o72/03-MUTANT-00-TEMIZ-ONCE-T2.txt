@@ -1,5 +1,0 @@
-EXIT=0
-
-00:00 +0: loading C:/dev/Momentum/src/client/test/gorev_satiri_silme_test.dart
-00:00 +0: IS-EMRI-o72 -- GorevSatiri silme T2 -- onSil verili: ikon var; labeledTapTargetGuideline VE androidTapTargetGuideline gecer
-00:00 +1: All tests passed!

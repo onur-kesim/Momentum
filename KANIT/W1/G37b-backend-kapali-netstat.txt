@@ -1,6 +1,0 @@
-== netstat -ano | findstr :5298 (TAM CIKTI) ==
-  TCP    127.0.0.1:5298         127.0.0.1:57426        TIME_WAIT       0
-
-== LISTENING satir sayisi (asil olcum) ==
-0
-HUKUM: BACKEND KAPANDI (LISTENING satiri 0)

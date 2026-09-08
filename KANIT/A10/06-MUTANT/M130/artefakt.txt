@@ -1,6 +1,0 @@
-﻿artefakt: C:\dev\Momentum\src\client\android\app\src\main\AndroidManifest.xml
-SHA256 hash of C:\dev\Momentum\src\client\android\app\src\main\AndroidManifest.xml:
-af99be180109f673138eb5722f102161dc188597994bd9aa6956bf99c5761999
-CertUtil: -hashfile command completed successfully.
-EXIT=0
-degistirilme zamani: 2026-08-01T22:47:50.4121172+03:00

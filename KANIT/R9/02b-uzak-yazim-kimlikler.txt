@@ -1,6 +1,0 @@
-opId=019fa9c0-0001-739c-9d18-aed7eebcbd00
-entityId=c00a580d-6943-4eeb-9701-afb418152d5e
-actorId=3e966072-284f-42b9-bd36-aaeb307aab72
-uzakClientId=d581b5ac-2334-4c17-9e71-aed020758aea
-baslik=R9 DUZELTME KANITI - senkronize ile dogmali
-wallMs=1785259360257

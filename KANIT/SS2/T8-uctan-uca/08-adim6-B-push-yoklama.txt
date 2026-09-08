@@ -1,7 +1,0 @@
-[00:23:56] YOKLAMA basladi: B nin YENI B1 opu (019ff7d5...) postgrese ULASTI mi (aralik=3s, tavan=30 deneme)
-[00:23:56]   [deneme 1/30, 0.3sn] ''
-[00:23:59]   [deneme 2/30, 3.6sn] ''
-[00:24:03]   [deneme 3/30, 6.9sn] ''
-[00:24:06]   [deneme 4/30, 10.2sn] ''
-[00:24:09]   [deneme 5/30, 13.5sn] '019ff7d5-352e-7518-8e9a-23b128d3f247 | Applied     | 2026-08-12 21:24:06.499151+00'
-[00:24:09] YOKLAMA GECTI: B nin YENI B1 opu (019ff7d5...) postgrese ULASTI mi (13.5 sn'de)

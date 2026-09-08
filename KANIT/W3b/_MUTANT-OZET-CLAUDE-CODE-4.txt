@@ -1,4 +1,0 @@
-  M250   rc=3   (ORTAM HATASI/OLCULEMEDI) ozdes=True -- beklenen: ORTAM HATASI bekleniyor (exit 3), G49/b pozitif kontrol dusmeli
-  M253   rc=2   (KIRMIZI) ozdes=True -- beklenen: G50/c KIRMIZI bekleniyor
-  M256   rc=3   (ORTAM HATASI/OLCULEMEDI) ozdes=True -- beklenen: ORTAM HATASI bekleniyor (exit 3), G50/f
-  M262   rc=3   (ORTAM HATASI/OLCULEMEDI) ozdes=True -- beklenen: ORTAM HATASI bekleniyor (exit != 0), G51/d

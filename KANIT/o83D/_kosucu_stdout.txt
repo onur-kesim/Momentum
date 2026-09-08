@@ -1,4 +1,0 @@
-=== KOSUM 1/3 ===
-dotnet test C:\dev\Momentum\tests\Momentum.Persistence.Tests\Momentum.Persistence.Tests.csproj --logger trx;LogFileName=kosum-1.trx --results-directory C:\dev\Momentum\KANIT\o83D\trx
-dotnet test exit=1  hedef test=Momentum.Persistence.Tests.DispatcherTests.Cursor_correctness_is_unaffected_by_concurrent_dispatch_single_owner  outcome=Failed
-DUSTU -- kosum 1/3 -- DUR

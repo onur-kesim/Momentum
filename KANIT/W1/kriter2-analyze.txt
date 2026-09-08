@@ -1,3 +1,0 @@
-Analyzing client...                                             
-No issues found! (ran in 24.8s)
-EXIT=0

@@ -1,6 +1,0 @@
-[00:39:02] §6 SOKME basliyor
-[00:39:02]   kayitli backend PID=700 -- Stop-Process deneniyor
-[00:39:04]   taskkill /PID 700 /T /F -> exit=0 out='SUCCESS: The process with PID 20848 (child process of PID 700) has been terminated.\nSUCCESS: The process with PID 700 (child process of PID 4820) has been terminated.' err=''
-[00:39:04] YOKLAMA basladi: netstat :5298 -- LISTENING satiri YOK (TIME_WAIT kalintisi KABUL) (aralik=2s, tavan=15 deneme)
-[00:39:05]   [deneme 1/15, 1.1sn] ('', [])
-[00:39:05] YOKLAMA GECTI: netstat :5298 -- LISTENING satiri YOK (TIME_WAIT kalintisi KABUL) (1.1 sn'de)

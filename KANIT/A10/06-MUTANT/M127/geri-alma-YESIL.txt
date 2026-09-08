@@ -1,7 +1,0 @@
-﻿=== G18/b (geri alma sonrasi) -- networkSecurityConfig (YOK olmali) ===
-    package="com.momentum.client"
-EXIT=0
-EXIT=1
-
-=== G18/e (geri alma sonrasi) -- res/xml/*network_security_config* (0 olmali) ===
-eslesen: 0

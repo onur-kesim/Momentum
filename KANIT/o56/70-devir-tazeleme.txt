@@ -1,5 +1,0 @@
-  yama 1: TUTTU
-  yama 2: TUTTU
-  yama 3: TUTTU
-  yama 4: TUTTU
-DEVIR-oturum-56.md : 5456 b -> 5722 b (+266)

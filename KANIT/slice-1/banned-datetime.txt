@@ -1,8 +1,0 @@
-==== D11 KANIT: BannedApiAnalyzers - DateTime.UtcNow uretimde build'i KIRAR ====
-Tarih: 2026-07-18
-Mutant: PingQueryHandler.Handle icine '_ = System.DateTime.UtcNow;' eklendi.
-Beklenen: RS0030 (banned symbol) + TreatWarningsAsErrors => derleme HATASI. Ciktisi:
------------------------------------------------------------------
-C:\Users\gulci\Desktop\MEMO ÖDEV PROGRAMLAR\TO DO LİST\Momentum\src\backend\Momentum.Application\Features\Diagnostics\Ping\PingQueryHandler.cs(15,13): error RS0030: 'DateTime.UtcNow' sembolü bu : Use TimeProvider.GetUtcNow() instead (ADR 0001 K-C5). projesinde yasaklı (https://github.com/dotnet/roslyn/blob/main/src/RoslynAnalyzers/Microsoft.CodeAnalysis.BannedApiAnalyzers/BannedApiAnalyzers.Help.md) [C:\Users\gulci\Desktop\MEMO ÖDEV PROGRAMLAR\TO DO LİST\Momentum\src\backend\Momentum.Application\Momentum.Application.csproj]
-C:\Users\gulci\Desktop\MEMO ÖDEV PROGRAMLAR\TO DO LİST\Momentum\src\backend\Momentum.Application\Features\Diagnostics\Ping\PingQueryHandler.cs(15,13): error RS0030: 'DateTime.UtcNow' sembolü bu : Use TimeProvider.GetUtcNow() instead (ADR 0001 K-C5). projesinde yasaklı (https://github.com/dotnet/roslyn/blob/main/src/RoslynAnalyzers/Microsoft.CodeAnalysis.BannedApiAnalyzers/BannedApiAnalyzers.Help.md) [C:\Users\gulci\Desktop\MEMO ÖDEV PROGRAMLAR\TO DO LİST\Momentum\src\backend\Momentum.Application\Momentum.Application.csproj]
-    1 Hata

@@ -1,4 +1,0 @@
-﻿=== G21/b -- yukleVeyaOlustur( cagrisi (0 eslesme BEKLENIR) ===
-113:  // [MUTANT M132] eski baga (ikinci yukleVeyaOlustur() sonucu) donduruldu
-114:  final eskiAyarlar = await ayarlarDeposu.yukleVeyaOlustur();
-EXIT=0

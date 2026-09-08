@@ -1,4 +1,0 @@
-opId=019fa963-16ea-72c1-b911-cd0db72dd59a
-entityId=d9eeffdc-a2f0-4341-9119-ea8a58912d07
-baslik=SOGUK ACILIS KANITI 35
-http=200

@@ -1,7 +1,0 @@
-==============================================================================
-EKRAN: emulator-5554    (5 dugum)
-  [ FrameLayout][ ] text='' desc='' id=content [0,0][1080,2274]
-  [CButton][ ] text='' desc='Back' id= [11,147][143,279]
-  [ View][ ] text='' desc='Çakışma var' id= [198,175][503,252]
-  [ View][ ] text='' desc='Çakışan bir değişiklik bulunamadı.' id= [196,1249][884,1315]
-  [ View][ ] text='' desc='' id=navigationBarBackground [0,2274][1080,2340]

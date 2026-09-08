@@ -1,2 +1,0 @@
-﻿=== G21/b (geri alma sonrasi) -- yukleVeyaOlustur( cagrisi (0 eslesme BEKLENIR) ===
-EXIT=1

@@ -1,3 +1,0 @@
-PROJE_HAFIZA.md : 988206 b -> 993113 b  (fark +4907)
-ARSIVLENEN BLOK : 3
-BORCLAR.md      : 31911 b -> 31437 b  (fark -474)

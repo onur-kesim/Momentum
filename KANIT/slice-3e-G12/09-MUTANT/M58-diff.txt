@@ -1,8 +1,0 @@
-M58 -- signalr_json_sinyal.dart -- "target == 'Changed'" kosulunu "true" yap
-Hedef ayak: A2 (type1 ama target != Changed -- olay YOK, gunlukYaz cagrilir)
-
---- once (satir ~285) ---
-        if (mesaj['target'] == 'Changed') {
-
---- sonra ---
-        if (true) {

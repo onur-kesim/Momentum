@@ -1,2 +1,0 @@
-cikti komutu: git --no-optional-locks diff --stat c50796f -- src
-cikti uzunlugu (satir): 1

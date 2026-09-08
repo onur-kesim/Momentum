@@ -1,5 +1,0 @@
-﻿=== G17/0 karsilastirma: bu FINAL surumun release manifest sha256'si (mutant tabani icin) ===
-SHA256 hash of build\app\intermediates\merged_manifests\release\processReleaseManifest\AndroidManifest.xml:
-e6516ba0e994d211ece32925232199e09304744a1354006cf73a28f90f70b20a
-CertUtil: -hashfile command completed successfully.
-EXIT=0

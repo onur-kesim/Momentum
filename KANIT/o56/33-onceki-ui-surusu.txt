@@ -1,6 +1,0 @@
-A7\07-CIHAZ\CM-OLCUM.txt:109: 4) adb shell input tap 324 1328  (bilesik satirin cakisma rozetinin MERKEZI)
-cevrimdisi-senkron\A11-KABUL-7-OZET.md:29: iki `input tap`/`input text`/`input tap`) bu koşumda güvenilmez davrandı — muhtemelen
-cevrimdisi-senkron\A11-KABUL-7-OZET.md:29: iki `input tap`/`input text`/`input tap`) bu koşumda güvenilmez davrandı — muhtemelen
-ucuncu-cihaz-senkron\01-OLCUM-OZETI.md:53: - 🔴 **`adb shell input text` uzun metni KESTİ:** `O48-SENKRON-KANITI-A` → **`O48-SENKRON-K`**.
----
-TARANAN_DOSYA=1045  BULGU=4

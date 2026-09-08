@@ -1,5 +1,0 @@
-MUTANT M3 -- DurumVitrini.build() icine "Builder(builder: (_) => throw StateError('mutant'))" eklendi.
-Hot restart sonrasi get_runtime_errors:
-  "The following StateError was thrown building Builder(dirty): Bad state: mutant"
-  errorsSinceReload: 0, kaynak: durum_vitrini.dart:47
-HUKUM: ISIRDI (beklenen kirmizi: get_runtime_errors DOLU). Mutant geri alindi, hot restart ile temiz durum dogrulandi.

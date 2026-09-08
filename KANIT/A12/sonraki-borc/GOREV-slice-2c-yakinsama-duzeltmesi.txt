@@ -1,9 +1,0 @@
-==========================================================================
-SPEC KAPI KAPSAMA -- GOREV_CLAUDE_CODE/GOREV-slice-2c-yakinsama-duzeltmesi.md
-==========================================================================
-[S0] BICIM: ?5'te hic '### G<n>' kapi basligi yok
---------------------------------------------------------------------------
-BEYAN EDILMIS SINIR: bu betik mutantin GERCEKTEN ISIRDIGINI olcmez;
-esdeger-mutant tespiti calisan kod ister. Yalnizca KAPSAMA olculur.
-==========================================================================
-EXIT=3

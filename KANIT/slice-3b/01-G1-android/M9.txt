@@ -1,5 +1,0 @@
-MUTANT M9 -- main.dart'tan enableFlutterDriverExtension() cagrisi kaldirildi (hot restart ile uygulandi).
-flutter_driver_command -> screenshot sonucu:
-  HATA: 'ext.flutter.driver: (-32601) Unknown method "ext.flutter.driver".'
-HUKUM: ISIRDI (beklenen kirmizi: screenshot basarisiz -- VM service extension'i hic kayitli degil).
-Mutant geri alindi, hot restart ile screenshot yeniden basarili oldugu dogrulandi.

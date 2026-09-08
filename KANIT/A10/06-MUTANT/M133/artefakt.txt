@@ -1,6 +1,0 @@
-﻿artefakt: C:\dev\Momentum\src\client\lib\veri\ayarlari_hazirla.dart
-SHA256 hash of C:\dev\Momentum\src\client\lib\veri\ayarlari_hazirla.dart:
-312fc23857aee1c34dc50d3d30c40478c65b15999550c725d622494603c3d9ea
-CertUtil: -hashfile command completed successfully.
-EXIT=0
-degistirilme zamani: 2026-08-01T22:42:01.0098073+03:00

@@ -1,6 +1,0 @@
-== emulator-5554: am start ciktisi ==
-Starting: Intent { cmp=com.momentum.client/.MainActivity }
-== emulator-5554: uiautomator dump (K86 -- 'dumped to' gorunene kadar yoklandi) ==
-UI hierchary dumped to: /sdcard/window_dump_b.xml
-== emulator-5554: dumpsys topResumedActivity ==
-    topResumedActivity=ActivityRecord{147bb1f u0 com.momentum.client/.MainActivity t47}

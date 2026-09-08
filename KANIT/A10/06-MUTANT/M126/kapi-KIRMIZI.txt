@@ -1,4 +1,0 @@
-﻿=== G18/a -- debug manifest networkSecurityConfig (VAR BEKLENIR -- silindigi icin artik BULUNMAMALI) ===
-    package="com.momentum.client"
-EXIT=0
-EXIT=1

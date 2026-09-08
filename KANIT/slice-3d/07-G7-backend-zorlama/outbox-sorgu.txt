@@ -1,5 +1,0 @@
-SELECT owner_id, actor_id FROM outbox_messages WHERE operation_id = @op (op=019ffc54-b4d2-76f6-8158-4b45f9d2b13f)
-actorX (kimlik dogrulama basligi) = 870dd5e8-445f-4e74-8d1d-3802a9596ea2
-actorY (govdenin actorId iddiasi) = 9165e719-b8c9-41ea-9b21-897b3a607c3a
-owner_id  = 870dd5e8-445f-4e74-8d1d-3802a9596ea2  (beklenen: actorX)
-actor_id  = 9165e719-b8c9-41ea-9b21-897b3a607c3a  (beklenen: actorY -- D9 BEYAN, degismez)

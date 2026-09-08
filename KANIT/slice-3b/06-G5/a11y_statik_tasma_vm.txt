@@ -1,3 +1,0 @@
-﻿00:00 +0: loading C:/dev/Momentum/src/client/test/a11y_statik_tasma_test.dart
-00:00 +0: lib/sunum ve lib/vitrin altindaki her Text( cagrisi korunakli (overflow/maxLines)
-00:00 +1: All tests passed!

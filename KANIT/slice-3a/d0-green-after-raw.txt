@@ -1,5 +1,0 @@
-Test run for C:\Users\gulci\Desktop\MEMO ÖDEV PROGRAMLAR\TO DO LİST\Momentum\tests\Momentum.Persistence.Tests\bin\Debug\net9.0\Momentum.Persistence.Tests.dll (.NETCoreApp,Version=v9.0)
-A total of 1 test files matched the specified pattern.
-Data collector 'Blame' message: All tests finished running, Sequence file will not be generated.
-
-Passed!  - Failed:     0, Passed:     3, Skipped:     0, Total:     3, Duration: 3 s - Momentum.Persistence.Tests.dll (net9.0)

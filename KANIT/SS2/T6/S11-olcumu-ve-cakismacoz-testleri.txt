@@ -1,7 +1,0 @@
-00:00 +0: loading C:/dev/Momentum/src/client/test/g34_cakismacoz_test.dart
-00:00 +0: S11 OLCUMU: ic ice transaction() savepoint'e duser -- disaridaki throw ICERIDEKI yazimi da geri alir
-00:00 +1: G34/d: benimkiniTut -- kuyruga 1 yeni op (HLC kazanandan buyuk) VE projeksiyon kaybedenDeger'e doner
-00:00 +2: G34/e: onlarinkiniAl -- kuyruga YENI OP GIRMEZ, projeksiyon DEGISMEZ, kayitlar silinir
-00:00 +3: G34/f: yazma ONCE, silme SONRA -- kayitlar SILINMEDEN ONCE okunur, sonuc bunu KANITLAR (M177)
-00:00 +4: All tests passed!
-EXIT=0

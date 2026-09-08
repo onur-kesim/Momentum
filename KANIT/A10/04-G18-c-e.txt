@@ -1,2 +1,0 @@
-﻿G18/c (debug apk, >=1 olmali): 1
-G18/e (release apk, 0 olmali): 0

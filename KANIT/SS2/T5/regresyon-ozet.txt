@@ -1,3 +1,0 @@
-00:34 +516: C:/dev/Momentum/src/client/test/yerel_yazma_itme_tetikleyicisi_test.dart: K112/c -- YANLIS-POZITIF: onYerelYazma null ise cokmez
-00:34 +517: C:/dev/Momentum/src/client/test/yerel_yazma_itme_tetikleyicisi_test.dart: K112/d -- BOS metin ne yazar ne tetikler
-00:35 +518: All tests passed!

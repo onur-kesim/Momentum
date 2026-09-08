@@ -1,7 +1,0 @@
-namespace Momentum.Domain;
-
-// [D10 MUTANT rule3] TEMPORARY: real dependency from Domain onto Microsoft.AspNetCore.*
-public sealed class ZzMutant
-{
-    public Microsoft.AspNetCore.Http.IResult? Result { get; set; }
-}

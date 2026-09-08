@@ -1,5 +1,0 @@
-[00:11:54] ADIM 4 -- B cevrimdisina aliniyor
-[00:11:55]   svc wifi disable -> exit=0 out='' err=''
-[00:11:55]   svc data disable -> exit=0 out='' err=''
-[00:11:57] NEGATIF olcum -- baglanti denemesi BASARISIZ donmeli
-[00:11:57]   nc -w 3 -q 1 10.0.2.2 5298 -> exit=1 (0.2sn) out='' err='nc: connect: Network is unreachable'

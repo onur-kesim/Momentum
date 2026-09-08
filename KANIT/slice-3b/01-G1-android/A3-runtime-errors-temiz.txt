@@ -1,2 +1,0 @@
-G1/A3 -- get_runtime_errors (temiz durum, DURUM_VITRINI=true, Android emulator-5554)
-Sonuc: "No runtime errors found."

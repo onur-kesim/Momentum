@@ -1,2 +1,0 @@
-[00:11:42] ADIM 4 -- B cevrimdisina alinmadan ONCE POZITIF baglanti kontrolu (duzeltilmis nc sozdizimi)
-[00:11:43]   nc -w 3 -q 1 10.0.2.2 5298 -> exit=0 (0.7sn) out='' err=''

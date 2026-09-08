@@ -1,8 +1,0 @@
-M73 -- signalr_json_sinyal.dart -- WS acilisindaki "headers:" argumanini kaldir
-Hedef ayak: Y4 (X-Momentum-Dev-User HEM negotiate'te HEM WS acilisinda gonderilmeli)
-
---- once ---
-  ) => IOWebSocketChannel.connect(url, headers: basliklar);
-
---- sonra ---
-  ) => IOWebSocketChannel.connect(url);

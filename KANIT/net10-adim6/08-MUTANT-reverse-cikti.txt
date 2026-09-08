@@ -1,8 +1,0 @@
-Izole mutant -- Momentum deposuna DOKUNULMADI (C:\dev\_o48_mutant).
-Kosan: Cowork (oturum 48, 2 Agu 2026). Iddia: A1'in CS0023'u SDK degil,
-net9 HEDEFI + C#14 kombinasyonundan doguyor.
-
-[net9.0 + LangVersion=latest (C#14)] EXIT=1   -> C:\dev\_o48_mutant\Program.cs(2,20): error CS0023: '.' işleci 'void' türündeki işlenene uygulanamaz [C:\dev\_o48_mutant\m.csproj]
-[net9.0 + LangVersion=13        ] EXIT=0   -> DERLENDI
-[net10.0 + LangVersion=latest    ] EXIT=0   -> DERLENDI
-BITTI

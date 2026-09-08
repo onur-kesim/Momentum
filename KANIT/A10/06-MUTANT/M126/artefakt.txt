@@ -1,7 +1,0 @@
-﻿artefakt: C:\dev\Momentum\src\client\build\app\intermediates\merged_manifests\debug\processDebugManifest\AndroidManifest.xml
-SHA256 hash of build\app\intermediates\merged_manifests\debug\processDebugManifest\AndroidManifest.xml:
-244880b99018d170b1187627e3b3d5430ed17246774668fc2e2fec1830f56568
-CertUtil: -hashfile command completed successfully.
-EXIT=0
-degistirilme zamani: 2026-08-01T22:51:29.9187801+03:00
-baseline (mutantsiz) sha8 icin bkz KANIT/A10/04-G18-a.txt olcumu -- FARKLI, rebuild GERCEK
