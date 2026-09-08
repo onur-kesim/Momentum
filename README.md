@@ -105,8 +105,11 @@ mutantla** kanıtlandı (`KANIT/o71/16-pages-demo/01-mutant-kosumlari.txt`).
 
 ## Depo haritası — nereden başlamalı
 
-🔴 **Bu depo alışılmadık bir bileşim taşır ve bu bilinçlidir.** İzlenen dosyaların **%75'i**
-(1.622 / 2.170) ürün kodu değil, **ölçüm kanıtıdır**. Ne aradığınıza göre:
+🔴 **Bu depo alışılmadık bir bileşim taşır ve bu bilinçlidir.** İzlenen 695 dosyanın **145'i
+(%20,9)** ürün kodu değil, **ölçüm kanıtıdır**: dilim özetleri, kabul hükümleri, mutant
+sonuçları — düşmüş denetimler dahil. Ham koşum logları ve dökümler 8 Eyl 2026'da ağaçtan
+çıkarıldı (**silinmedi**, git tarihçesinde duruyor — erişim: [`KANIT/INDEX.md`](KANIT/INDEX.md)).
+Ne aradığınıza göre:
 
 | ne arıyorsanız | nereye bakın |
 |---|---|
@@ -115,14 +118,18 @@ mutantla** kanıtlandı (`KANIT/o71/16-pages-demo/01-mutant-kosumlari.txt`).
 | **Mimari kararlar** | [`docs/ADR/`](docs/ADR/) |
 | **Kapsam otoritesi** | [`docs/ODEV.md`](docs/ODEV.md) — neyin istendiği; kesilenler [Kapsam dışı](#kapsam-dışı--teslim-beyanı) |
 | **Ölçüm araçları** | `araclar/` — CI'nın koştuğu `verify.ps1` + bağımlılık/yayın araçları; oturum kapıları `arsiv/araclar/` altına alındı (14 Ağu 2026) |
-| **Ham ölçüm kanıtları** | `KANIT/` — **1.622 izlenen dosya, 27,9 MiB** (`daa435d`'de sayıldı, 6 Eyl 2026) |
+| **Ölçüm kanıtları** | `KANIT/` — **145 dosya, 1,2 MB** dilim özeti (`1f602c6`'da sayıldı, 8 Eyl 2026). Ham log ve dökümler ağaçta değil, erişim [`KANIT/INDEX.md`](KANIT/INDEX.md) |
 | **Dış inceleme brifingi** | [`docs/BRIFING.md`](docs/BRIFING.md) — kodu inceleyecek yazılımcı **buradan başlasın** |
 | **Esaslar ve durum** | `CLAUDE.md` (tek talimat dosyası) · `DURUM.md` (canlı durum) · süreç tarihçesi `arsiv/` |
 
-**`KANIT/` nedir:** her kabul hükmünün, her düşmüş denetimin ve her mutant koşumunun **ham
-çıktısı**. Dosya adları arasında `…-DENETIMDE-DUSTU…`, `…-KILITLENEMEDI…` gibi kayıtlar görürsünüz —
-bunlar **temizlenmemiştir ve bilerek durmaktadır**: bir spec'in üç kez düşmesi, bu deponun
-gizlediği değil **belgelediği** bir olgudur.
+**`KANIT/` nedir:** her kabul hükmünün, her düşmüş denetimin ve her mutant koşumunun **özeti**.
+Dosya adları arasında `…-DENETIMDE-DUSTU…`, `…-KILITLENEMEDI…` gibi kayıtlar görürsünüz — bunlar
+**temizlenmemiştir ve bilerek durmaktadır**: bir spec'in üç kez düşmesi, bu deponun gizlediği
+değil **belgelediği** bir olgudur.
+
+Özetlerin içinde `03-mutant-kosumlari.txt` gibi ham dosya adları geçer. O dosyalar **vardır** —
+ağaçta değil, `964603d` commit'inde. `git show 964603d:<yol>` ile okunur; ayrıntı
+[`KANIT/INDEX.md`](KANIT/INDEX.md). Kırık başvuru değil, **arşivlenmiş** başvurudur.
 
 ---
 

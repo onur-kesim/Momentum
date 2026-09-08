@@ -62,8 +62,10 @@ Gerçek zamanlı kanal **veri taşımaz**, yalnız "çek" der.
   öldürülür. Örnek: Pages demosunun CDN kapısı **beş mutantla** doğrulandı.
 - **Üreten ≠ denetleyen.** Hiçbir çıktı kendi üreticisi tarafından kabul edilmez.
 - **Düşmüş denetimler silinmez.** `KANIT/` altında `…-DENETIMDE-DUSTU…`, `…-KILITLENEMEDI…`
-  dosyaları **bilerek durur**. İzlenen 2.170 dosyanın **1.622'si** (%75, 27,9 MiB) ürün kodu değil,
-  ham ölçüm kanıtıdır.
+  dosyaları **bilerek durur**. İzlenen 695 dosyanın **145'i** (%20,9 · 1,2 MB) ürün kodu değil,
+  dilim başına ölçüm özetidir (`1f602c6`'da sayıldı, 8 Eyl 2026). Ham koşum logları ve dökümler
+  aynı gün ağaçtan çıkarıldı — **silinmedi**, `964603d` commit'inde duruyor; nasıl okunacağı
+  `KANIT/INDEX.md`'de yazılı.
 
 Bu disiplinin işe yaradığı ölçülmüş bir örnek: dört oturum boyunca "flake" sanılan bir kusur,
 `SyncPuller`de gölgelenmiş bir `ORDER BY` çıktı — basamak sınırında satırlar **sessizce

@@ -214,7 +214,13 @@ Kurulumda "bilinmeyen kaynak" onayı isteyecektir. Gözden kaçma değil, **yaz�
 `README.md` — zorunlu şartlar, ölçülmüş sınırlar, beyan edilmiş kısıtlar · `docs/ODEV.md` — kapsam
 otoritesi · `docs/ADR/` — karar kayıtları · `src/backend/` dört katman (Domain · Application ·
 Infrastructure · Api), testler `tests/` altında · `src/client/lib/` — sunum · vitrin · veri ayrımı ·
-`KANIT/` — **1622** izlenen dosya, ham ölçüm; **düşmüş denetimler dahil, temizlenmemiş**.
+`KANIT/` — v1.1.0 etiketinde **1622** izlenen dosya, ham ölçüm; **düşmüş denetimler dahil,
+temizlenmemiş**.
+
+> **8 Eyl 2026 eki (sürüm notu geriye yazılmaz, üstüne not düşülür):** ham koşum logları ve
+> dökümler `1f602c6` ile ağaçtan çıkarıldı — KANIT **145 dosya / 1,2 MB**'a indi. Hiçbir dosya
+> silinmedi; hepsi `964603d` commit'inde duruyor, erişim yolu `KANIT/INDEX.md`. Yukarıdaki 1622,
+> `v1.1.0` etiketinin gösterdiği sayıdır ve o hâliyle doğrudur.
 
 ---
 

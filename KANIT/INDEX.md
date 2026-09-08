@@ -16,8 +16,10 @@ bunların çoğu ham logdu. Kanıtın kendisi değerlidir, ama yeri yanlıştı:
 
 | | önce | sonra |
 |---|---|---|
-| KANIT'ta izlenen dosya | 1.622 | **144** |
-| Bunun ürün+belge içindeki payı | %75 | **%10** |
+| KANIT'ta izlenen dosya | 1.622 | **145** |
+| İzlenen toplam dosya | 2.172 | **695** |
+| KANIT'ın payı | %75 | **%20,9** |
+| KANIT'ın diskteki boyutu | 27,9 MB | **1,2 MB** |
 
 **Ham kanıtın son bulunduğu commit: `964603d`.** O commit ve öncesi hiç değişmedi.
 
