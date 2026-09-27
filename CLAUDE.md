@@ -35,7 +35,7 @@ orkestrasyon · hafıza yapar, **kod yazmaz**.
 
 🔒 **ARŞİV — 27 Eyl 2026: KAPANDI, yayın kararı YOK.** Dış inceleme **tam not** verdi.
 `v1.1.0` (6 Eyl) · etiket `22fa0b2` · üç kapı yeşil · **AÇIK DİLİM YOK.**
-🔴 Devam için arşiv kökündeki **`00_ARSIV_DEVIR.md`**: açık gedikler (**G-1 hız sınırı YOK,
+🔴 Devam için depo kökündeki **`00_ARSIV_DEVIR.md`**: açık gedikler (**G-1 hız sınırı YOK,
 YÜKSEK**), G-5'in **yanlış pozitif** olduğu ve ne ölçülmediği orada.
 🔴 **ADR/spec YAZILMAZ** (İŞLEYİŞ md.4): kimliği bir kez **altı kâğıt kapı turu öldürdü, 30 gün**
 (ÖDEV §6.1). Hatırlatıcı 4 Eyl, **tekrar** 5 Eyl kesildi; kesme sırası TÜKENDİ.
