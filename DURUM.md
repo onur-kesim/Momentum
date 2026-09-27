@@ -1,6 +1,6 @@
 # DURUM.md — Momentum
 
-**BİTTİ: 13/13 · kutu 9 Eyl · DİLİM 3 BİTTİ (§F 9/9) · `v1.1.0` TESLİM EDİLDİ (6 Eyl), release yayında ve `latest`.**
+**ARŞİV 27 Eyl 2026 — KAPANDI, yayın kararı YOK. Dış inceleme tam not. `v1.1.0` `latest`. Bulgular: `00_ARSIV_DEVIR.md`.**
 
 > Açılış ≤3 komut: ① `git --no-optional-locks log --oneline -1` + `status --porcelain -- src`
 > ② bu dosya ③ CI durumu — **cihaz Chrome'undan** (bulut tarayıcısı kanıt değil). `arsiv/` AÇILMAZ.

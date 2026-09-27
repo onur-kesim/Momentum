@@ -33,10 +33,10 @@ orkestrasyon · hafıza yapar, **kod yazmaz**.
 
 ## 3. SIRADAKİ İŞ (tek dikey dilim)
 
-🟢 **TESLİM EDİLDİ — `v1.1.0`, 6 Eyl 2026.** DİLİM 3 (işbirliği) §F vitrininde **9/9**
-(`KANIT/o86F`). Release yayında ve `latest`; etiket **`22fa0b2`**, üç kapı (`ci #85` · `paket #18` ·
-`pages #17`) **aynı sha'da yeşil**; yayınlanan APK indirilip **sha256 + `aapt dump badging`** ile
-doğrulandı (`1.1.0`/`2`). **AÇIK DİLİM YOK.**
+🔒 **ARŞİV — 27 Eyl 2026: KAPANDI, yayın kararı YOK.** Dış inceleme **tam not** verdi.
+`v1.1.0` (6 Eyl) · etiket `22fa0b2` · üç kapı yeşil · **AÇIK DİLİM YOK.**
+🔴 Devam için arşiv kökündeki **`00_ARSIV_DEVIR.md`**: açık gedikler (**G-1 hız sınırı YOK,
+YÜKSEK**), G-5'in **yanlış pozitif** olduğu ve ne ölçülmediği orada.
 🔴 **ADR/spec YAZILMAZ** (İŞLEYİŞ md.4): kimliği bir kez **altı kâğıt kapı turu öldürdü, 30 gün**
 (ÖDEV §6.1). Hatırlatıcı 4 Eyl, **tekrar** 5 Eyl kesildi; kesme sırası TÜKENDİ.
 
